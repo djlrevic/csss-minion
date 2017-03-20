@@ -1,4 +1,4 @@
-# py -m install pip -U __
+# py -m pip install -U __
 import discord
 # import sympy
 from discord.ext import commands
@@ -72,7 +72,6 @@ async def newclass(ctx, course):
        
 @bot.command()
 async def wolf(query : str):
-    bot.
     res = wClient.query(query)
     try:
         await bot.say("```"+(next(res.results).text)+"```")
