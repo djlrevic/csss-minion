@@ -78,4 +78,9 @@ async def wolf(query : str):
     except AttributeError:
         await bot.say("I ain't found shit.")
 
+@bot.command()
+async def vote():
+    await bot.say(
+    """```The voting period for the Computing Science Student Society General Elections for the 2017-2018 term begins on Monday March 20th, 2017 at 11:59 PM and closes on Monday March 27th, 2017 at 11:59 PM.\n\nVisit https://www.sfu.ca/~pjalali/speeches.html to view candidate speeches, and http://websurvey.sfu.ca/survey/273372327 to vote.```""")
+
 bot.run(token)
