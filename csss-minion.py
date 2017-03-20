@@ -1,7 +1,8 @@
+# py -m install pip -U __
 import discord
-import sympy
+# import sympy
 from discord.ext import commands
-from sympy import *
+# from sympy import *
 import wolframalpha
 
 description = 'Bot of the CSSS'
@@ -23,9 +24,9 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
-@bot.command()
-async def add(number1 : int, number2 : int):
-    await bot.say(number1+number2)
+# @bot.command()
+# async def add(number1 : int, number2 : int):
+#     await bot.say(number1+number2)
 
 @bot.command(pass_context = True)
 async def iam(ctx, course : str):
@@ -51,25 +52,31 @@ async def newclass(ctx, course):
         await bot.say("Class already exists")    
     else:
         # temp value
-        flag = True
+        # flag = True
         # temp value
 
-        # flag = False
-        # for i in range(0, len(ctx.message.author.roles)):
-        #     if ctx.message.author.roles[i].name == "Regular":
-        #         flag = True
+        flag = False
+        for i in range(0, len(ctx.message.author.roles)):
+            if ctx.message.author.roles[i].name == "Regular":
+                flag = True
         if flag == True:
             newRole = await bot.create_role(server, name = course, mentionable = True, hoist = True)
             await bot.add_roles(ctx.message.author, newRole)
             await bot.say(course+" class has been created. You have been placed in it.")
+        else:
+            await bot.say("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
 
-@bot.command()
-async def calc(equation : str):
-    await bot.say("``"+sympify+(equation)+"``")
+# @bot.command()
+# async def calc(equation : str):
+#     await bot.say("``"+sympify+(equation)+"``")
        
 @bot.command()
 async def wolf(query : str):
+    bot.
     res = wClient.query(query)
-    await bot.say("```"+(next(res.results).text)+"```")
+    try:
+        await bot.say("```"+(next(res.results).text)+"```")
+    except AttributeError:
+        await bot.say("I ain't found shit.")
 
 bot.run(token)
