@@ -52,15 +52,15 @@ async def newclass(ctx, course):
         await bot.say("Class already exists")    
     else:
         # temp value
-        # flag = True
+        flag = True
         # temp value
 
-        flag = False
-        for i in range(0, len(ctx.message.author.roles)):
-            if ctx.message.author.roles[i].name == "Regular":
-                flag = True
+        # flag = False
+        # for i in range(0, len(ctx.message.author.roles)):
+        #     if ctx.message.author.roles[i].name == "Regular":
+        #         flag = True
         if flag == True:
-            newRole = await bot.create_role(server, name = course, mentionable = True, hoist = True)
+            newRole = await bot.create_role(server, name = course, mentionable = True)# , hoist = True)
             await bot.add_roles(ctx.message.author, newRole)
             await bot.say(course+" class has been created. You have been placed in it.")
         else:
