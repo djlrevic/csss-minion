@@ -1,15 +1,18 @@
 import discord
+import sympy
 from discord.ext import commands
+from sympy import *
+import wolframalpha
 
 description = 'Bot of the CSSS'
 
 bot = commands.Bot(command_prefix='.', description=description)
+wolframid = 'J9E82A-53G2L78JKQ'
+wClient = wolframalpha.Client(wolframid)
 
 token = "***REMOVED***"
 DISCORD_API_ID = '***REMOVED***'
 
-# server = discord.utils.get(self.bot.guilds, id = DISCORD_API_ID)
-# channel = discord.utils.get(server.text_channels, id = DISCORD_API_ID)
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
 
@@ -59,5 +62,14 @@ async def newclass(ctx, course):
             newRole = await bot.create_role(server, name = course, mentionable = True, hoist = True)
             await bot.add_roles(ctx.message.author, newRole)
             await bot.say(course+" class has been created. You have been placed in it.")
+
+@bot.command()
+async def calc(equation : str):
+    await bot.say("``"+sympify+(equation)+"``")
        
+@bot.command()
+async def wolf(query : str):
+    res = wClient.query(query)
+    await bot.say("```"+(next(res.results).text)+"```")
+
 bot.run(token)
