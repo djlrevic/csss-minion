@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 # from sympy import *
 import wolframalpha
+from mcstatus import MinecraftServer
 
 description = 'Bot of the CSSS'
 
@@ -26,7 +27,6 @@ roles = server.roles
 async def on_ready():
     print('Logged in as')
     print(bot.user.name)
-    print(bot.user.id)
     print('------')
 
 # @bot.command()
@@ -93,12 +93,39 @@ async def help():
     await bot.say(
 
         """```I am the minion of the CSSS, here's what I can do:\n\n
-        .help               -   bring up this message\n
-        .newclass <class>   -   Start a new class group. Great for notifying everyone in that class ie. @macm316\n
-        .iam <class>        -   Place yourself in an existing class\n
-        .wolf <query>       -   Asks WolframAlpha a question! Make sure to wrap your entire question in quotation marks\n
-        .vote               -   Find voting details for the CSSS exec election!\n\nQuestions? @henrymzhao to find out more.```
+        .help               
+            -   bring up this message
+        .newclass <class>   
+            -   Start a new class group. Great for notifying everyone in that class
+        .iam <class>        
+            -   Place yourself in an existing class
+        .wolf <query>       
+            -   Asks WolframAlpha a question! 
+            -   Make sure to wrap your entire question in quotation marks
+        .vote               
+            -   Find voting details for the CSSS exec election!
+        
+Questions? @henrymzhao to find out more.
+        
+My code can be found here: https://github.com/henrymzhao/csss-minion```
         """
     )
+
+@bot.command(pass_context = True)
+async def status(ctx):
+    server = MinecraftServer.lookup("172.93.48.238:25565")
+    status = server.status()
+    query = server.query()
+    em = discord.Embed(title='CSSS FTB Server Status', description=
+    """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency) + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
+    await bot.send_message(ctx.message.channel, embed=em)
+
+@bot.command(pass_context = True)
+async def info(ctx):
+    em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
+Modpack: Direwolf20 v1.10.0
+Minecraft: 1.7.10
+Cracked: NO (working on it)""", colour=0x3D85C6)
+    await bot.send_message(ctx.message.channel, embed=em)
 
 bot.run(token)
