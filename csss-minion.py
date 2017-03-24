@@ -16,10 +16,15 @@ wClient = wolframalpha.Client(wolframid)
 
 bot.remove_command("help")
 
-with open("token.txt") as f:
-    for line in f:
-        DISCORD_API_ID = line
-        token = line
+try:
+    with open("token.txt") as f:
+        for line in f:
+            DISCORD_API_ID = line
+            token = line
+except FileNotFoundError as e:
+    DISCORD_API_ID = input('Discord API: ')
+    token = input('Token: ')
+
 
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
