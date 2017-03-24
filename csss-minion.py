@@ -11,8 +11,13 @@ bot = commands.Bot(command_prefix='.', description=description)
 wolframid = 'J9E82A-53G2L78JKQ'
 wClient = wolframalpha.Client(wolframid)
 
-token = "***REMOVED***"
-DISCORD_API_ID = '***REMOVED***'
+bot.remove_command("help")
+
+token = ""
+with open("token.txt") as f:
+    for line in f:
+        DISCORD_API_ID = line
+        token = line
 
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
@@ -82,5 +87,18 @@ async def wolf(query : str):
 async def vote():
     await bot.say(
     """```The voting period for the Computing Science Student Society General Elections for the 2017-2018 term begins on Monday March 20th, 2017 at 11:59 PM and closes on Monday March 27th, 2017 at 11:59 PM.\n\nVisit https://www.sfu.ca/~pjalali/speeches.html to view candidate speeches, and http://websurvey.sfu.ca/survey/273372327 to vote.```""")
+
+@bot.command()
+async def help():
+    await bot.say(
+
+        """```I am the minion of the CSSS, here's what I can do:\n\n
+        .help               -   bring up this message\n
+        .newclass <class>   -   Start a new class group. Great for notifying everyone in that class ie. @macm316\n
+        .iam <class>        -   Place yourself in an existing class\n
+        .wolf <query>       -   Asks WolframAlpha a question! Make sure to wrap your entire question in quotation marks\n
+        .vote               -   Find voting details for the CSSS exec election!\n\nQuestions? @henrymzhao to find out more.```
+        """
+    )
 
 bot.run(token)
