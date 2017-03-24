@@ -6,7 +6,6 @@ from discord.ext import commands
 import wolframalpha
 from mcstatus import MinecraftServer
 import datetime
-import random
 
 description = 'Bot of the CSSS'
 
