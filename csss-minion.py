@@ -5,6 +5,8 @@ from discord.ext import commands
 # from sympy import *
 import wolframalpha
 from mcstatus import MinecraftServer
+import datetime
+import random
 
 description = 'Bot of the CSSS'
 
@@ -14,7 +16,6 @@ wClient = wolframalpha.Client(wolframid)
 
 bot.remove_command("help")
 
-token = ""
 with open("token.txt") as f:
     for line in f:
         DISCORD_API_ID = line
@@ -85,47 +86,79 @@ async def wolf(query : str):
 
 @bot.command()
 async def vote():
-    await bot.say(
-    """```The voting period for the Computing Science Student Society General Elections for the 2017-2018 term begins on Monday March 20th, 2017 at 11:59 PM and closes on Monday March 27th, 2017 at 11:59 PM.\n\nVisit https://www.sfu.ca/~pjalali/speeches.html to view candidate speeches, and http://websurvey.sfu.ca/survey/273372327 to vote.```""")
+    embed = discord.Embed(colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
 
-@bot.command()
-async def help():
-    await bot.say(
+    embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+    embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+    embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
 
-        """```I am the minion of the CSSS, here's what I can do:\n\n
-        .help               
-            -   bring up this message
-        .newclass <class>   
-            -   Start a new class group. Great for notifying everyone in that class
-        .iam <class>        
-            -   Place yourself in an existing class
-        .wolf <query>       
-            -   Asks WolframAlpha a question! 
-            -   Make sure to wrap your entire question in quotation marks
-        .vote               
-            -   Find voting details for the CSSS exec election!
-        
-Questions? @henrymzhao to find out more.
-        
-My code can be found here: https://github.com/henrymzhao/csss-minion```
-        """
-    )
+    embed.add_field(name="CSSS Voting Information", value="The voting period for the Computing Science Student Society General Elections for the 2017-2018 term begins on Monday March 20th, 2017 at 11:59 PM and closes on Monday March 27th, 2017 at 11:59 PM. \n\nVisit https://www.sfu.ca/~pjalali/speeches.html to view candidate speeches, and http://websurvey.sfu.ca/survey/273372327 to vote.")
+
+    await bot.say(embed=embed)
+
+@bot.group(pass_context = True)
+async def help(ctx):
+
+    if ctx.invoked_subcommand is None:
+        embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+
+        embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+        embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+        embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+
+        embed.add_field(name=".help", value="Displays this help menu.")
+        embed.add_field(name=".newclass <class>", value="Start a new class group. Great for notifying everyone in that particular class.")
+        embed.add_field(name=".iam <class>", value="Places yourself in an existing class.")
+        embed.add_field(name=".wolf <query>", value="Asks WolframAlpha a question! Wrap your questions in \"quotes\"!")
+        embed.add_field(name=".vote", value="Find voting details for the CSSS Exec election!.")
+        embed.add_field(name=".help", value="Displays this help menu.")
+        embed.add_field(name=".help mc", value="Displays commands for the CSSS Minecraft server. Only usable within #minecraft")
+
+        await bot.say(embed=embed)
+
+@help.command(pass_context = True)
+async def mc(ctx):
+    if ctx.message.channel.name != "minecraft":
+        await bot.say("Please move to #minecraft for this command.")
+    else:
+        embed = discord.Embed(title="CSSS-Minion Minecraft Commands", colour=discord.Colour(
+            0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+        embed.set_thumbnail(
+            url="https://media-elerium.cursecdn.com/avatars/13/940/635581309636616244.png")
+        embed.set_author(
+            name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+        embed.set_footer(
+            text="CSSS-Minion", icon_url="https://s-media-cache-ak0.pinimg.com/originals/aa/65/70/aa657074a12fb0d961a1789c671b73e3.jpg")
+        embed.add_field(name=".help mc", value="Displays this help menu.\n")
+        embed.add_field(name=".status", value="Displays the current server status.\n")
+        embed.add_field(name=".info", value="Information about how to connect to server.\n")
+        await bot.say(embed=embed)
 
 @bot.command(pass_context = True)
 async def status(ctx):
-    server = MinecraftServer.lookup("172.93.48.238:25565")
-    status = server.status()
-    query = server.query()
-    em = discord.Embed(title='CSSS FTB Server Status', description=
-    """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency) + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
-    await bot.send_message(ctx.message.channel, embed=em)
+    if ctx.message.channel.name != "minecraft":
+        await bot.say("Please move to #minecraft for this command.")
+    else:    
+        server = MinecraftServer.lookup("172.93.48.238:25565")
+        try:
+            status = server.status()
+        except IOError as e:
+            bot.say("It's dead Jim.")
+        query = server.query()
+        em = discord.Embed(title='CSSS FTB Server Status', description=
+        """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency) + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
+        await bot.send_message(ctx.message.channel, embed=em)
 
 @bot.command(pass_context = True)
 async def info(ctx):
-    em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
-Modpack: Direwolf20 v1.10.0
-Minecraft: 1.7.10
-Cracked: NO (working on it)""", colour=0x3D85C6)
-    await bot.send_message(ctx.message.channel, embed=em)
+    if ctx.message.channel.name != "minecraft":
+        await bot.say("Please move to #minecraft for this command.")
+    else:    
+        em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
+    Modpack: Direwolf20 v1.10.0
+    Minecraft: 1.7.10
+    Cracked: NO (working on it)""", colour=0x3D85C6)
+        await bot.send_message(ctx.message.channel, embed=em)
+
 
 bot.run(token)
