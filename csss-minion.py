@@ -1,5 +1,6 @@
 # py -m pip install -U __
 import discord
+import os
 # import sympy
 from discord.ext import commands
 # from sympy import *
@@ -8,11 +9,16 @@ from mcstatus import MinecraftServer
 import datetime
 import configparser
 
-#Load the config file into vars for later use
+configFile = "botMain.settings"
 
+#check if config file exists
+if not os.path.isfile(configFile):
+    exit("Config file not found")
+    
+
+#Load the config file
 config = configparser.ConfigParser()
-config.read("botMain.settings")
-
+config.read(configFile)
 
 description = config.get("Discord","Description")
 
