@@ -6,6 +6,7 @@ from discord.ext import commands
 import wolframalpha
 from mcstatus import MinecraftServer
 import datetime
+import getpass
 
 description = 'Bot of the CSSS'
 
@@ -22,9 +23,9 @@ try:
             token = line
             ip = line
 except FileNotFoundError as e:
-    DISCORD_API_ID = input('Discord API: ')
-    token = input('Token: ')
-    ip = input('IP: ')
+    DISCORD_API_ID = getpass.getpass('Discord API: ')
+    token = getpass.getpass('Token: ')
+    ip = getpass.getpass('IP: ')
 
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
