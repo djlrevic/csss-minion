@@ -24,7 +24,6 @@ except FileNotFoundError as e:
     DISCORD_API_ID = input('Discord API: ')
     token = input('Token: ')
 
-
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
 
@@ -33,10 +32,6 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print('------')
-
-# @bot.command()
-# async def add(number1 : int, number2 : int):
-#     await bot.say(number1+number2)
 
 @bot.command(pass_context = True)
 async def iam(ctx, course : str):
@@ -117,6 +112,7 @@ async def help(ctx):
         embed.add_field(name=".vote", value="Find voting details for the CSSS Exec election!.")
         embed.add_field(name=".help", value="Displays this help menu.")
         embed.add_field(name=".help mc", value="Displays commands for the CSSS Minecraft server. Only usable within #minecraft")
+        embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
         await bot.say(embed=embed)
 
@@ -140,17 +136,18 @@ async def mc(ctx):
 
 @bot.command(pass_context = True)
 async def status(ctx):
-    if ctx.message.channel.name != "minecraft":
-        await bot.say("Please move to #minecraft for this command.")
-    else:    
+    # if ctx.message.channel.name != "minecraft":
+    #     await bot.say("Please move to #minecraft for this command.")
+    # else:    
         server = MinecraftServer.lookup("172.93.48.238:25565")
         try:
             status = server.status()
         except IOError as e:
             bot.say("It's dead Jim.")
-        query = server.query()
+        # query = server.query()
         em = discord.Embed(title='CSSS FTB Server Status', description=
-        """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency) + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
+        """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency) )
+        # + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
 @bot.command(pass_context = True)
@@ -159,9 +156,9 @@ async def info(ctx):
         await bot.say("Please move to #minecraft for this command.")
     else:    
         em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
-    Modpack: Direwolf20 v1.10.0
-    Minecraft: 1.7.10
-    Cracked: NO (working on it)""", colour=0x3D85C6)
+Modpack: Direwolf20 v1.10.0
+Minecraft: 1.7.10
+Cracked: NO (working on it)""", colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
 
