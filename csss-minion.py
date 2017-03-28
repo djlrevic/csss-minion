@@ -136,9 +136,9 @@ async def mc(ctx):
 
 @bot.command(pass_context = True)
 async def status(ctx):
-    # if ctx.message.channel.name != "minecraft":
-    #     await bot.say("Please move to #minecraft for this command.")
-    # else:    
+    if ctx.message.channel.name != "minecraft":
+        await bot.say("Please move to #minecraft for this command.")
+    else:    
         server = MinecraftServer.lookup("172.93.48.238:25565")
         try:
             status = server.status()
@@ -146,7 +146,7 @@ async def status(ctx):
             bot.say("It's dead Jim.")
         # query = server.query()
         em = discord.Embed(title='CSSS FTB Server Status', description=
-        """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency) )
+        """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency), colour=0x3D85C6 )
         # + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
