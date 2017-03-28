@@ -20,9 +20,11 @@ try:
         for line in f:
             DISCORD_API_ID = line
             token = line
+            ip = line
 except FileNotFoundError as e:
     DISCORD_API_ID = input('Discord API: ')
     token = input('Token: ')
+    ip = input('IP: ')
 
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
@@ -138,10 +140,8 @@ async def mc(ctx):
 async def status(ctx):
     if ctx.message.channel.name != "minecraft":
         await bot.say("Please move to #minecraft for this command.")
-    else:    
-        ip1 = "127.0.0.1:25565" #localhost
-        ip2 = "172.93.48.238:25565" #actual IP
-        server = MinecraftServer.lookup(ip1)
+    else: 
+        server = MinecraftServer.lookup(ip)
         try:
             status = server.status()
         except IOError as e:
