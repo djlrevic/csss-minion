@@ -139,7 +139,7 @@ async def status(ctx):
     if ctx.message.channel.name != "minecraft":
         await bot.say("Please move to #minecraft for this command.")
     else:    
-        server = MinecraftServer.lookup("172.93.48.238:25565")
+        server = MinecraftServer.lookup("127.0.0.1:25565")
         try:
             status = server.status()
         except IOError as e:
