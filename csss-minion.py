@@ -147,10 +147,10 @@ async def status(ctx):
             status = server.status()
         except IOError as e:
             await bot.say("It's dead Jim.")
-        try:
-            query = server.query()
-        except TimeoutError as e:
-            await bot.say("Server too slow for query!")
+        # try:
+        #     query = server.query()
+        # except Sock as e:
+        #     await bot.say("Server too slow for query!")
         em = discord.Embed(title='CSSS FTB Server Status', description=
         """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency), colour=0x3D85C6 )
         # + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
