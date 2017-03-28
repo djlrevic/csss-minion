@@ -25,7 +25,7 @@ try:
 except FileNotFoundError as e:
     DISCORD_API_ID = getpass.getpass('Discord API: ')
     token = getpass.getpass('Token: ')
-    ip = getpass.getpass('IP: ')
+    ip = "172.93.48.238:25565"
 
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
