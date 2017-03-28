@@ -6,26 +6,30 @@ from discord.ext import commands
 import wolframalpha
 from mcstatus import MinecraftServer
 import datetime
+import configparser
 
-description = 'Bot of the CSSS'
+#Load the config file into vars for later use
+
+config = configparser.ConfigParser()
+config.read("botMain.settings")
+
+
+description = config.get("Discord","Description")
 
 bot = commands.Bot(command_prefix='.', description=description)
-wolframid = 'J9E82A-53G2L78JKQ'
+wolframid = config.get("WolfGram","TokenId")
 wClient = wolframalpha.Client(wolframid)
 
+DISCORD_API_ID = config.get("Discord","API_ID")
+token = config.get("Discord","Token")
+
 bot.remove_command("help")
-
-try:
-    with open("token.txt") as f:
-        for line in f:
-            DISCORD_API_ID = line
-            token = line
-except FileNotFoundError as e:
-    DISCORD_API_ID = input('Discord API: ')
-    token = input('Token: ')
-
+  
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
+
+def reloadConfig():
+    pass
 
 @bot.event
 async def on_ready():

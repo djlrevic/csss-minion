@@ -1,10 +1,12 @@
 [Minecraft]
-Ip :
-Info : 
+Ip : 
+Info = 
 
 [WolfGram]
-Token :
+TokenId : 
 
 [Discord]
 Token : 
+API_ID : 
+Description : 
 HelpMsg :
