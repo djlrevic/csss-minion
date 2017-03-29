@@ -8,6 +8,7 @@ import wolframalpha
 from mcstatus import MinecraftServer
 import datetime
 import configparser
+import getpass
 
 configFile = "botMain.settings"
 
@@ -28,6 +29,8 @@ wClient = wolframalpha.Client(wolframid)
 
 DISCORD_API_ID = config.get("Discord","API_ID")
 token = config.get("Discord","Token")
+ip = "172.93.48.238:25565"
+
 
 bot.remove_command("help")
   
@@ -148,13 +151,16 @@ async def mc(ctx):
 async def status(ctx):
     if ctx.message.channel.name != "minecraft":
         await bot.say("Please move to #minecraft for this command.")
-    else:    
-        server = MinecraftServer.lookup("127.0.0.1:25565")
+    else: 
+        server = MinecraftServer.lookup(ip)
         try:
             status = server.status()
         except IOError as e:
-            bot.say("It's dead Jim.")
-        # query = server.query()
+            await bot.say("It's dead Jim.")
+        # try:
+        #     query = server.query()
+        # except Sock as e:
+        #     await bot.say("Server too slow for query!")
         em = discord.Embed(title='CSSS FTB Server Status', description=
         """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency), colour=0x3D85C6 )
         # + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
