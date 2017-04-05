@@ -99,8 +99,8 @@ async def wolf(query : str):
 
 #     await bot.say(embed=embed)
 
-@bot.command()
-async def voteresult():
+@bot.command(pass_context = true)
+async def voteresult(ctx):
     if ctx.invoked_subcommand is None:
         embed = discord.Embed(title="CSSS Exec Positions", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
 
