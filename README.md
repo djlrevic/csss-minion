@@ -23,4 +23,4 @@ You can use this command to give yourself any roles that already exist, and cons
 This command is used to display the winners of the CSSS annual election. It contains information about the following elected positions: President, Vice President, Treasurer, Director of Resources, Director of Events, Director of Communications, and Director of Archives.
 
 ## .help mc ##
-This command can only be used within the #minecraft channel. When used in that channel, it will display commands specific to minecraft. When used outide of the channel, it will display a message alerting the user to move to that channel. 
+This command can only be used within the #minecraft channel. When used in that channel, it will display commands specific to minecraft. When used outside of the channel, it will display a message alerting the user to move to that channel. 
