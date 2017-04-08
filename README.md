@@ -23,4 +23,8 @@ You can use this command to give yourself any roles that already exist, and cons
 Voteresult is used to display the winners of the CSSS annual election. It contains information about the following elected positions: President, Vice President, Treasurer, Director of Resources, Director of Events, Director of Communications, and Director of Archives.
 
 ## .help mc ##
+
 This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to minecraft. Outide of the correct channel, it will display a message alerting the user to move to that channel. 
+
+
+
