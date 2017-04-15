@@ -96,17 +96,38 @@ async def wolf(query : str):
     except AttributeError:
         await bot.say("I ain't found shit.")
 
-@bot.command()
-async def vote():
-    embed = discord.Embed(colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+# Voting done, command disabled
+# @bot.command()
+# async def vote():
+#     embed = discord.Embed(colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
 
-    embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
-    embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
-    embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+#     embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+#     embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+#     embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
 
-    embed.add_field(name="CSSS Voting Information", value="The voting period for the Computing Science Student Society General Elections for the 2017-2018 term begins on Monday March 20th, 2017 at 11:59 PM and closes on Monday March 27th, 2017 at 11:59 PM. \n\nVisit https://www.sfu.ca/~pjalali/speeches.html to view candidate speeches, and http://websurvey.sfu.ca/survey/273372327 to vote.")
+#     embed.add_field(name="CSSS Voting Information", value="The voting period for the Computing Science Student Society General Elections for the 2017-2018 term begins on Monday March 20th, 2017 at 11:59 PM and closes on Monday March 27th, 2017 at 11:59 PM. \n\nVisit https://www.sfu.ca/~pjalali/speeches.html to view candidate speeches, and http://websurvey.sfu.ca/survey/273372327 to vote.")
 
-    await bot.say(embed=embed)
+#     await bot.say(embed=embed)
+
+@bot.command(pass_context = True)
+async def voteresult(ctx):
+    if ctx.invoked_subcommand is None:
+        embed = discord.Embed(title="CSSS Exec Positions", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+
+        embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+        embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+        embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+
+        embed.add_field(name="President", value="David Miiller")
+        embed.add_field(name="Vice President", value="Jon Loewen")
+        embed.add_field(name="Treasurer", value="Dustin Cao")
+        embed.add_field(name="Director of Resources", value="Kiarash Mirsalehi")
+        embed.add_field(name="Director of Events", value="Brendan Chan")
+        embed.add_field(name="Director of Communications", value="Henry Zhao")
+        embed.add_field(name="Director of Archives", value="Josh Wu")
+        embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
+
+        await bot.say(embed=embed)    
 
 @bot.group(pass_context = True)
 async def help(ctx):
@@ -122,8 +143,8 @@ async def help(ctx):
         embed.add_field(name=".newclass <class>", value="Start a new class group. Great for notifying everyone in that particular class.")
         embed.add_field(name=".iam <class>", value="Places yourself in an existing class.")
         embed.add_field(name=".wolf <query>", value="Asks WolframAlpha a question! Wrap your questions in \"quotes\"!")
-        embed.add_field(name=".vote", value="Find voting details for the CSSS Exec election!.")
-        embed.add_field(name=".help", value="Displays this help menu.")
+        # embed.add_field(name=".vote", value="Find voting details for the CSSS Exec election!.")
+        embed.add_field(name=".voteresult", value="Find out the winners of the CSSS annual election!")
         embed.add_field(name=".help mc", value="Displays commands for the CSSS Minecraft server. Only usable within #minecraft")
         embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
@@ -172,9 +193,10 @@ async def info(ctx):
         await bot.say("Please move to #minecraft for this command.")
     else:    
         em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
-Modpack: Direwolf20 v1.10.0
-Minecraft: 1.7.10
-Cracked: NO (working on it)""", colour=0x3D85C6)
+Modpack: FTBBeyond 1.5.3
+Minecraft: 1.10.2
+Cracked: YES
+See pinned message to download cracked client.""", colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
 
