@@ -185,7 +185,8 @@ async def info(ctx):
         em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
 Modpack: FTBBeyond 1.5.3
 Minecraft: 1.10.2
-Cracked: no""", colour=0x3D85C6)
+Cracked: YES
+See pinned message to download cracked client.""", colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
 
