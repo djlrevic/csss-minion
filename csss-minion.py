@@ -183,9 +183,10 @@ async def info(ctx):
         await bot.say("Please move to #minecraft for this command.")
     else:    
         em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
-Modpack: Direwolf20 v1.10.0
-Minecraft: 1.7.10
-Cracked: NO (working on it)""", colour=0x3D85C6)
+Modpack: FTBBeyond 1.5.3
+Minecraft: 1.10.2
+Cracked: YES
+See pinned message to download cracked client.""", colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
 
