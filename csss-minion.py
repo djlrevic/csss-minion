@@ -1,34 +1,44 @@
 # py -m pip install -U __
 import discord
+import os
 # import sympy
 from discord.ext import commands
 # from sympy import *
 import wolframalpha
 from mcstatus import MinecraftServer
 import datetime
+import configparser
 import getpass
 
-description = 'Bot of the CSSS'
+configFile = "botMain.settings"
+
+#check if config file exists
+if not os.path.isfile(configFile):
+    exit("Config file not found")
+    
+
+#Load the config file
+config = configparser.ConfigParser()
+config.read(configFile)
+
+description = config.get("Discord","Description")
 
 bot = commands.Bot(command_prefix='.', description=description)
-wolframid = 'J9E82A-53G2L78JKQ'
+wolframid = config.get("WolfGram","TokenId")
 wClient = wolframalpha.Client(wolframid)
 
+DISCORD_API_ID = config.get("Discord","API_ID")
+token = config.get("Discord","Token")
+ip = "172.93.48.238:25565"
+
+
 bot.remove_command("help")
-
-try:
-    with open("token.txt") as f:
-        for line in f:
-            DISCORD_API_ID = line
-            token = line
-            ip = line
-except FileNotFoundError as e:
-    DISCORD_API_ID = getpass.getpass('Discord API: ')
-    token = getpass.getpass('Token: ')
-    ip = "172.93.48.238:25565"
-
+  
 server = discord.Server(id=DISCORD_API_ID)
 roles = server.roles
+
+def reloadConfig():
+    pass
 
 @bot.event
 async def on_ready():

@@ -1,5 +1,6 @@
 # csss-minion
 
+
 The csss-minion bot is programmed by Henry using the language Python and discord.py. The bot accepts user input from Discord chat channels and runs a script to execute the command. Commands available include WolframAlpha math functions, grouping users by courses and admin commands. When an invalid input is detected, the bot sends feedback to the user indicating the command does not exist. Valid inputs are processed by the bot and the specific command is executed. The bot then displays the command output to the user.
 
 
@@ -25,6 +26,3 @@ Voteresult is used to display the winners of the CSSS annual election. It contai
 ## .help mc ##
 
 This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to minecraft. Outside of the correct channel, it will display a message alerting the user to move to that channel. 
-
-
-
