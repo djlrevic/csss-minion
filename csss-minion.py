@@ -16,6 +16,7 @@ configFile = "botMain.settings"
 if not os.path.isfile(configFile):
     DISCORD_API_ID = getpass.getpass('Discord API: ')
     token = getpass.getpass('Token: ')
+    wolframid = getpass.getpass('Wolframalpha: ')
     ip = "172.93.48.238:25565"
 else:
     #Load the config file
@@ -24,15 +25,14 @@ else:
 
     description = config.get("Discord","Description")
 
-    bot = commands.Bot(command_prefix='.', description=description)
     wolframid = config.get("WolfGram","TokenId")
-    wClient = wolframalpha.Client(wolframid)
 
     DISCORD_API_ID = config.get("Discord","API_ID")
     token = config.get("Discord","Token")
     ip = "172.93.48.238:25565"
 
-
+wClient = wolframalpha.Client(wolframid)
+bot = commands.Bot(command_prefix='.', description=description)
 bot.remove_command("help")
   
 server = discord.Server(id=DISCORD_API_ID)
