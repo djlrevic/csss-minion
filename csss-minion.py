@@ -40,11 +40,44 @@ roles = server.roles
 def reloadConfig():
     pass
 
+# await client.change_status(game=discord.Game(name='whatever'))
+
 @bot.event
 async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print('------')
+    await bot.change_presence(game=discord.Game(name='Yes my master'))
+
+@bot.command(pass_context = True)
+async def poll(ctx, *args):
+    if len(args) == 0:
+        # no question
+        await bot.say("Give me a question!")
+    elif len(args) > 9:
+        # too many options
+        await bot.say("Too many choices yo!")
+    elif len(args) == 1:
+        # just the question itself, hence by default assume y/n true/false
+        question = await bot.say("Question: **"+ args[0] + "** (Y/N).")
+        await bot.add_reaction(question, '👍')
+        await bot.add_reaction(question, '👎')
+        # await bot.add_reaction(question, '1\U000020e3') #example with unicode
+    else:
+        # actual question with choices
+        print(len(args))
+        choice = [0] * (len(args)-1)
+        # creating individual options
+        for i in range(1, len(args)):
+            choice[i-1] = str(i)+". "+str(args[i])
+        question = await bot.say("Question: **" + args[0] + "**" + "\n" + "\n".join(choice)) #use join to display array of strings in a list
+        for i in range(1, len(args)):
+            await bot.add_reaction(question, str(i)+'\U000020e3')
+    
+
+@bot.command()
+async def play(msg):
+    await bot.change_presence(game = discord.Game(name=msg))
 
 @bot.command(pass_context = True)
 async def iam(ctx, course : str):
