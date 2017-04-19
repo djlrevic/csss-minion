@@ -12,24 +12,25 @@ import getpass
 
 configFile = "botMain.settings"
 
-#check if config file exists
+#check if config file exists, if not, input manually
 if not os.path.isfile(configFile):
-    exit("Config file not found")
-    
+    DISCORD_API_ID = getpass.getpass('Discord API: ')
+    token = getpass.getpass('Token: ')
+    ip = "172.93.48.238:25565"
+else:
+    #Load the config file
+    config = configparser.ConfigParser()
+    config.read(configFile)
 
-#Load the config file
-config = configparser.ConfigParser()
-config.read(configFile)
+    description = config.get("Discord","Description")
 
-description = config.get("Discord","Description")
+    bot = commands.Bot(command_prefix='.', description=description)
+    wolframid = config.get("WolfGram","TokenId")
+    wClient = wolframalpha.Client(wolframid)
 
-bot = commands.Bot(command_prefix='.', description=description)
-wolframid = config.get("WolfGram","TokenId")
-wClient = wolframalpha.Client(wolframid)
-
-DISCORD_API_ID = config.get("Discord","API_ID")
-token = config.get("Discord","Token")
-ip = "172.93.48.238:25565"
+    DISCORD_API_ID = config.get("Discord","API_ID")
+    token = config.get("Discord","Token")
+    ip = "172.93.48.238:25565"
 
 
 bot.remove_command("help")
