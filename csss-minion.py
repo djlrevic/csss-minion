@@ -18,6 +18,7 @@ if not os.path.isfile(configFile):
     token = getpass.getpass('Token: ')
     wolframid = getpass.getpass('Wolframalpha: ')
     ip = "172.93.48.238:25565"
+    description = "Bot of the CSSS"
 else:
     #Load the config file
     config = configparser.ConfigParser()
