@@ -1,3 +1,4 @@
 discord.py
 wolframalpha
 mcstatus
+psycopg2

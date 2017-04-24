@@ -1,4 +1,5 @@
 # py -m pip install -U __
+# pylint: disable=C
 import discord
 import os
 # import sympy
@@ -9,6 +10,8 @@ from mcstatus import MinecraftServer
 import datetime
 import configparser
 import getpass
+import psycopg2
+import urllib
 
 configFile = "botMain.settings"
 
@@ -23,21 +26,31 @@ else:
     #Load the config file
     config = configparser.ConfigParser()
     config.read(configFile)
-
-    description = config.get("Discord","Description")
-
-    wolframid = config.get("WolfGram","TokenId")
-
-    DISCORD_API_ID = config.get("Discord","API_ID")
-    token = config.get("Discord","Token")
+    description = config.get("Discord", "Description")
+    wolframid = config.get("WolfGram", "TokenId")
+    DISCORD_API_ID = config.get("Discord", "API_ID")
+    token = config.get("Discord", "Token")
     ip = "172.93.48.238:25565"
+
+# SQL SETUP------------------------------------------------------------------------------
+urllib.parse.uses_netloc.append("postgres")
+url = urllib.parse(urllib.parse(os.environ["postgres://zocnciwk:80s1DpFZahJf5ILEAvPDAVbgIZyV1JKa@tantor.db.elephantsql.com:5432/zocnciwk"]))
+
+conn = psycopg2.connect(database = url.path[1:],
+    user = url.username,
+    password = url.password,
+    host = url.hostname,
+    port = url.port
+)
+
+
+# SQL SETUP------------------------------------------------------------------------------
 
 wClient = wolframalpha.Client(wolframid)
 bot = commands.Bot(command_prefix='.', description=description)
 bot.remove_command("help")
   
 server = discord.Server(id=DISCORD_API_ID)
-roles = server.roles
 
 def reloadConfig():
     pass
@@ -51,7 +64,7 @@ async def on_ready():
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
 
-@bot.command(pass_context = True)
+@bot.command(pass_context=True)
 async def poll(ctx, *args):
     if len(args) == 0:
         # no question
@@ -93,6 +106,20 @@ async def iam(ctx, course : str):
     else:
         await bot.add_roles(ctx.message.author, ctx.message.server.roles[found])
         await bot.say("You've been placed in "+ course)
+
+# Remove user from role
+@bot.command(pass_context = True)
+async def iamn(ctx, course : str):
+    course = course.lower()
+    found = 0
+    for i in range(0, len(ctx.message.author.roles)):
+        if course == ctx.message.author.roles[i].name:
+            found = i
+    if found == 0:
+        await bot.say("You are not currently in this class.")
+    else:
+        await bot.remove_roles(ctx.message.author, ctx.message.author.roles[found])
+        await bot.say("You've been removed from " + course)
 
 @bot.command(pass_context = True)
 async def newclass(ctx, course):
