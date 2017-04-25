@@ -11,7 +11,7 @@ import datetime
 import configparser
 import getpass
 import psycopg2
-import urllib
+import urllib.parse
 
 configFile = "botMain.settings"
 
@@ -34,15 +34,8 @@ else:
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
-url = urllib.parse(urllib.parse(os.environ["postgres://zocnciwk:80s1DpFZahJf5ILEAvPDAVbgIZyV1JKa@tantor.db.elephantsql.com:5432/zocnciwk"]))
-
-conn = psycopg2.connect(database = url.path[1:],
-    user = url.username,
-    password = url.password,
-    host = url.hostname,
-    port = url.port
-)
-
+conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='80s1DpFZahJf5ILEAvPDAVbgIZyV1JKa'")
+cur = conn.cursor()
 
 # SQL SETUP------------------------------------------------------------------------------
 
