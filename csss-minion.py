@@ -13,6 +13,8 @@ import getpass
 import psycopg2
 import urllib.parse
 import random
+import time
+import asyncio
 
 configFile = "botMain.settings"
 
@@ -41,9 +43,9 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-conn.close()
-conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
-cur = conn.cursor()
+# conn.close()
+# conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
+# cur = conn.cursor()
 
 wClient = wolframalpha.Client(wolframid)
 bot = commands.Bot(command_prefix='.', description=description)
@@ -54,7 +56,8 @@ server = discord.Server(id=DISCORD_API_ID)
 def reloadConfig():
     pass
 
-# await client.change_status(game=discord.Game(name='whatever'))
+# creating a 2D empty array for exp queues
+qu = []
 
 @bot.event
 async def on_ready():
@@ -66,9 +69,38 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     print(message.author.name+"#"+message.author.id)
-    # await add(message)
+    if validate(message):
+        await add(message)
     await bot.process_commands(message)
 
+# handle 60 second cooldown timer for exp gain
+def validate(message):
+    # check if user is in queue
+    flag = False
+    for i in qu:
+        if i[0] == message.author.id:
+            # user already in queue
+            flag = True
+    if flag == True:
+        print("dupe found")
+        return False
+    # user not in queue
+    qu.append([message.author.id, time.time()])
+    print("added to array")
+    return True
+
+# used to update the queue
+async def update():
+    await bot.wait_until_ready()
+    print("ready")
+    while not bot.is_closed:        
+        for i, item in enumerate(qu):
+            if time.time() - item[1] >= 60:
+                print("entry expired")
+                del qu[i]
+        await asyncio.sleep(1)
+
+# handles adding new users and updating existing user exp to database
 async def add(message):
     # check if user is in database
     cur.execute("SELECT * FROM experience WHERE user_id = (%s)", (int(message.author.id),))
@@ -112,7 +144,6 @@ async def poll(ctx, *args):
         question = await bot.say("Question: **" + args[0] + "**" + "\n" + "\n".join(choice)) #use join to display array of strings in a list
         for i in range(1, len(args)):
             await bot.add_reaction(question, str(i)+'\U000020e3')
-    
 
 @bot.command()
 async def play(msg):
@@ -285,5 +316,5 @@ Cracked: YES
 See pinned message to download cracked client.""", colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
 
-
+bot.loop.create_task(update())
 bot.run(token)
