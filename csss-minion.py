@@ -22,6 +22,7 @@ if not os.path.isfile(configFile):
     wolframid = getpass.getpass('Wolframalpha: ')
     ip = "172.93.48.238:25565"
     description = "Bot of the CSSS"
+    postgrespass = getpass.getpass('Database Password: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
@@ -31,13 +32,17 @@ else:
     DISCORD_API_ID = config.get("Discord", "API_ID")
     token = config.get("Discord", "Token")
     ip = "172.93.48.238:25565"
+    postgrespass = config.get("Postgres", "Password")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
-conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='80s1DpFZahJf5ILEAvPDAVbgIZyV1JKa'")
+conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
 cur = conn.cursor()
-
 # SQL SETUP------------------------------------------------------------------------------
+
+conn.close()
+conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
+cur = conn.cursor()
 
 wClient = wolframalpha.Client(wolframid)
 bot = commands.Bot(command_prefix='.', description=description)
@@ -56,6 +61,30 @@ async def on_ready():
     print(bot.user.name)
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
+
+@bot.event
+async def on_message(message):
+    print(message.author.name+"#"+message.author.id)
+    # await add(message)
+    await bot.process_commands(message)
+
+async def add(message):
+    # check if user is in database
+    entry = cur.execute("SELECT * FROM experience WHERE user_id = (%s)", (int(message.author.id),))
+    if entry == None:
+        # user not in database
+        cur.execute("INSERT INTO experience (name, user_id, exp) VALUES (%s, %s, %s)", 
+            (message.author.name, message.author.id, 1))
+        conn.commit()
+    else:
+        # user in database
+        entry = list(entry)
+        cur.execute("UPDATE experience SET exp = exp+1 WHERE user_id = (%s)", int(message.author.id),)
+
+
+@bot.command(pass_context=True)
+async def howoldami(ctx):
+    await bot.say(ctx.message.author.joined_at)
 
 @bot.command(pass_context=True)
 async def poll(ctx, *args):
