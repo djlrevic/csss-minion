@@ -12,6 +12,7 @@ import configparser
 import getpass
 import psycopg2
 import urllib.parse
+import random
 
 configFile = "botMain.settings"
 
@@ -70,16 +71,17 @@ async def on_message(message):
 
 async def add(message):
     # check if user is in database
-    entry = cur.execute("SELECT * FROM experience WHERE user_id = (%s)", (int(message.author.id),))
+    cur.execute("SELECT * FROM experience WHERE user_id = (%s)", (int(message.author.id),))
+    entry = cur.fetchone()
     if entry == None:
         # user not in database
         cur.execute("INSERT INTO experience (name, user_id, exp) VALUES (%s, %s, %s)", 
-            (message.author.name, message.author.id, 1))
+            (message.author.name, int(message.author.id), random.randint(15, 25), ))
         conn.commit()
     else:
         # user in database
-        entry = list(entry)
-        cur.execute("UPDATE experience SET exp = exp+1 WHERE user_id = (%s)", int(message.author.id),)
+        cur.execute("UPDATE experience SET exp = exp+(%s) WHERE user_id = (%s)", (random.randint(15, 25), int(message.author.id), ))
+        conn.commit()
 
 
 @bot.command(pass_context=True)
