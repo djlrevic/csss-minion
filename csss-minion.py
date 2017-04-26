@@ -15,6 +15,7 @@ import urllib.parse
 import random
 import time
 import asyncio
+import codecs as codex
 
 configFile = "botMain.settings"
 
@@ -38,9 +39,9 @@ else:
     postgrespass = config.get("Postgres", "Password")
 
 # SQL SETUP------------------------------------------------------------------------------
-urllib.parse.uses_netloc.append("postgres")
-conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
-cur = conn.cursor()
+# urllib.parse.uses_netloc.append("postgres")
+# conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
+# cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
 # conn.close()
@@ -68,10 +69,30 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print(message.author.name+"#"+message.author.id)
-    if validate(message):
-        await add(message)
+    # DATABASE OPERATIONS. DISABLE UNLESS ACTUALLY RUNNING AS SERVICE
+    # print(message.author.name+"#"+message.author.id)
+    # if validate(message):
+    #     await add(message)
     await bot.process_commands(message)
+
+# pulling all members from the server. Disable unless admin using
+# @bot.command(pass_context = True)
+# async def pull(ctx):
+#     members = ctx.message.server.members
+#     with codex.open('ids.txt', 'a', 'utf-8') as log:
+#             log.write('[')
+#     for i in members:
+#         # target.write('{"name" : "')
+#         # target.write(i.name)
+#         # target.write(', "user_id" : "')
+#         # target.write(i.id)
+#         # target.write('"}, ')
+#         name = bytes(i.name, 'utf-8').decode('utf-8', 'ignore')
+#         with codex.open('ids.txt', 'a', 'utf-8') as log:
+#             log.write('{"name" : "' + name + '", "user_id" : "' + i.id + '", "id" : "' + i.discriminator + '"}, ')
+#     with codex.open('ids.txt', 'a', 'utf-8') as log:
+#             log.write(']')
+
 
 # handle 60 second cooldown timer for exp gain
 def validate(message):
