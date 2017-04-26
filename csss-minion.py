@@ -70,7 +70,7 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # DATABASE OPERATIONS. DISABLE UNLESS ACTUALLY RUNNING AS SERVICE
-    # print(message.author.name+"#"+message.author.id)
+    # print(message.author.name+"#"+message.author.discriminator)
     # if validate(message):
     #     await add(message)
     await bot.process_commands(message)
