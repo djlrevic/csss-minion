@@ -16,8 +16,10 @@ import random
 import time
 import asyncio
 import codecs as codex
+import math
 
 configFile = "botMain.settings"
+database = "experience" #database name used for exp
 
 #check if config file exists, if not, input manually
 if not os.path.isfile(configFile):
@@ -39,9 +41,9 @@ else:
     postgrespass = config.get("Postgres", "Password")
 
 # SQL SETUP------------------------------------------------------------------------------
-# urllib.parse.uses_netloc.append("postgres")
-# conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
-# cur = conn.cursor()
+urllib.parse.uses_netloc.append("postgres")
+conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
+cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
 # conn.close()
@@ -59,6 +61,8 @@ def reloadConfig():
 
 # creating a 2D empty array for exp queues
 qu = []
+global expTable
+expTable = []
 
 @bot.event
 async def on_ready():
@@ -66,13 +70,15 @@ async def on_ready():
     print(bot.user.name)
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
+    global expTable 
+    expTable = getLevel() #pulling exp templates
 
 @bot.event
 async def on_message(message):
     # DATABASE OPERATIONS. DISABLE UNLESS ACTUALLY RUNNING AS SERVICE
-    # print(message.author.name+"#"+message.author.discriminator)
-    # if validate(message):
-    #     await add(message)
+    print(message.author.name+"#"+message.author.discriminator)
+    if validate(message):
+        await add(message)
     await bot.process_commands(message)
 
 # pulling all members from the server. Disable unless admin using
@@ -93,7 +99,6 @@ async def on_message(message):
 #     with codex.open('ids.txt', 'a', 'utf-8') as log:
 #             log.write(']')
 
-
 # handle 60 second cooldown timer for exp gain
 def validate(message):
     # check if user is in queue
@@ -110,13 +115,17 @@ def validate(message):
     print("added to array")
     return True
 
+# formula used to calculate exact experience needed for next level
+def calcLevel(x):
+    return 5*math.pow(x, 2) + 40*x + 55
+
 # used to update the queue
 async def update():
     await bot.wait_until_ready()
     print("ready")
     while not bot.is_closed:        
         for i, item in enumerate(qu):
-            if time.time() - item[1] >= 60:
+            if time.time() - item[1] >= 5:
                 print("entry expired")
                 del qu[i]
         await asyncio.sleep(1)
@@ -124,18 +133,73 @@ async def update():
 # handles adding new users and updating existing user exp to database
 async def add(message):
     # check if user is in database
-    cur.execute("SELECT * FROM experience WHERE user_id = (%s)", (int(message.author.id),))
+    cur.execute("SELECT * FROM "+database+" WHERE user_id = (%s)", (str(message.author.id),))
     entry = cur.fetchone()
     if entry == None:
         # user not in database
-        cur.execute("INSERT INTO experience (name, user_id, exp) VALUES (%s, %s, %s)", 
-            (message.author.name, int(message.author.id), random.randint(15, 25), ))
+        cur.execute("INSERT INTO "+database+" (name, user_id, exp) VALUES (%s, %s, %s)", 
+            (message.author.name, str(message.author.id), random.randint(15, 25), ))
         conn.commit()
     else:
+        list(entry)
         # user in database
-        cur.execute("UPDATE experience SET exp = exp+(%s) WHERE user_id = (%s)", (random.randint(15, 25), int(message.author.id), ))
+        changeInExp = random.randint(15, 25)
+        if updateLevel(changeInExp, entry[3], entry[4]) == True:
+            # user has leveled up, perform special operations
+            # cur.execute("UPDATE "+database+" SET level = {} WHERE user_id = {}".format(userLevel(changeInExp+entry[3]), message.author.id))
+            # await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
+            pass
+        # else user has not leveled, just add exp
+        cur.execute("UPDATE "+database+" SET exp = exp+(%s) WHERE user_id = (%s)", (changeInExp, int(message.author.id), ))
+        cur.execute("UPDATE experience E SET level = (SELECT MAX(T.level) FROM template T, experience E1 WHERE T.exp <= E1.exp AND E.user_id = E1.user_id)")
         conn.commit()
 
+# used to pull template levels and exp goals from db
+def getLevel():
+    cur.execute("SELECT level, exp FROM template")
+    i = 0
+    table = []
+    stop = False
+    while stop == False:
+        temp = cur.fetchone()
+        if temp == None:
+            stop = True
+        else:
+            table.append(temp)
+            i = i+1
+    return table
+
+# used to find the current level of user given experience
+def userLevel(experience):
+    global expTable
+    print(expTable[5][1])
+    lowerBound = 0
+    upperBound = 0
+    for foo in expTable:
+        if experience > foo[1]:
+            lowerBound = foo[0]
+        if experience < foo[1]:
+            upperBound = foo[0]
+    return lowerBound
+    
+
+# detect if user is eligible for the next level
+def updateLevel(change, experience, currLevel):
+    print("Experience : {} and Change : {}".format(experience, change))
+    print("CurrLevel: {}".format(currLevel))
+    foo = change + experience
+    print("foo : {}".format(foo))
+    afterChange = userLevel(foo)
+    print("afterChange : {}".format(afterChange))
+    if afterChange != currLevel:
+        return True
+    return False  
+
+@bot.command(pass_context = True)
+async def rank(ctx):
+    cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
+    msg = cur.fetchone()
+    await bot.say(msg)  
 
 @bot.command(pass_context=True)
 async def howoldami(ctx):
@@ -223,7 +287,7 @@ async def newclass(ctx, course):
             await bot.say("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
 
 # @bot.command()
-# async def calc(equation : str):
+# async def (equation : str):
 #     await bot.say("``"+sympify+(equation)+"``")
        
 @bot.command()
