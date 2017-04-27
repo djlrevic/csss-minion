@@ -51,8 +51,10 @@ cur = conn.cursor()
 # cur = conn.cursor()
 
 bot = commands.Bot(command_prefix='.', description=description)
-if os.path.isfile(configFile):
-    bot.config = configparser.ConfigParser()
+# if os.path.isfile(configFile):
+#     bot.config = configparser.ConfigParser()
+# else:
+bot.wolframid = wolframid
 # else:
 #     bot
 bot.remove_command("help")

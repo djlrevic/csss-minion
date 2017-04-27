@@ -51,6 +51,6 @@ class Misc():
             await self.bot.say("I ain't found shit.")
 
 def setup(bot):
-    bot.config.read("botMain.settings")
-    wolframid = bot.config.get("Wolfram", "TokenId")
-    bot.add_cog(Misc(bot, wolframid))
+    # bot.config.read("botMain.settings")
+    # wolframid = bot.config.get("Wolfram", "TokenId")
+    bot.add_cog(Misc(bot, bot.wolframid))
