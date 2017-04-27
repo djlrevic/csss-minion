@@ -34,7 +34,7 @@ else:
     config = configparser.ConfigParser()
     config.read(configFile)
     description = config.get("Discord", "Description")
-    wolframid = config.get("WolfGram", "TokenId")
+    wolframid = config.get("Wolfram", "TokenId")
     DISCORD_API_ID = config.get("Discord", "API_ID")
     token = config.get("Discord", "Token")
     ip = "172.93.48.238:25565"
@@ -50,8 +50,11 @@ cur = conn.cursor()
 # conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
 # cur = conn.cursor()
 
-wClient = wolframalpha.Client(wolframid)
 bot = commands.Bot(command_prefix='.', description=description)
+if os.path.isfile(configFile):
+    bot.config = configparser.ConfigParser()
+# else:
+#     bot
 bot.remove_command("help")
   
 server = discord.Server(id=DISCORD_API_ID)
@@ -80,6 +83,22 @@ async def on_message(message):
     if validate(message):
         await add(message)
     await bot.process_commands(message)
+
+startup_extensions = ["classes", "misc"]
+
+@bot.command()
+async def loadExt(name):
+    try: 
+        bot.load_extension(name)
+    except(AttributeError, ImportError) as e:
+        await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+        return
+    await bot.say("{} cog loaded.".format(name))
+
+@bot.command()
+async def unload(name):
+    bot.unload_extension(name)
+    await bot.say("{} cog unloaded".format(name))
 
 # pulling all members from the server. Disable unless admin using
 # @bot.command(pass_context = True)
@@ -148,7 +167,6 @@ async def add(message):
             # user has leveled up, perform special operations
             cur.execute("UPDATE "+database+" SET level = {} WHERE user_id = {}".format(userLevel(changeInExp+entry[3]), message.author.id))
             await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
-            pass
         # else user has not leveled, just add exp
         cur.execute("UPDATE "+database+" SET exp = exp+(%s) WHERE user_id = (%s)", (changeInExp, int(message.author.id), ))
         cur.execute("UPDATE experience E SET level = (SELECT MAX(T.level) FROM template T, experience E1 WHERE T.exp <= E1.exp AND E.user_id = E1.user_id)")
@@ -201,102 +219,7 @@ async def rank(ctx):
     msg = cur.fetchone()
     await bot.say(msg)  
 
-@bot.command(pass_context=True)
-async def howoldami(ctx):
-    await bot.say(ctx.message.author.joined_at)
 
-@bot.command(pass_context=True)
-async def poll(ctx, *args):
-    if len(args) == 0:
-        # no question
-        await bot.say("Give me a question!")
-    elif len(args) > 9:
-        # too many options
-        await bot.say("Too many choices yo!")
-    elif len(args) == 1:
-        # just the question itself, hence by default assume y/n true/false
-        question = await bot.say("Question: **"+ args[0] + "** (Y/N).")
-        await bot.add_reaction(question, '👍')
-        await bot.add_reaction(question, '👎')
-        # await bot.add_reaction(question, '1\U000020e3') #example with unicode
-    else:
-        # actual question with choices
-        print(len(args))
-        choice = [0] * (len(args)-1)
-        # creating individual options
-        for i in range(1, len(args)):
-            choice[i-1] = str(i)+". "+str(args[i])
-        question = await bot.say("Question: **" + args[0] + "**" + "\n" + "\n".join(choice)) #use join to display array of strings in a list
-        for i in range(1, len(args)):
-            await bot.add_reaction(question, str(i)+'\U000020e3')
-
-@bot.command()
-async def play(msg):
-    await bot.change_presence(game = discord.Game(name=msg))
-
-@bot.command(pass_context = True)
-async def iam(ctx, course : str):
-    course = course.lower()
-    found = 0
-    for i in range(0, len(ctx.message.server.roles)):
-        if course == ctx.message.server.roles[i].name:
-            found = i
-    if found == 0:
-        await bot.say("This class doesn't exist. Try creating it with .newclass name")
-    else:
-        await bot.add_roles(ctx.message.author, ctx.message.server.roles[found])
-        await bot.say("You've been placed in "+ course)
-
-# Remove user from role
-@bot.command(pass_context = True)
-async def iamn(ctx, course : str):
-    course = course.lower()
-    found = 0
-    for i in range(0, len(ctx.message.author.roles)):
-        if course == ctx.message.author.roles[i].name:
-            found = i
-    if found == 0:
-        await bot.say("You are not currently in this class.")
-    else:
-        await bot.remove_roles(ctx.message.author, ctx.message.author.roles[found])
-        await bot.say("You've been removed from " + course)
-
-@bot.command(pass_context = True)
-async def newclass(ctx, course):
-    course = course.lower()
-    dupe = False
-    for j in range(0, len(ctx.message.server.roles)):
-        if ctx.message.server.roles[j].name == course:
-            dupe = True
-    if dupe == True:
-        await bot.say("Class already exists")    
-    else:
-        # temp value
-        flag = True
-        # temp value
-
-        # flag = False
-        # for i in range(0, len(ctx.message.author.roles)):
-        #     if ctx.message.author.roles[i].name == "Regular":
-        #         flag = True
-        if flag == True:
-            newRole = await bot.create_role(server, name = course, mentionable = True)# , hoist = True)
-            await bot.add_roles(ctx.message.author, newRole)
-            await bot.say(course+" class has been created. You have been placed in it.")
-        else:
-            await bot.say("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
-
-# @bot.command()
-# async def (equation : str):
-#     await bot.say("``"+sympify+(equation)+"``")
-       
-@bot.command()
-async def wolf(query : str):
-    res = wClient.query(query)
-    try:
-        await bot.say("```"+(next(res.results).text)+"```")
-    except AttributeError:
-        await bot.say("I ain't found shit.")
 
 # Voting done, command disabled
 # @bot.command()
@@ -400,6 +323,14 @@ Minecraft: 1.10.2
 Cracked: YES
 See pinned message to download cracked client.""", colour=0x3D85C6)
         await bot.send_message(ctx.message.channel, embed=em)
+
+if __name__ == "__main__":
+    for extension in startup_extensions:
+        try:
+            bot.load_extension(extension)
+        except Exception as e:
+            exc = '{}: {}'.format(type(e).__name__, e)
+            print('Failed to load extension {}\n{}'.format(extension, exc))
 
 bot.loop.create_task(update())
 bot.run(token)

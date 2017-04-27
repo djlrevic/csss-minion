@@ -10,4 +10,4 @@ while True:
         level = userLevel(result[1])[0]
         cur.execute("UPDATE experience SET level = "+str(level)+" WHERE user_id = "+str(result[0])+";")
         
-UPDATE experience SET level = (SELECT exp FROM experience)
+UPDATE experience SET level = userLevel((SELECT exp FROM experience)) WHERE level = None
