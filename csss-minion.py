@@ -146,8 +146,8 @@ async def add(message):
         changeInExp = random.randint(15, 25)
         if updateLevel(changeInExp, entry[3], entry[4]) == True:
             # user has leveled up, perform special operations
-            # cur.execute("UPDATE "+database+" SET level = {} WHERE user_id = {}".format(userLevel(changeInExp+entry[3]), message.author.id))
-            # await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
+            cur.execute("UPDATE "+database+" SET level = {} WHERE user_id = {}".format(userLevel(changeInExp+entry[3]), message.author.id))
+            await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
             pass
         # else user has not leveled, just add exp
         cur.execute("UPDATE "+database+" SET exp = exp+(%s) WHERE user_id = (%s)", (changeInExp, int(message.author.id), ))
@@ -156,7 +156,7 @@ async def add(message):
 
 # used to pull template levels and exp goals from db
 def getLevel():
-    cur.execute("SELECT level, exp FROM template")
+    cur.execute("SELECT level, exp FROM template ORDER BY level")
     i = 0
     table = []
     stop = False

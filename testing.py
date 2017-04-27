@@ -49,7 +49,7 @@ expTable = []
 
 # used to pull template levels and exp goals from db
 def getLevel():
-    cur.execute("SELECT level, exp FROM template")
+    cur.execute("SELECT level, exp FROM template ORDER BY level")
     i = 0
     table = []
     stop = False
@@ -64,15 +64,11 @@ def getLevel():
 
 # used to find the current level of user given experience
 def userLevel(experience):
-    lowerBound = 0
-    upperBound = 0
+    global expTable
     for foo in expTable:
-        if experience > foo[1]:
-            lowerBound = foo[0]
-        if experience < foo[1]:
-            upperBound = foo[0]
-    # return [lowerBound, upperBound] #use this when trying to find next level as well
-    return lowerBound
+        if experience >= foo[1]:
+            level = foo[0]
+    return level
 
 # detect if user is eligible for the next level
 async def updateLevel(change, experience):
