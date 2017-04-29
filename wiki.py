@@ -58,7 +58,7 @@ class Wiki:
             definition_str = "There was an error."+str(json.status_code)+" There is no page for this."
         msgs = self.fit_msg(definition_str)
         for msg in msgs:
-            await self.bot.say(msg)
+            await self.bot.say("```"+msg+"```")
         
         
 def setup(bot):
