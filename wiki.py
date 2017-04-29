@@ -8,6 +8,7 @@ import json
 # prettify message
 
 class Wiki:
+    """Makes wordart from strings or someshizz"""
     
     def __init__(self, bot):
         self.bot = bot
@@ -49,7 +50,7 @@ class Wiki:
         json = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/'+query+'?redirect=true')
         msg = json.json()
         if json.status_code == 200:
-            if "description" in msg and msg["description"] == "Wikipedia disambiguation page":
+            if "description" in msg or msg["description"] == "Wikipedia disambiguation page":
             # no page found
                 definition_str = "Try to be more specific"
             else:
@@ -58,7 +59,7 @@ class Wiki:
             definition_str = "There was an error."+str(json.status_code)+" There is no page for this."
         msgs = self.fit_msg(definition_str)
         for msg in msgs:
-            await self.bot.say(msg)
+            await self.bot.say("```"+msg+"```")
         
         
 def setup(bot):
