@@ -75,7 +75,7 @@ async def on_message(message):
         await add(message)
     await bot.process_commands(message)
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki"]
 
 @bot.command(pass_context = True)
 async def loadExt(ctx, name):
