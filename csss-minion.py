@@ -75,21 +75,21 @@ async def on_message(message):
         await add(message)
     await bot.process_commands(message)
 
-startup_extensions = ["classes", "misc", "info"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary"]
 
-@bot.command()
-async def loadExt(name):
-    try: 
-        bot.load_extension(name)
-    except(AttributeError, ImportError) as e:
-        await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
-        return
-    await bot.say("{} cog loaded.".format(name))
+# @bot.command()
+# async def loadExt(name):
+#     try: 
+#         bot.load_extension(name)
+#     except(AttributeError, ImportError) as e:
+#         await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+#         return
+#     await bot.say("{} cog loaded.".format(name))
 
-@bot.command()
-async def unload(name):
-    bot.unload_extension(name)
-    await bot.say("{} cog unloaded".format(name))
+# @bot.command()
+# async def unload(name):
+#     bot.unload_extension(name)
+#     await bot.say("{} cog unloaded".format(name))
 
 # pulling all members from the server. Disable unless admin using
 # @bot.command(pass_context = True)
