@@ -75,7 +75,7 @@ async def on_message(message):
         await add(message)
     await bot.process_commands(message)
 
-startup_extensions = ["classes", "misc", "info", "dictionary", "poem", "wiki", "spellcheck"]
+startup_extensions = ["classes", "misc", "info"]
 
 @bot.command()
 async def loadExt(name):
@@ -135,7 +135,7 @@ async def update():
     print("ready")
     while not bot.is_closed:        
         for i, item in enumerate(qu):
-            if time.time() - item[1] >= 5:
+            if time.time() - item[1] >= 60:
                 print("entry expired")
                 del qu[i]
         await asyncio.sleep(1)
