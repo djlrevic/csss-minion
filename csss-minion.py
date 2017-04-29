@@ -12,6 +12,7 @@ import asyncio
 import codecs as codex
 import math
 import time
+from subprocess import call
 
 configFile = "botMain.settings"
 database = "experience" #database name used for exp
@@ -70,7 +71,7 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # DATABASE OPERATIONS. DISABLE UNLESS ACTUALLY RUNNING AS SERVICE
-    print(message.author.name+"#"+message.author.discriminator)
+    # print(message.author.name+"#"+message.author.discriminator)
     if validate(message):
         await add(message)
     await bot.process_commands(message)
@@ -94,6 +95,14 @@ async def unload(ctx, name):
     if Henry(ctx):
         bot.unload_extension(name)
         await bot.say("{} cog unloaded".format(name))
+    else:
+        await bot.say("You ain't my master! Shoo!")
+
+@bot.command(pass_context = True)
+async def execute(ctx, query):
+    if Henry(ctx):
+        res = call(query)
+        await bot.say(res)
     else:
         await bot.say("You ain't my master! Shoo!")
 
@@ -130,11 +139,11 @@ def validate(message):
             # user already in queue
             flag = True
     if flag == True:
-        print("dupe found")
+        # print("dupe found")
         return False
     # user not in queue
     qu.append([message.author.id, time.time()])
-    print("added to array")
+    # print("added to array")
     return True
 
 # formula used to calculate exact experience needed for next level
@@ -148,7 +157,7 @@ async def update():
     while not bot.is_closed:        
         for i, item in enumerate(qu):
             if time.time() - item[1] >= 60:
-                print("entry expired")
+                # print("entry expired")
                 del qu[i]
         await asyncio.sleep(1)
 
@@ -193,7 +202,7 @@ def getLevel():
 # used to find the current level of user given experience
 def userLevel(experience):
     global expTable
-    print(expTable[5][1])
+    # print(expTable[5][1])
     lowerBound = 0
     upperBound = 0
     for foo in expTable:
@@ -206,12 +215,12 @@ def userLevel(experience):
 
 # detect if user is eligible for the next level
 def updateLevel(change, experience, currLevel):
-    print("Experience : {} and Change : {}".format(experience, change))
-    print("CurrLevel: {}".format(currLevel))
+    # print("Experience : {} and Change : {}".format(experience, change))
+    # print("CurrLevel: {}".format(currLevel))
     foo = change + experience
-    print("foo : {}".format(foo))
+    # print("foo : {}".format(foo))
     afterChange = userLevel(foo)
-    print("afterChange : {}".format(afterChange))
+    # print("afterChange : {}".format(afterChange))
     if afterChange != currLevel:
         return True
     return False  
