@@ -50,7 +50,7 @@ class Wiki:
         json = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/'+query+'?redirect=true')
         msg = json.json()
         if json.status_code == 200:
-            if "description" in msg or msg["description"] == "Wikipedia disambiguation page":
+            if "description" in msg and (msg["description"] == "Wikipedia disambiguation page" or msg["description"] == "Wikimedia disambiguation page"):
             # no page found
                 definition_str = "Try to be more specific"
             else:
