@@ -12,6 +12,7 @@ import asyncio
 import codecs as codex
 import math
 import time
+from subprocess import call
 
 configFile = "botMain.settings"
 database = "experience" #database name used for exp
@@ -70,26 +71,46 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # DATABASE OPERATIONS. DISABLE UNLESS ACTUALLY RUNNING AS SERVICE
-    print(message.author.name+"#"+message.author.discriminator)
+    # print(message.author.name+"#"+message.author.discriminator)
     if validate(message):
         await add(message)
     await bot.process_commands(message)
 
-startup_extensions = ["classes", "misc", "info", "dictionary", "poem", "wiki", "spellcheck"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki"]
 
-@bot.command()
-async def loadExt(name):
-    try: 
-        bot.load_extension(name)
-    except(AttributeError, ImportError) as e:
-        await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
-        return
-    await bot.say("{} cog loaded.".format(name))
+@bot.command(pass_context = True)
+async def loadExt(ctx, name):
+    if Henry(ctx):
+        try: 
+            bot.load_extension(name)
+        except(AttributeError, ImportError) as e:
+            await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            return
+        await bot.say("{} cog loaded.".format(name))
+    else:
+        await bot.say("You ain't my master! Shoo!")
 
-@bot.command()
-async def unload(name):
-    bot.unload_extension(name)
-    await bot.say("{} cog unloaded".format(name))
+@bot.command(pass_context = True)
+async def unload(ctx, name):
+    if Henry(ctx):
+        bot.unload_extension(name)
+        await bot.say("{} cog unloaded".format(name))
+    else:
+        await bot.say("You ain't my master! Shoo!")
+
+@bot.command(pass_context = True)
+async def execute(ctx, query):
+    if Henry(ctx):
+        res = call(query)
+        await bot.say(res)
+    else:
+        await bot.say("You ain't my master! Shoo!")
+
+def Henry(ctx):
+    if ctx.message.author.id == "173702138122338305":
+        return True
+    else:
+        return False
 
 # pulling all members from the server. Disable unless admin using
 # @bot.command(pass_context = True)
@@ -118,11 +139,11 @@ def validate(message):
             # user already in queue
             flag = True
     if flag == True:
-        print("dupe found")
+        # print("dupe found")
         return False
     # user not in queue
     qu.append([message.author.id, time.time()])
-    print("added to array")
+    # print("added to array")
     return True
 
 # formula used to calculate exact experience needed for next level
@@ -135,8 +156,8 @@ async def update():
     print("ready")
     while not bot.is_closed:        
         for i, item in enumerate(qu):
-            if time.time() - item[1] >= 5:
-                print("entry expired")
+            if time.time() - item[1] >= 60:
+                # print("entry expired")
                 del qu[i]
         await asyncio.sleep(1)
 
@@ -157,7 +178,7 @@ async def add(message):
         if updateLevel(changeInExp, entry[3], entry[4]) == True:
             # user has leveled up, perform special operations
             cur.execute("UPDATE "+database+" SET level = {} WHERE user_id = {}".format(userLevel(changeInExp+entry[3]), message.author.id))
-            await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
+            # await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
         # else user has not leveled, just add exp
         cur.execute("UPDATE "+database+" SET exp = exp+(%s) WHERE user_id = (%s)", (changeInExp, int(message.author.id), ))
         cur.execute("UPDATE experience E SET level = (SELECT MAX(T.level) FROM template T, experience E1 WHERE T.exp <= E1.exp AND E.user_id = E1.user_id)")
@@ -181,7 +202,7 @@ def getLevel():
 # used to find the current level of user given experience
 def userLevel(experience):
     global expTable
-    print(expTable[5][1])
+    # print(expTable[5][1])
     lowerBound = 0
     upperBound = 0
     for foo in expTable:
@@ -194,12 +215,12 @@ def userLevel(experience):
 
 # detect if user is eligible for the next level
 def updateLevel(change, experience, currLevel):
-    print("Experience : {} and Change : {}".format(experience, change))
-    print("CurrLevel: {}".format(currLevel))
+    # print("Experience : {} and Change : {}".format(experience, change))
+    # print("CurrLevel: {}".format(currLevel))
     foo = change + experience
-    print("foo : {}".format(foo))
+    # print("foo : {}".format(foo))
     afterChange = userLevel(foo)
-    print("afterChange : {}".format(afterChange))
+    # print("afterChange : {}".format(afterChange))
     if afterChange != currLevel:
         return True
     return False  
