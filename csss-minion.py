@@ -77,19 +77,31 @@ async def on_message(message):
 
 startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary"]
 
-# @bot.command()
-# async def loadExt(name):
-#     try: 
-#         bot.load_extension(name)
-#     except(AttributeError, ImportError) as e:
-#         await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
-#         return
-#     await bot.say("{} cog loaded.".format(name))
+@bot.command(pass_context = True)
+async def loadExt(ctx, name):
+    if Henry(ctx):
+        try: 
+            bot.load_extension(name)
+        except(AttributeError, ImportError) as e:
+            await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            return
+        await bot.say("{} cog loaded.".format(name))
+    else:
+        await bot.say("You ain't my master! Shoo!")
 
-# @bot.command()
-# async def unload(name):
-#     bot.unload_extension(name)
-#     await bot.say("{} cog unloaded".format(name))
+@bot.command(pass_context = True)
+async def unload(ctx, name):
+    if Henry(ctx):
+        bot.unload_extension(name)
+        await bot.say("{} cog unloaded".format(name))
+    else:
+        await bot.say("You ain't my master! Shoo!")
+
+def Henry(ctx):
+    if ctx.message.author.id == "173702138122338305":
+        return True
+    else:
+        return False
 
 # pulling all members from the server. Disable unless admin using
 # @bot.command(pass_context = True)
