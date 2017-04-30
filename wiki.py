@@ -42,25 +42,28 @@ class Wiki:
         else: # append msg if too short ALSO adds final part of string after looping
             msgs.append(msg)
         return msgs    
-        
+           
         
     @commands.command()
     async def wiki(self, query:str):
         """shit goes here"""
-        json = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/'+query+'?redirect=true')
+        json = requests.get('https://en.wikipedia.org/w/api.php?action=opensearch&search='+query+'&limit=5&format=json&redirects=resolve')
         msg = json.json()
         if json.status_code == 200:
-            if "description" in msg and (msg["description"] == "Wikipedia disambiguation page" or msg["description"] == "Wikimedia disambiguation page"):
-            # no page found
-                definition_str = "Try to be more specific"
+            if isinstance(msg[1][0], str) and ("(disambiguation)" in msg[1][0] or "may refer to:" in msg[2][0]):
+            # list disambiguations
+                definition_str = "Search for '"+msg[0]+"' is too general. Try one of these: \n"
+                for i in range(0,len(msg[1])):
+                    if "may refer to:" not in msg[2][i]:
+                        definition_str += "\n"+msg[1][i]
             else:
-                definition_str = "\n"+msg['title']+"\n\n"+msg['extract']
+            # display summary
+                definition_str = "Wiki summary for "+ msg[0] + "\n\n" +msg[2][0]
         else:
             definition_str = "There was an error."+str(json.status_code)+" There is no page for this."
         msgs = self.fit_msg(definition_str)
         for msg in msgs:
             await self.bot.say("```"+msg+"```")
-        
         
 def setup(bot):
     bot.add_cog(Wiki(bot))
