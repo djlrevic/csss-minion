@@ -58,6 +58,7 @@ class Info():
             # embed.add_field(name=".vote", value="Find voting details for the CSSS Exec election!.")
             embed.add_field(name=".voteresult", value="Find out the winners of the CSSS annual election!")
             embed.add_field(name=".help mc", value="Displays commands for the CSSS Minecraft server. Only usable within #minecraft")
+            embed.add_field(name=".gameR help", value="Displays commands for the for the Roullette game")
             embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
             await self.bot.say(embed=embed)
