@@ -12,7 +12,7 @@ import asyncio
 import codecs as codex
 import math
 import time
-from subprocess import call
+import subprocess
 
 configFile = "botMain.settings"
 database = "experience" #database name used for exp
@@ -101,8 +101,7 @@ async def unload(ctx, name):
 @bot.command(pass_context = True)
 async def execute(ctx, query):
     if Henry(ctx):
-        res = call(query)
-        await bot.say(res)
+        await bot.say("```"+subprocess.getoutput(query)+"```")
     else:
         await bot.say("You ain't my master! Shoo!")
 
