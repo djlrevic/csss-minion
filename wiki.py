@@ -49,7 +49,7 @@ class Wiki:
         """shit goes here"""
         json = requests.get('https://en.wikipedia.org/w/api.php?action=opensearch&search='+query+'&limit=5&format=json&redirects=resolve')
         msg = json.json()
-        if json.status_code == 200:
+        if json.status_code == 200 and not len(msg[1]) == 0:
             if isinstance(msg[1][0], str) and ("(disambiguation)" in msg[1][0] or "may refer to:" in msg[2][0]):
             # list disambiguations
                 definition_str = "Search for '"+msg[0]+"' is too general. Try one of these: \n"
@@ -60,7 +60,7 @@ class Wiki:
             # display summary
                 definition_str = "Wiki summary for "+ msg[0] + "\n\n" +msg[2][0]
         else:
-            definition_str = "There was an error."+str(json.status_code)+" There is no page for this."
+            definition_str = "There was an error "+str(json.status_code)+". There is no page for this."
         msgs = self.fit_msg(definition_str)
         for msg in msgs:
             await self.bot.say("```"+msg+"```")
