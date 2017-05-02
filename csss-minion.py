@@ -39,6 +39,7 @@ else:
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
 conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
+bot.conn_wc = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'") # second connection for wordcloud cog
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
