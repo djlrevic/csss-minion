@@ -66,6 +66,7 @@ class Info():
             embed.add_field(name=".poem <title> <author>", value="Retrieve a poem from the poem database")
             embed.add_field(name=".wiki <query>", value="Retrieve summary of a wikipedia article")
             embed.add_field(name=".wordart", value="Make a wordcloud out of your common words")
+            embed.add_field(name=".avatart <invert> <colour>", value="Turn your avatar into a wordcloud!")
             embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
             await self.bot.say(embed=embed)
