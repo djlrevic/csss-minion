@@ -59,6 +59,13 @@ class Info():
             embed.add_field(name=".voteresult", value="Find out the winners of the CSSS annual election!")
             embed.add_field(name=".help mc", value="Displays commands for the CSSS Minecraft server. Only usable within #minecraft")
             embed.add_field(name=".gameR help", value="Displays commands for the for the Roullette game")
+            embed.add_field(name=".meaning <word>", value="Display the meaning of an english word")
+            embed.add_field(name=".synonym <word>", value="Display synonyms for an english word")
+            embed.add_field(name=".antonym <word>", value="Display antonyms for an english word")
+            embed.add_field(name=".spell <word>", value="Check the spelling of an english word")
+            embed.add_field(name=".poem <title> <author>", value="Retrieve a poem from the poem database")
+            embed.add_field(name=".wiki <query>", value="Retrieve summary of a wikipedia article")
+            embed.add_field(name=".wordart", value="Make a wordcloud out of your common words")
             embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
             await self.bot.say(embed=embed)
