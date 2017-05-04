@@ -125,7 +125,7 @@ class WordArt:
         img = cv2.imdecode(np.frombuffer(img_data, np.uint8),1) # convert from string butter to uint8
         img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) # grayscale that motha
         ret,img_bw = cv2.threshold(img_gray,127,255, thresh) #threshold values
-        
+        # it's different
         word = self.wordsFromDB(ctx.message.author) # retrieve words from DB
         text = " ".join(word)
         avatar_mask = np.array(img_bw) # create mask
