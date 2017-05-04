@@ -128,9 +128,8 @@ class WordArt:
         
         word = self.wordsFromDB(ctx.message.author) # retrieve words from DB
         text = " ".join(word)
-
-        avatar_mask = np.array(Image.open(avatar_bw)) # create mask
-        wc = WordCloud(background_color="black", max_words=2000, mask=avatar_mask)
+        avatar_mask = np.array(img_bw) # create mask
+        wc = WordCloud(background_color=bg_colour, max_words=2000, mask=avatar_mask)
         wc.generate(text)
         wc.to_file(fin_img) # save masked wordart to file
         
