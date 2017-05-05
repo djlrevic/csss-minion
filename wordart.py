@@ -88,9 +88,32 @@ class WordArt:
         self.bot.conn_wc.commit()
         cur.close()
 
+
+    # also this http://i.imgur.com/dmqYSvu.jpg
+    @commands.command()
+    async def impeach(self):
+        await self.bot.say("Yessir! Right away, sir!" + "http://imgur.com/pCQT0pm")
+        
+    @commands.command()
+    async def triggered(self):
+        await self.bot.say("Oh no you didn't!"+" http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
+
+
+    @commands.command(pass_context=True)
+    async def remindme(self, ctx, *args):
+        await self.bot.say("```Thanks for reminding me to write the rest of this function.```")
+
+    @commands.command()
+    async def kms(self):
+        await self.bot.say("http://i.imgur.com/XStaKp3.jpg")
+
+    @commands.command()
+    async def eggplant(self):
+        await self.bot.say("🍆My eggplant brings all the boys to the yard🍆")
+
     @commands.command(pass_context=True)
     async def avatart(self, ctx, *args):
-        await self.bot.say("Making artwork, hold your horses!")
+        await self.bot.say("```Making artwork "+str(ctx.message.author)+", hold your horses!```")
         fin_img = path.join(self.d,self.e,"fin.png")
         
         # this whole block is lol
