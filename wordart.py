@@ -9,16 +9,21 @@ from PIL import Image
 import numpy as np
 from colour import Color
 import io
-#opencv-python is a dependency
+import os
+#opencv-python is a dependency 
+
+#note to self... this will need refactoring one day. That day is not today.
 
 class WordArt:
     tablename = "wordartMessages"
     backupArr = ['sad','oh no', 'terrible timing', 'broken', 'sad','sad', 'nuuu',':(', 'broken', 'sad','brokenhearted', 'next time?', 'database_down', 'database_down', 'database_down']
-    
-    
+    STOPWORDS = set([x.strip() for x in open(os.path.join(os.path.dirname(__file__), 'stopwords.txt')).read().split('\n')])
+
     testimg = "testimg.png"
     d = path.dirname(__file__)
     e = "wordart_dir"
+    serverCache = None
+    serverImage = path.join(d,e, "server.png")
     
        
     def __init__(self, bot):
@@ -28,6 +33,26 @@ class WordArt:
         cur.execute(query)
         self.bot.conn_wc.commit()
         cur.close()
+        self.populateCaches()
+    
+    # populates a word and image cache for the server's wordcloud
+    # calls are limited to __init__, nos, and henry
+    def populateCaches(self):
+        try:
+            cur = self.bot.conn_wc.cursor()
+            cur.execute("SELECT msgs FROM "+self.tablename+" LIMIT 2000") #yeah boy we're limiting
+            entries = cur.fetchall()
+            arr = []
+            for i in range(0, len(entries)):
+                arr.append(entries[i][0])
+            self.serverCache = arr
+        except:
+            print("server cache retrieval error")
+            self.serverCache = backupArr
+        text = " ".join(self.serverCache)
+        wc = WordCloud(width=1024, height=1024, max_words=2000, stopwords=self.STOPWORDS).generate(text)
+        wc.to_file(self.serverImage)
+    
        
        
        # open DB and retrieve messages from a userID
@@ -46,10 +71,10 @@ class WordArt:
             print(e)
             return self.backupArr
         
-    def createImage(self, arr):
+    def createImage(self, arr, saveName):
         text = " ".join(arr)
-        savedir = path.join(self.d,self.e, "wow.png") # local image gets overwritten each time. will this break if too many requests?
-        wc = WordCloud().generate(text)
+        savedir = path.join(self.d,self.e, saveName) # local image gets overwritten each time. will this break if too many requests?
+        wc = WordCloud(max_words=2000, stopwords=self.STOPWORDS).generate(text)
         wc.to_file(savedir)
         return savedir
         
@@ -65,6 +90,7 @@ class WordArt:
 
     @commands.command(pass_context=True)
     async def avatart(self, ctx, *args):
+        await self.bot.say("Making artwork, hold your horses!")
         fin_img = path.join(self.d,self.e,"fin.png")
         
         # this whole block is lol
@@ -102,7 +128,7 @@ class WordArt:
         word = self.wordsFromDB(ctx.message.author) # retrieve words from DB
         text = " ".join(word)
         avatar_mask = np.array(scaled) # create mask
-        wc = WordCloud(background_color=bg_colour, max_words=2000, mask=avatar_mask)
+        wc = WordCloud(background_color=bg_colour, max_words=2000,stopwords=self.STOPWORDS, mask=avatar_mask)
         wc.generate(text)
         wc.to_file(fin_img) # save masked wordart to file
         
@@ -110,10 +136,25 @@ class WordArt:
         await self.bot.send_file(ctx.message.channel, fin_img)
 
 
+    # only refresh cache if an authorized ID
+    @commands.command(pass_context=True)
+    async def refreshCache(self, ctx):
+        if ctx.message.author.id == "173177975045488640" or ctx.message.author.id == "173702138122338305": #users authorized to refresh
+            self.populateCaches()
+            
+            await self.bot.say("```Repopulated the caches my master```")
+        else:
+            await self.bot.say("```Bad boy! Down!```")
+
+
+    @commands.command(pass_context=True)
+    async def servart(self,ctx, *args):
+        await self.bot.send_file(ctx.message.channel, self.serverImage)
+
     @commands.command(pass_context=True)
     async def wordart(self,ctx):
         words = self.wordsFromDB(ctx.message.author)
-        filename = self.createImage(words)
+        filename = self.createImage(words, "wow.png")
         await self.bot.send_file(ctx.message.channel, filename)
         
 def setup(bot):
