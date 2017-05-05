@@ -46,7 +46,7 @@ class Wiki:
         
     @commands.command()
     async def wiki(self, query:str):
-        """shit goes here"""
+        link = None
         json = requests.get('https://en.wikipedia.org/w/api.php?action=opensearch&search='+query+'&limit=5&format=json&redirects=resolve')
         msg = json.json()
         if json.status_code == 200 and not len(msg[1]) == 0:
@@ -59,11 +59,14 @@ class Wiki:
             else:
             # display summary
                 definition_str = "Wiki summary for "+ msg[0] + "\n\n" +msg[2][0]
+                link = msg[3][0]
         else:
             definition_str = "There was an error "+str(json.status_code)+". There is no page for this."
         msgs = self.fit_msg(definition_str)
         for msg in msgs:
             await self.bot.say("```"+msg+"```")
+        if type(link) == str:
+            await self.bot.say("<"+link+">")
         
 def setup(bot):
     bot.add_cog(Wiki(bot))
