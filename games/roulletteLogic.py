@@ -33,7 +33,8 @@ class GameLogic():
     
     def startGame(self):
         self.gameState = self.gameState_running
-        self.sendMsg("Game " + self.gameName + " has started")
+        #self.sendMsg("Game " + self.gameName + " has started")
+        self.bot.send_message(self.channel, "HENRY THE GREATEST")
         pass   
     
     def command(self,player,com):
