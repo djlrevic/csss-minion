@@ -31,6 +31,12 @@ class Dictionary:
                      def_str += i + "\n"
                 def_str += "\n"
             await self.bot.say("```"+def_str+"```")
+       
+    @commands.command(pass_context=True)
+    async def stealthegg(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        await self.bot.say(":eggplant:")
+        
         
         
     @commands.command()
