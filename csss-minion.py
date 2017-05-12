@@ -25,6 +25,7 @@ if not os.path.isfile(configFile):
     ip = "172.93.48.238:25565"
     description = "Bot of the CSSS"
     postgrespass = getpass.getpass('Database Password: ')
+    mashape_key = getpass.getpass('Mashape Key: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
@@ -35,6 +36,7 @@ else:
     token = config.get("Discord", "Token")
     ip = "172.93.48.238:25565"
     postgrespass = config.get("Postgres", "Password")
+    mashape_key = config.get("Mashape", "Token")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -42,14 +44,11 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-# conn.close()
-# conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'")
-# cur = conn.cursor()
-
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
 bot.mcip = ip
 bot.remove_command("help")
+bot.mashape_key = mashape_key
 
 def reloadConfig():
     pass
@@ -80,7 +79,7 @@ async def on_message(message):
 startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki","roullette"]
 
 @bot.command(pass_context = True)
-async def loadExt(ctx, name):
+async def load(ctx, name):
     if Henry(ctx):
         try: 
             bot.load_extension(name)
