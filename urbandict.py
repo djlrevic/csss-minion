@@ -10,7 +10,7 @@ class UrbanDict:
 
     def __init__(self, bot):
         self.bot = bot
-        self.key = self.bot.urban_key #this key is your key, this key is my key.
+        self.key = self.bot.mashape_key #this key is your key, this key is my key.
         self.headers = {"X-Mashape-Key": self.key, "Accept": "text/plain"}
         
     # take raw json response and return appropriate message for bot to say    

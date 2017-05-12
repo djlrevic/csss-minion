@@ -44,6 +44,8 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck"]
+
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
 bot.mcip = ip
@@ -75,8 +77,6 @@ async def on_message(message):
     if validate(message):
         await add(message)
     await bot.process_commands(message)
-
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki","roullette"]
 
 @bot.command(pass_context = True)
 async def load(ctx, name):

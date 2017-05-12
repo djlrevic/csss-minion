@@ -60,7 +60,7 @@ class Duck:
     
     
     @commands.command()
-    async def duck(self, word):
+    async def search(self, word):
         
         msg = self.parseResponse(word)
         await self.bot.say(msg)
