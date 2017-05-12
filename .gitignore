@@ -5,3 +5,4 @@ wordart_dir/*
 
 # exception to rules
 !wordart_dir/.gitkeep
+!wordart_dir/default_avatar.jpg

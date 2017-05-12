@@ -141,28 +141,36 @@ class WordArt:
             thresh = cv2.THRESH_BINARY
             bg_colour = "white"     
         ava = ctx.message.author.avatar_url # grab avatar URL
-        img_data = requests.get(ava, stream=True).content #dl from dat url
+        try:
+            if ava == "":
+                print("there's no avatar for this user: "+str(ctx.message.author))
+                await self.bot.say("```I can't make avatar art without an avatar you silly goose. But it's ok, I have something special for you.```")
+                img = cv2.imread(path.join(self.d,self.e,"default_avatar.jpg"),1)
+            else:
+                img_data = requests.get(ava, stream=True).content #dl from dat url
+                img = cv2.imdecode(np.frombuffer(img_data, np.uint8),1) # convert from string butter to uint8    
         
-        img = cv2.imdecode(np.frombuffer(img_data, np.uint8),1) # convert from string butter to uint8
-        img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) # grayscale that motha
-        ret,img_bw = cv2.threshold(img_gray,127,255, thresh) #threshold values
-        scaled = cv2.resize(img_bw, (1024,1024), interpolation = cv2.INTER_LINEAR)
+            img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) # grayscale that motha
+            ret,img_bw = cv2.threshold(img_gray,127,255, thresh) #threshold values
+            scaled = cv2.resize(img_bw, (1024,1024), interpolation = cv2.INTER_LINEAR)
         
-        word = self.wordsFromDB(ctx.message.author) # retrieve words from DB
-        text = " ".join(word)
-        avatar_mask = np.array(scaled) # create mask
-        wc = WordCloud(background_color=bg_colour, max_words=2000,stopwords=self.STOPWORDS, mask=avatar_mask)
-        wc.generate(text)
-        wc.to_file(fin_img) # save masked wordart to file
+            word = self.wordsFromDB(ctx.message.author) # retrieve words from DB
+            text = " ".join(word)
+            avatar_mask = np.array(scaled) # create mask
+            wc = WordCloud(background_color=bg_colour, max_words=20000,stopwords=self.STOPWORDS, mask=avatar_mask)
+            wc.generate(text)
+            wc.to_file(fin_img) # save masked wordart to file
+            await self.bot.send_file(ctx.message.channel, fin_img)
+        except:
+            await self.bot.say("```Something has gone horribly wrong.```")
         
-       
-        await self.bot.send_file(ctx.message.channel, fin_img)
 
 
     # only refresh cache if an authorized ID
     @commands.command(pass_context=True)
     async def refreshCache(self, ctx):
         if ctx.message.author.id == "173177975045488640" or ctx.message.author.id == "173702138122338305": #users authorized to refresh
+            await self.bot.say("```Working...```")
             self.populateCaches()
             
             await self.bot.say("```Repopulated the caches my master```")
