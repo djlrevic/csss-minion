@@ -2,21 +2,11 @@ import discord
 from discord.ext import commands
 from PyDictionary import PyDictionary
 
-# !meaning #meaning of a word
-# !synonym #synonyms of a word
-# !antonym #antonyms of a word
-# !translate #translation of a word
-
 class Dictionary:
-    """Makes wordart from strings or someshizz"""
     
     def __init__(self, bot):
         self.bot = bot
         self.dictionary = PyDictionary('lxml')
-        
-    
-    def unjson(self, msg):
-        print("huh")
        
     @commands.command()
     async def meaning(self, word:str):
@@ -65,8 +55,8 @@ class Dictionary:
     @commands.command()
     async def translate(self, word:str, lang:str):
         ret = self.dictionary.translate(word, lang)
-        print(word)
-        print(lang)
+        #print(word)
+        #print(lang)
         if ret is None:
             await self.bot.say(word+" not found.")
         else:

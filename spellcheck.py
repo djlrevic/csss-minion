@@ -2,10 +2,7 @@ import discord
 import enchant
 from discord.ext import commands
 
-# requires an installed dictionary. Reference the README.
-
 class Spellcheck:
-    """Checks and corrects"""
     
     def __init__(self, bot, dictionary):
         self.bot = bot
@@ -14,7 +11,6 @@ class Spellcheck:
         
     @commands.command()
     async def spell(self, word: str):
-        """shit goes here"""
         if self.spchk.check(word):
             await self.bot.say("Yes! "+word+" is spelled correctly.")
         else:

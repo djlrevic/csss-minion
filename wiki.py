@@ -3,12 +3,7 @@ from discord.ext import commands
 import requests
 import json
 
-# TODO: 
-# wiki summary concatenates the one displayed on the wiki, it's possible we don't need fit_msg here.
-# prettify message
-
 class Wiki:
-    """Makes wordart from strings or someshizz"""
     
     def __init__(self, bot):
         self.bot = bot
@@ -29,13 +24,12 @@ class Wiki:
         while len(msg) >= 2000:
             for x in range(2000,0,-1):
                 if simpleSplit:
-                    print("Simple splitting at: "+str(x))
+                    #print("Simple splitting at: "+str(x))
                     msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
                     msg = msg[x:] #put everything after newline back into str 
                     break;
                 elif msg[x] == splitSymbol:
-                    print("FOUND A SPLITSYMBOL: "+ str(x))
-                
+                    #print("FOUND A SPLITSYMBOL: "+ str(x))
                     msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
                     msg = msg[x:] #put everything after newline back into str
                     break;

@@ -8,7 +8,6 @@ import random
 # is most of poetry_url redundant with new commands.bot?
 
 class Poem:
-    """Retrieves Poems and PMs them to you"""
     poetry_base_url = "http://poetrydb.org/"
     def __init__(self, bot):
         self.bot = bot
@@ -16,7 +15,6 @@ class Poem:
         
     # cache titles to avoid 2 API calls when servicing random poem
     def populate_poetry_cache(self):
-        #self.poetry_title_cache
         url = self.poetry_base_url + "title"
         json = requests.get(url)
         if json.status_code == 200:
@@ -24,8 +22,8 @@ class Poem:
             if "titles" in msg:
                 self.poetry_title_cache = msg
                 print("Cache filled")
-                print(type(msg))
-                print(type(self.poetry_title_cache))
+                #print(type(msg))
+                #print(type(self.poetry_title_cache))
             else:
                 print("Cache not filled")
         else:
@@ -48,12 +46,12 @@ class Poem:
         while len(msg) >= 2000:
             for x in range(2000,0,-1):
                 if simpleSplit:
-                    print("Simple splitting at: "+str(x))
+                    #print("Simple splitting at: "+str(x))
                     msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
                     msg = msg[x:] #put everything after newline back into str 
                     break;
                 elif msg[x] == splitSymbol:
-                    print("FOUND A SPLITSYMBOL: "+ str(x))
+                    #print("FOUND A SPLITSYMBOL: "+ str(x))
                 
                     msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
                     msg = msg[x:] #put everything after newline back into str
@@ -108,12 +106,11 @@ class Poem:
          
     @commands.command(pass_context=True)
     async def poem(self,ctx, *args):
-        """shit goes here"""
-        print(args)
+        #print(args)
         url = self.poetry_url(args)
         msg = self.poetry_json(url)
         msgs = self.fit_msg(msg[0]+"\n"+msg[1])
-        print("There are "+str(len(msgs))+" parts to this msg")
+        #print("There are "+str(len(msgs))+" parts to this msg")
         if msg[0] == "error":
             await self.bot.say("Spelling error or not in database.")
         else:
