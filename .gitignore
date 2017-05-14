@@ -2,6 +2,7 @@
 botMain.settings
 bot.log
 wordart_dir/*
+__pycache__
 
 # exception to rules
 !wordart_dir/.gitkeep

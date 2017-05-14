@@ -62,13 +62,14 @@ class Duck:
         
         msg = self.parseResponse(word)
         await self.bot.say(msg)
-            
+        
+    # so broke, so sad        
     @commands.command()
     async def eggwrite(self, word:str):
         newstr = ""
         for s in word:
             if s.isalpha():
-                newstr += ":"+s.upper()+"_Eggplant:"
+                newstr += "**:"+s.upper()+"_Eggplant:**"
                 #newstr += ":regional_indicator_"+s.lower()+":"
             else:
                 newstr += s
