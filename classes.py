@@ -14,7 +14,7 @@ class Classes():
             if ctx.message.server.roles[j].name == course:
                 dupe = True
         if dupe == True:
-            await self.bot.say("Class already exists")    
+            await self.bot.say("Class already exists")
         else:
             # temp value
             flag = True
@@ -30,7 +30,36 @@ class Classes():
                 await self.bot.say(course+" class has been created. You have been placed in it.")
             else:
                 await self.bot.say("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
-    
+
+    @commands.command(pass_context = True)
+    async def whois(self, ctx, course):
+        get = 0
+        for i in ctx.message.server.roles:
+            if i.name == course:
+                get = i
+        if get == 0:
+            # not role specified not found
+            await self.bot.say("That course doesn't exist!")
+        else:
+            # role specified is found
+            # await self.bot.say("Found {}".format(get.name))
+            people = []
+            for i in ctx.message.server.members:
+                if get in i.roles:
+                    if i.nick == None:
+                        people.append(i.name)
+                    else:
+                        people.append(i.nick)
+            if len(people) == 0:
+                # no users found in that group
+                await self.bot.say("No one in this group!")
+            else:
+                result = "```I found these people: \n \n"
+                for i in people:
+                    result += str(i) + "\n"
+                result += "```"
+                await self.bot.say(result)
+
     # Remove user from role
     @commands.command(pass_context = True)
     async def iamn(self, ctx, course : str):
@@ -44,7 +73,7 @@ class Classes():
         else:
             await self.bot.remove_roles(ctx.message.author, ctx.message.author.roles[found])
             await self.bot.say("You've been removed from " + course)
-    
+
     @commands.command(pass_context = True)
     async def iam(self, ctx, course : str):
         course = course.lower()
