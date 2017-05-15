@@ -6,7 +6,6 @@ from urllib import parse
 # note to self, do not use mashape API for duckduckgo. It has malformed JSON
 # note to self, duckduckgo API doesn't return search results... just scrape
 
-# TODO: autocomplete bot !autocomplete "what if".... finds result
 
 class Duck:
 
@@ -45,8 +44,7 @@ class Duck:
                         #print("Have cutoff: "+cutoff)
                         if cutoff not in results: # don't put 4 duplicates in arr
                             #print("Adding cutoff: "+cutoff)
-                            results.append(cutoff)
-                    
+                            results.append(cutoff)    
             res = results[0]
             for r in results[1:11]: # return 10 results
                 res += "\n<"+r+">"  # escape discord embedding       
@@ -64,13 +62,14 @@ class Duck:
         
         msg = self.parseResponse(word)
         await self.bot.say(msg)
-            
+        
+    # so broke, so sad        
     @commands.command()
     async def eggwrite(self, word:str):
         newstr = ""
         for s in word:
             if s.isalpha():
-                newstr += ":"+s.upper()+"_Eggplant:"
+                newstr += "**:"+s.upper()+"_Eggplant:**"
                 #newstr += ":regional_indicator_"+s.lower()+":"
             else:
                 newstr += s

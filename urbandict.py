@@ -2,10 +2,6 @@ import requests
 import discord
 from discord.ext import commands
 
-
- # test length on "gavin free"
- # need length shortening for anti-spam
-
 class UrbanDict:
 
     def __init__(self, bot):
@@ -19,17 +15,13 @@ class UrbanDict:
             r = json.json()
             if r['result_type'] == "exact":
                 msg = " " #python strings are funny sometimes
- 
                 msg += "**"+r['list'][0]['word']+"**"
                 msg +="```"+ r['list'][0]['definition'] +"```"
                 msg += "**example: **"+r['list'][0]['example']
                 msg += "\n<"+r['list'][0]['permalink']+">"
                 return msg
-           
-            
             elif r['result_type'] == "no_results":
                 return "You probably typed in some dumb shit, cuz I can't find it." 
-            
             else:
                 return "Contact Nos ASAP cuz shit's broke"  
         else:

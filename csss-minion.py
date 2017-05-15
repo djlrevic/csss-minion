@@ -238,5 +238,11 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
+@bot.command()
+async def cogs():
+    """Lists the currently loaded cogs."""
+    cogs = list(bot.cogs.keys())
+    await bot.say("\n".join(cogs)) 
+
 bot.loop.create_task(update())
 bot.run(token)
