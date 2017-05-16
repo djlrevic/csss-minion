@@ -230,6 +230,11 @@ async def rank(ctx):
     msg = cur.fetchone()
     await bot.say(msg)  
 
+# testing if the bot is alive
+@bot.command()
+async def ping:
+    await bot.say("pong")
+
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
