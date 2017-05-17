@@ -99,7 +99,7 @@ async def unload(ctx, name):
         await bot.say("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
-async def execute(ctx, *args):
+async def exc(ctx, *args):
     if Henry(ctx):
         query = " ".join(args)
         await bot.say("```"+subprocess.getoutput(query)+"```")
