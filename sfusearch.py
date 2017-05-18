@@ -7,7 +7,7 @@ import datetime
 # http://www.sfu.ca/students/calendar/2017/spring/courses/cmpt/120.html
 
 
-class Classes:
+class SfuSearch:
 
     def __init__(self, bot):
         self.bot = bot
@@ -149,4 +149,4 @@ class Classes:
     
    
 def setup(bot):
-    bot.add_cog(Classes(bot))
+    bot.add_cog(SfuSearch(bot))
