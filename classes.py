@@ -88,4 +88,4 @@ class Classes():
             await self.bot.say("You've been placed in "+ course)
 
 def setup(bot):
-bot.add_cog(Classes(bot))
+    bot.add_cog(Classes(bot))
