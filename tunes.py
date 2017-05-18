@@ -13,7 +13,8 @@ import __main__
 # TODO 
 # cooldown for heat
 # dies when requester skips.
-# toggle authoritarian mode
+# dies when queue with no song in queue
+# download entire song first
 
 
 if not discord.opus.is_loaded():
@@ -169,6 +170,9 @@ class Tunes:
         """
         if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
+            return False
+        if str(ctx.message.channel.id) != "293120981067890691":
+            await self.bot.say("You can only request from #bottesting")
             return False
         
         state = self.get_voice_state(ctx.message.server)

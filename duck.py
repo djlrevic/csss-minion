@@ -11,7 +11,7 @@ class Duck:
 
     def __init__(self, bot):
         self.bot = bot
-   
+        self.emojis = None
    
     # take raw json response and return appropriate message for bot to say    
     def parseResponse(self, word):
@@ -58,22 +58,43 @@ class Duck:
     
     
     @commands.command()
-    async def search(self, word):
-        
+    async def search(self, *query):
+        word = " ".join(query)
         msg = self.parseResponse(word)
         await self.bot.say(msg)
         
-    # so broke, so sad        
-    @commands.command()
-    async def eggwrite(self, word:str):
+      #<:crabplant:314875003168489472>
+  
+    @commands.command(pass_context=True)
+    async def eggwrite(self, ctx, *msg):
+        if self.emojis == None:
+            self.emojis = ctx.message.server.emojis
+        word = " ".join(msg)
         newstr = ""
         for s in word:
             if s.isalpha():
-                newstr += "**:"+s.upper()+"_Eggplant:**"
-                #newstr += ":regional_indicator_"+s.lower()+":"
+                #convert to eggplant letter
+                for em in self.emojis:
+                    if str(em)[2] == s.upper():
+                        newstr += str(em)
+            elif s == " ":
+                #change to 5 spaces
+                newstr += "     "
             else:
                 newstr += s
         await self.bot.say(newstr)
+        
+        
+   # @commands.command()
+   # async def eggwrite(self, *word):
+   #     newstr = ""
+   #     for s in word:
+   #         if s.isalpha():
+   #             newstr += "**:"+s.upper()+"_Eggplant:**"
+   #             #newstr += ":regional_indicator_"+s.lower()+":"
+   #         else:
+   #             newstr += s
+   #     await self.bot.say(newstr)
         
    
 def setup(bot):
