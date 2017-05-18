@@ -1,152 +1,91 @@
+#pylint: disable=C
 import discord
 from discord.ext import commands
-import requests
-from bs4 import BeautifulSoup
-from urllib import parse
-import datetime
-# http://www.sfu.ca/students/calendar/2017/spring/courses/cmpt/120.html
 
-
-class Classes:
-
+class Classes():
     def __init__(self, bot):
         self.bot = bot
-        self.seasons = ["fall", "spring", "summer"]
-   
-    def gettime():
-        now = datetime.datetime.now()
-   
-   
-    # take raw json response and return appropriate message for bot to say    
-    def parseResponse(self, query):
-        ret = requests.get(query)
-        parr = []
-        if ret.status_code == 200:
-            res = None
-            html = ret.text
-            soup = BeautifulSoup(html, "html.parser")
-            for paragraph in soup.find_all('p'):
-                parr.append(paragraph.text)   
-            if len(parr) < 1:
-                return "Unable to retrieve data from SFU page"
-            elif len(parr) < 2:
-                return "Unable to find page"
-            else:
-                return parr[1]    
-            
+
+    @commands.command(pass_context = True)
+    async def newclass(self, ctx, course):
+        course = course.lower()
+        dupe = False
+        for j in range(0, len(ctx.message.server.roles)):
+            if ctx.message.server.roles[j].name == course:
+                dupe = True
+        if dupe == True:
+            await self.bot.say("Class already exists")
         else:
-            return "SFU Server Error "+str(ret.status_code)
-    
-    
-    def semester(self, month:str):
-        """map months to semesters"""
-        semesters = {
-            "january":"spring",       
-            "february":"spring",
-            "march":"spring",
-            "april":"spring",
-            "may":"summer",
-            "june":"summer",
-            "july":"summer",
-            "august":"summer",
-            "september":"fall",
-            "october":"fall",
-            "november":"fall",
-            "december":"fall",
-            '1':"spring",       
-            '2':"spring",
-            '3':"spring",
-            '4':"spring",
-            '5':"summer",
-            '6':"summer",
-            '7':"summer",
-            '8':"summer",
-            '9':"fall",
-            '10':"fall",
-            '11':"fall",
-            '12':"fall"
-            }
-        if month in semesters:
-            return semesters[month]
-        else:
-            print(str(month) +" is not in the dict")
-            return "fall"
-    
-    # coursepart must contain both course and subject
-    def parsecoursepart(self, coursepart:str):
-        subject = None
-        course = None
-        for i, c in enumerate(coursepart):
-            if c.isdigit():
-                subject = coursepart[:i]
-                course = coursepart[i:]
-                break;
-          #fix undefined error
-        return (subject, course)
-    
-    
-    def createurl(self, word):
-        semester = None
-        subject = None
-        if len(word) == 1:
-            coursepart = word[0]
-            if len(coursepart) < 4:
-                # assume cmpt course search
-                course = coursepart
+            # temp value
+            flag = True
+            # temp value
+
+            # flag = False
+            # for i in range(0, len(ctx.message.author.roles)):
+            #     if ctx.message.author.roles[i].name == "Regular":
+            #         flag = True
+            if flag == True:
+                newRole = await self.bot.create_role(ctx.message.server, name = course, mentionable = True)# , hoist = True)
+                await self.bot.add_roles(ctx.message.author, newRole)
+                await self.bot.say(course+" class has been created. You have been placed in it.")
             else:
-                # assume course and subject search
-                subject, course = self.parsecoursepart(coursepart)
-                        
-            
-        elif len(word) == 2:
-            
-            if word[0] in self.seasons: # two parts are season and coursepart
-                semester = word[0]
-                subject, course = self.parsecoursepart(word[1])
-            elif word[1] in self.seasons:
-                semester = word[1]
-                subject, course = self.parsecoursepart(word[0])
-            else:
-                # two parts are course and subject
-                if any(char.isdigit() for char in word[0]): #subjects have no digits
-                    subject = word[1]
-                    course = word[0]
-                    
-                elif any(char.isdigit() for char in word[1]):
-                    subject = word[0]
-                    course = word[1]
-                else:
-                    # some sort of error occured
-                    print("An error occured")
-        
+                await self.bot.say("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
+
+    @commands.command(pass_context = True)
+    async def whois(self, ctx, course):
+        get = 0
+        for i in ctx.message.server.roles:
+            if i.name == course:
+                get = i
+        if get == 0:
+            # not role specified not found
+            await self.bot.say("That course doesn't exist!")
         else:
-            print("bad number of args")
-        query = "http://www.sfu.ca/students/calendar/"
-        now = datetime.datetime.now()
-        year = str(now.year)
-        if semester == None:
-            semester = self.semester(str(now.month))
-        if subject == None:
-            subject = "cmpt"
-        #coursenumber = word
-        
-        query += year +"/"+ semester + "/courses/" + subject + "/" + course
-        return query
-        
-    
-    
-    @commands.command(pass_context=True)
-    async def sfu(self,ctx, *words:str):
-        """Lookup an SFU class
-        usage: !sfu <cmpt120> or !sfu <cmpt> <120>
-        
-        """
-        url = self.createurl(words)
-        msg = self.parseResponse(url)
-        await self.bot.say(msg)
-        await self.bot.say(url)
-    
-    
-   
+            # role specified is found
+            # await self.bot.say("Found {}".format(get.name))
+            people = []
+            for i in ctx.message.server.members:
+                if get in i.roles:
+                    if i.nick == None:
+                        people.append(i.name)
+                    else:
+                        people.append(i.nick)
+            if len(people) == 0:
+                # no users found in that group
+                await self.bot.say("No one in this group!")
+            else:
+                result = "```I found these people: \n \n"
+                for i in people:
+                    result += str(i) + "\n"
+                result += "```"
+                await self.bot.say(result)
+
+    # Remove user from role
+    @commands.command(pass_context = True)
+    async def iamn(self, ctx, course : str):
+        course = course.lower()
+        found = 0
+        for i in range(0, len(ctx.message.author.roles)):
+            if course == ctx.message.author.roles[i].name:
+                found = i
+        if found == 0:
+            await self.bot.say("You are not currently in this class.")
+        else:
+            await self.bot.remove_roles(ctx.message.author, ctx.message.author.roles[found])
+            await self.bot.say("You've been removed from " + course)
+
+    @commands.command(pass_context = True)
+    async def iam(self, ctx, course : str):
+        course = course.lower()
+        found = 0
+        for i in range(0, len(ctx.message.server.roles)):
+            if course == ctx.message.server.roles[i].name:
+                found = i
+        if found == 0:
+            await self.bot.say("This class doesn't exist. Try creating it with .newclass name")
+        else:
+            await self.bot.add_roles(ctx.message.author, ctx.message.server.roles[found])
+            await self.bot.say("You've been placed in "+ course)
+
 def setup(bot):
-    bot.add_cog(Classes(bot))
+bot.add_cog(Classes(bot))
