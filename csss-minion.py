@@ -44,7 +44,7 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -232,7 +232,7 @@ async def rank(ctx):
 
 # testing if the bot is alive
 @bot.command()
-async def ping:
+async def ping():
     await bot.say("pong")
 
 if __name__ == "__main__":

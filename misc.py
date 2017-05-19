@@ -35,7 +35,7 @@ class Misc():
                 await self.bot.add_reaction(question, str(i)+'\U000020e3')
 
     @commands.command()
-    async def play(self, msg):
+    async def playmsg(self, msg):
         await self.bot.change_presence(game = discord.Game(name=msg))
 
     @commands.command(pass_context=True)
