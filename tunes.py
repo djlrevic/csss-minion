@@ -171,18 +171,15 @@ class Tunes:
         if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
             return False
-        if str(ctx.message.channel.id) != "293120981067890691":
+        if not self.bot.testing and   str(ctx.message.channel.id) != "293120981067890691":
             await self.bot.say("You can only request from #bottesting")
             return False
         
         state = self.get_voice_state(ctx.message.server)
+        beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         opts = {
             'default_search': 'auto',
-            'quiet': True,
-            'reconnect': 1,
-            'reconnect_streamed':1,
-            'reconnect_delay_max':5,
-            'socket-timeout':5
+            'quiet': True
         }
 
         if state.voice is None:
@@ -192,7 +189,7 @@ class Tunes:
                 return
 
         try:
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next, before_options=beforeArgs)
             print("successfully created player")
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
@@ -360,9 +357,11 @@ def setup(bot):
     bot.add_cog(Tunes(bot))
     if __main__.__file__ == "bot.py": # use test channels
         print("set to test channels")
+        bot.testing = True
         bot.request_channel = "304837708650643459"
         bot.music_channel = "312693106736889867"
     else: # use production channels
+        bot.testing = False
         print("set to production channels")
         bot.request_channel = "293120981067890691"
         bot.music_channel = "228761314644852737"
