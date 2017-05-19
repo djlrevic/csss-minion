@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import datetime
 import __main__
 
 # pip install PyNaCl
@@ -22,10 +23,17 @@ if not discord.opus.is_loaded():
 
 
 class VoiceEntry:
-    def __init__(self, message, player):
+    def __init__(self, message, player, datetime, heat):
         self.requester = message.author
         self.channel = message.channel
         self.player = player
+        self.datetime = datetime
+        self.heat = heat
+
+    def __lt__(self, other):
+        selfpriority = (self.heat, self.datetime)
+        otherpriority = (other.heat, other.datetime)
+        return selfpriority < otherpriority
 
     def __str__(self):
         fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
@@ -189,6 +197,7 @@ class Tunes:
                 return
 
         try:
+        
             player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next, before_options=beforeArgs)
             print("successfully created player")
         except Exception as e:
@@ -197,12 +206,12 @@ class Tunes:
         else:
             if not state.is_playing() and state.current is not None:
                 print("shit gone south")
-            
+            heat = state.getheat(ctx.message.author)
             player.volume = 0.6
-            entry = VoiceEntry(ctx.message, player)
+            entry = VoiceEntry(ctx.message, player, datetime.datetime.now(), heat)
             await self.bot.say('Enqueued ' + str(entry))
             state.updateheat(ctx.message)
-            heat = state.getheat(ctx.message.author)
+            
             print("current heat is "+str(heat))
             await self.bot.say("Your heat is now at "+str(heat))
             if self.bot.music_priorityqueue:
@@ -365,7 +374,7 @@ def setup(bot):
         print("set to production channels")
         bot.request_channel = "293120981067890691"
         bot.music_channel = "228761314644852737"
-    bot.music_priorityqueue = False
+    bot.music_priorityqueue = True
     bot.music_authoritarian = False
     bot.admins_dict = {"173702138122338305":"henry",
      "173177975045488640":"nos"
