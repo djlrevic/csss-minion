@@ -232,7 +232,7 @@ async def rank(ctx):
 
 # testing if the bot is alive
 @bot.command()
-async def ping:
+async def ping():
     await bot.say("pong")
 
 if __name__ == "__main__":

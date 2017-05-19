@@ -64,18 +64,22 @@ class Roulette():
             return
         
         self.bot.say(getName(ctx.message.author) + " in Room " + game.gameName + " on channel " + game.channel.name)   
+        
     
     @gameR.command(pass_context = True)
     async def start(self,ctx):
+        
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
             return
         
         game.start()
+        self.bot.delete_message(ctx.message)
     
     @gameR.command(pass_context = True)
     async def fire(self,ctx):
+        self.bot.delete_message(ctx.message)
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -84,6 +88,7 @@ class Roulette():
      
     @gameR.command(pass_context = True)
     async def spin(self,ctx):
+        self.bot.delete_message(ctx.message)
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -92,6 +97,7 @@ class Roulette():
      
     @gameR.command(pass_context = True)
     async def restart(self,ctx):
+        self.bot.delete_message(ctx.message)
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -102,6 +108,7 @@ class Roulette():
     
     @gameR.command(pass_context = True)
     async def afk(self,ctx):
+        self.bot.delete_message(ctx.message)
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -111,6 +118,7 @@ class Roulette():
      
     @gameR.command(pass_context = True)
     async def list(self):
+        #self.bot.delete_message(ctx.message)
         if len(self.games) > 0:
             keys = self.games.keys()
             await self.bot.say("Current Running games  : " + '\n'.join(keys))
@@ -119,6 +127,7 @@ class Roulette():
     
     @gameR.command(pass_context = True)
     async def new(self,ctx,gameNameInput : str):
+        
         if self.inGame(ctx.message.author) != None:
             await self.bot.say("Your already in a game cant create a new one!")
         else:
@@ -126,10 +135,12 @@ class Roulette():
             gme.addPlayer(ctx.message.author)
             self.games[gameNameInput] = gme
             await self.bot.say("Starting Game " + gameNameInput)
+            
+        self.bot.delete_message(ctx.message)
         
     @gameR.command(pass_context = True)
     async def join(self,ctx,gameId : str):
-    
+        #self.bot.delete_message(ctx.message)
         if self.inGame(ctx.message.author) != None:
             await self.bot.say("Your already in a game cant join a new one!")
             return   
@@ -144,14 +155,28 @@ class Roulette():
     
     @gameR.command(pass_context = True)
     async def players(self,ctx,gameId : str):
+        
         if gameId in self.games:
             await self.bot.say("Current players in this game : " + self.games[gameId].getPlayers())
         else:
             await self.bot.say("Game not found")
+            
+        self.bot.delete_message(ctx.message)
     
     @gameR.command(pass_context = True)
+    async def newMsg(self,ctx):
+        
+        game = self.inGame(ctx.message.author)
+        if game == None:
+            await self.bot.say("Your not in a game!")
+        else:
+            game.setNewMsg()
+        
+        self.bot.delete_message(ctx.message)
+        
+    @gameR.command(pass_context = True)
     async def leave(self,ctx):
-    
+        self.bot.delete_message(ctx.message)
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -166,6 +191,7 @@ class Roulette():
         else:
             await self.bot.say("Game is running you cant leave")
             
+
             
 def setup(bot):
     bot.add_cog(Roulette(bot))
