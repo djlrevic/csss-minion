@@ -33,7 +33,8 @@ class YoutubeSearch:
             return "Youtube Server Error"
         
     @commands.command(pass_context=True)
-    async def youtube(self, ctx, query :str):
+    async def youtube(self, ctx, *query):
+        query = " ".join(query)
         link = self.requestVid(query)
         await self.bot.say(link)
         

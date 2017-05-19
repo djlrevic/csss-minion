@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import datetime
 import __main__
 
 # pip install PyNaCl
@@ -13,7 +14,8 @@ import __main__
 # TODO 
 # cooldown for heat
 # dies when requester skips.
-# toggle authoritarian mode
+# dies when queue with no song in queue
+# download entire song first
 
 
 if not discord.opus.is_loaded():
@@ -21,10 +23,17 @@ if not discord.opus.is_loaded():
 
 
 class VoiceEntry:
-    def __init__(self, message, player):
+    def __init__(self, message, player, datetime, heat):
         self.requester = message.author
         self.channel = message.channel
         self.player = player
+        self.datetime = datetime
+        self.heat = heat
+
+    def __lt__(self, other):
+        selfpriority = (self.heat, self.datetime)
+        otherpriority = (other.heat, other.datetime)
+        return selfpriority < otherpriority
 
     def __str__(self):
         fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
@@ -170,15 +179,15 @@ class Tunes:
         if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
             return False
+        if not self.bot.testing and   str(ctx.message.channel.id) != "293120981067890691":
+            await self.bot.say("You can only request from #bottesting")
+            return False
         
         state = self.get_voice_state(ctx.message.server)
+        beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         opts = {
             'default_search': 'auto',
-            'quiet': True,
-            'reconnect': 1,
-            'reconnect_streamed':1,
-            'reconnect_delay_max':5,
-            'socket-timeout':5
+            'quiet': True
         }
 
         if state.voice is None:
@@ -188,7 +197,8 @@ class Tunes:
                 return
 
         try:
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+        
+            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next, before_options=beforeArgs)
             print("successfully created player")
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
@@ -196,12 +206,12 @@ class Tunes:
         else:
             if not state.is_playing() and state.current is not None:
                 print("shit gone south")
-            
+            heat = state.getheat(ctx.message.author)
             player.volume = 0.6
-            entry = VoiceEntry(ctx.message, player)
+            entry = VoiceEntry(ctx.message, player, datetime.datetime.now(), heat)
             await self.bot.say('Enqueued ' + str(entry))
             state.updateheat(ctx.message)
-            heat = state.getheat(ctx.message.author)
+            
             print("current heat is "+str(heat))
             await self.bot.say("Your heat is now at "+str(heat))
             if self.bot.music_priorityqueue:
@@ -356,13 +366,15 @@ def setup(bot):
     bot.add_cog(Tunes(bot))
     if __main__.__file__ == "bot.py": # use test channels
         print("set to test channels")
+        bot.testing = True
         bot.request_channel = "304837708650643459"
         bot.music_channel = "312693106736889867"
     else: # use production channels
+        bot.testing = False
         print("set to production channels")
         bot.request_channel = "293120981067890691"
         bot.music_channel = "228761314644852737"
-    bot.music_priorityqueue = False
+    bot.music_priorityqueue = True
     bot.music_authoritarian = False
     bot.admins_dict = {"173702138122338305":"henry",
      "173177975045488640":"nos"
