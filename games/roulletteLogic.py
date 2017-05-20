@@ -23,6 +23,7 @@ class GameLogic():
         self.gameName = gameName
         self.newMsg = True
         self.curMsg = None
+        self.curMsgTxt = ""
         self.future = None
         
     #Because all of thease run in a courutine I need to run in in this weird way
@@ -30,39 +31,25 @@ class GameLogic():
     #But I could be wrong, either way with out asyncio call it wont work
     def sendMsg(self,txt):
         #Do we need to send a new msg? Or just edit the old one
-        print("attempt to msg")
         if self.newMsg:
             #Lets hope this works
-            self.future = asyncio.run_coroutine_threadsafe(self.bot.send_message(self.channel, txt), self.bot.loop)
-            
-            try:
-                self.curMsg = self.future.result(5)
-            except asyncio.TimeoutError:
-                print('The coroutine took too long, cancelling the task...')
-                self.future.cancel()
-            except Exception as exc:
-                print('The coroutine raised an exception: {!r}'.format(exc))
-            else:
-                print('The coroutine worked')
+            #Eventually create a new msg, and give us the result at self.curMsg
+            self.curMsg = asyncio.run_coroutine_threadsafe(self.bot.send_message(self.channel, txt), self.bot.loop)
             
             self.newMsg = False
         else:
-            #Append to the current msg
-            try:
-                self.curMsg = self.future.result(5)
-            except asyncio.TimeoutError:
-                print('The coroutine took too long, cancelling the task...')
-                self.future.cancel()
-            except Exception as exc:
-                print('The coroutine raised an exception: {!r}'.format(exc))
+            #First we need to check if the Msg has been sent yet, if not guess we just miss out on a msg
+            if self.curMsg.done():
+                #When I edit I only edit the original messege, so keep track of our additions
+                self.curMsgTxt = self.curMsgTxt + " \n" + txt
+                self.editMsg(self.curMsg.result(),self.curMsgTxt)
             else:
-                print('The coroutine worked')
-            
-            self.editMsg(self.curMsg,'\n'+txt)
-            
+                print("Message not done yet")
             
     def setNewMsg(self):
+        #Clear curMsg so we dont spam
         self.newMsg = True
+        self.curMsgTxt = ""
  
     def editMsg(self,msg,txt):
         asyncio.run_coroutine_threadsafe(self.bot.edit_message(msg,txt), self.bot.loop)
