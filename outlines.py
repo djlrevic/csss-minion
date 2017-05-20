@@ -24,8 +24,8 @@ class Outlines:
             text = (courses.print_outline(args[1], args[2], args[3], args[4], args[5]))
         else:
             text = ("Usage: outline <department> <number> (section) (year) (semester)")
-            
-        await self.bot.say(text)
+
+        await self.bot.say("```" + text + "```")
 
 
 def setup(bot):

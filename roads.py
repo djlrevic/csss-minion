@@ -14,7 +14,11 @@ class Roads:
             text = road.conditions(args[1])
         else:
             text = road.conditions()
-        await self.bot.say(text)
+
+        text += road.announcements()
+        await self.bot.say("```" + text+ "```")
+
+
 
 
 def setup(bot):
