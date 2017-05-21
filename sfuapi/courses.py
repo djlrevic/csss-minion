@@ -29,11 +29,9 @@ def find_section(dept, num, year = 'current', term = 'current'):
     data = get_sections(dept, num, year, term)
     try:
         for sec in data:
-            if sec['sectionCode'] == "LEC":
+            if sec['sectionCode'] == "LEC" or sec['sectionCode'] == "LAB":
                 return sec['value']
-    except TypeError:
-        return None
-    except KeyError:
+    except Exception:
         return None
 
 #returns a course outline JSON Dictionary
@@ -41,80 +39,36 @@ def find_outline(dept, num, sec='placeholder', year = 'current', term = 'current
     if sec == 'placeholder':
         sec = find_section(dept, num, year, term)
         if sec == None:
-            return "Error finding section"
+            return None
 
     data = get_outline(dept, num, sec, year, term)
     return data
 
 #formats the outline JSON into readable string
 def format_outline(data:dict):
-    if data['info']['deliveryMethod'] == "In Person":
-        return format_outline_inperson(data)
-    else:
-        return format_outline_distance(data)
-
-#formatter for distance ed courses
-def format_outline_distance(data:dict):
     #data aliases
-    info = data['info']
-    instructor = data['instructor']
-    exam = data['examSchedule']
+    try:
+        info = data['info']
+
+        schedule = data['courseSchedule']
+
+    except Exception:
+        return "Error: Maybe the class doesn't exist? \nreturned data:\n" + json.dumps(data)
 
     #set up variable strings
-    outlinepath = info['outlinePath'].upper()
+    outlinepath = "{}".format(info['outlinePath'].upper())
     courseTitle = "{} ({})".format(info['title'], info['units'])
     prof = ""
-    for i in instructor:
-        prof += "{} ({})\n".format(i['name'], i['email'])
-    examtime = ""
-    for time in exam:
-        try:
-            if time['isExam']:
-                examtime += "{} {} - {}\n{} {}, {}\n".format(
-                    time['startDate'].split(" 00", 1)[0],
-                    time['startTime'],
-                    time['endTime'],
-                    time['buildingCode'],
-                    time['roomNumber'],
-                    time['campus'])
-        except KeyError:
-            #TBA I guess
-            examtime = "TBA\n"
-            break
-    description = info['description']
+    try:
+        for i in data['instructor']:
+            prof += "{} ({})\n".format(i['name'], i['email'])
+    except Exception:
+        prof = "Unknown"
 
-    #setup final formatting
-    doc = """Outline for: {}
-Course Title: {}
-Instructor: {}
-Exam Time:
-{}
-Description: {}""".format(\
-        outlinepath,
-        courseTitle,
-        prof,
-        examtime,
-        description)
-    return doc
-
-
-#formatter for inperson courses
-def format_outline_inperson(data:dict):
-    #data aliases
-    info = data['info']
-    instructor = data['instructor']
-    schedule = data['courseSchedule']
-    exam = data['examSchedule']
-
-    #set up variable strings
-    outlinepath = info['outlinePath'].upper()
-    courseTitle = "{} ({})".format(info['title'], info['units'])
-    prof = ""
-    for i in instructor:
-        prof += "{} ({})\n".format(i['name'], i['email'])
     classtimes = ""
     for time in schedule:
-        classtimes += "{} {} - {}\n{} {}, {}\n".format(
+        classtimes += "[{}] {} {} - {}\n{} {}, {}\n".format(
+            time['sectionCode'],
             time['days'],
             time['startTime'],
             time['endTime'],
@@ -122,8 +76,8 @@ def format_outline_inperson(data:dict):
             time['roomNumber'],
             time['campus'])
     examtime = ""
-    for time in exam:
-        try:
+    try:
+        for time in data['examSchedule']:
             if time['isExam']:
                 examtime += "{} {} - {}\n{} {}, {}\n".format(
                     time['startDate'].split(" 00", 1)[0],
@@ -132,27 +86,48 @@ def format_outline_inperson(data:dict):
                     time['buildingCode'],
                     time['roomNumber'],
                     time['campus'])
-        except KeyError:
-            #TBA I guess
-            examtime = "TBA\n"
-            break
+    except Exception:
+        #TBA I guess
+        examtime = "TBA\n"
     description = info['description']
+    try:
+        details = info['courseDetails']
+        #fix html entities
+        details = html.unescape(details)
+        #fix html tags
+        details = re.sub('<[^<]+?>', '', details)
+        #truncate
+        details = (details[:700] + " (...)") if len(details) > 700 else details
+
+    except Exception:
+        details = ""
+    try:
+        prereq = info['prerequisites']
+    except Exception:
+        prereq = ""
+
+    try:
+        coreq = info['corequisites']
+    except Exception:
+        coreq = ""
 
     #setup final formatting
-    doc = """Outline for: {}
-Course Title: {}
-Instructor: {}
-Class Times:
-{}
-Exam Time:
-{}
-Description: {}""".format(\
-        outlinepath,
-        courseTitle,
-        prof,
-        classtimes,
-        examtime,
-        description)
+    doc = ""
+    doc += "Outline for: {}\n".format(outlinepath)
+    doc += "Course Title: {}\n".format(courseTitle)
+    doc += "Instructor: {}\n".format(prof)
+    if classtimes != "":
+        doc += "Class Times:\n{}\n".format(classtimes)
+    doc += "Exam Time:\n{}\n".format(examtime)
+
+    doc += "Description:\n{}\n\n".format(description)
+    if details != "":
+        doc += "Details:\n{}\n\n".format(details)
+    if prereq != "":
+        doc += "Prerequisites: {}\n".format(prereq)
+    if coreq != "":
+        doc += "Corequisites: {}\n".format(prereq)
+
     return doc
 
 def print_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
