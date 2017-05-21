@@ -41,6 +41,7 @@ def find_outline(dept, num, sec='placeholder', year = 'current', term = 'current
         if sec == None:
             return None
 
+    #print("sec = "  + sec)
     data = get_outline(dept, num, sec, year, term)
     return data
 
@@ -148,13 +149,15 @@ def print_outline(dept, num, sec='placeholder', year = 'current', term = 'curren
 #returns a dictionary with relevant information or a string if something went wrong
 def dict_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
     data = find_outline(dept, num, sec, year, term)
-
+    #print(data)
     strings = extract(data)
+    #print(strings)
     if len(strings) == 1:
         return {
             'Error': strings[0]
         }
     #if
+
     ret = {
         'outline': strings[0],
         'title': strings[1],

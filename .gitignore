@@ -8,4 +8,5 @@ __pycache__
 !wordart_dir/.gitkeep
 !wordart_dir/default_avatar.jpg
 
+#brendan's custom runner
 bottest.py
