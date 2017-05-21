@@ -11,21 +11,25 @@ class Outlines:
     @commands.command()
     async def outline(self, *args):
         #probably a better way to do this
-        text = ""
         if len(args) < 2:
-            text = ("Usage: outline <department> <number> (section) (year) (semester)")
+            data = {'Error':"Usage: outline <department> <number> (section) (year) (semester)"}
         elif len(args) == 2:
-            text = (courses.print_outline(args[0], args[1]))
+            data= (courses.print_outline(args[0], args[1]))
         elif len(args) == 3:
-            text = (courses.print_outline(args[0], args[1], args[2]))
+            data = (courses.print_outline(args[0], args[1], args[2]))
         elif len(args) == 4:
-            text = (courses.print_outline(args[0], args[1], args[2], args[3]))
+            data = (courses.print_outline(args[0], args[1], args[2], args[3]))
         elif len(args) == 5:
-            text = (courses.print_outline(args[0], args[1], args[2], args[3], args[4]))
+            data = (courses.print_outline(args[0], args[1], args[2], args[3], args[4]))
         else:
-            text = ("Usage: outline <department> <number> (section) (year) (semester)")
+            data = {'Error':"Usage: outline <department> <number> (section) (year) (semester)"}
 
-        await self.bot.say("```" + text + "```")
+        embed = discord.Embed(title = "SFU Course Outlines", color = discord.Colour(0xa6192e))
+        for key, entry in data.iteritems():
+            embed.add_field(name = key.title(), value = value)
+
+
+        await self.bot.say(embed=embed)
 
 
 def setup(bot):
