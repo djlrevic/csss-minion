@@ -15,13 +15,13 @@ class Outlines:
         if len(args) < 2:
             text = ("Usage: outline <department> <number> (section) (year) (semester)")
         elif len(args) == 2:
-            text = (courses.print_outline(args[1], args[2]))
+            text = (courses.print_outline(args[0], args[1]))
         elif len(args) == 3:
-            text = (courses.print_outline(args[1], args[2], args[3]))
+            text = (courses.print_outline(args[0], args[1], args[2]))
         elif len(args) == 4:
-            text = (courses.print_outline(args[1], args[2], args[3], args[4]))
+            text = (courses.print_outline(args[0], args[1], args[2], args[3]))
         elif len(args) == 5:
-            text = (courses.print_outline(args[1], args[2], args[3], args[4], args[5]))
+            text = (courses.print_outline(args[0], args[1], args[2], args[3], args[4]))
         else:
             text = ("Usage: outline <department> <number> (section) (year) (semester)")
 
