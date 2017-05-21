@@ -10,11 +10,15 @@ class Roads:
 
     @commands.command()
     async def roads(self, *args):
-        if len(args) > 1:
-            text = road.conditions(args[1])
+        if len(args) >= 1:
+            text = road.conditions(args[0])
         else:
             text = road.conditions()
-        await self.bot.say(text)
+
+        text += road.announcements()
+        await self.bot.say("```" + text+ "```")
+
+
 
 
 def setup(bot):
