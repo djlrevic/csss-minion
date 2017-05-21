@@ -146,7 +146,7 @@ def print_outline(dept, num, sec='placeholder', year = 'current', term = 'curren
     data = find_outline(dept, num, sec, year, term)
     return format_outline(data)
 
-#returns a dictionary with relevant information or a string if something went wrong
+#returns a dictionary with relevant information
 def dict_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
     data = find_outline(dept, num, sec, year, term)
     #print(data)
@@ -170,3 +170,26 @@ def dict_outline(dept, num, sec='placeholder', year = 'current', term = 'current
         'corequisites':strings[8]
     }
     return ret
+
+#eturns two lists with relevant information
+def list_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
+    data = find_outline(dept, num, sec, year, term)
+    #print(data)
+    strings = extract(data)
+    #print(strings)
+    if len(strings) == 1:
+        return ['Error'], strings
+    #if
+
+    keys =[
+        'outline',
+        'title',
+        'instructor',
+        'class times',
+        'exam time',
+        'description',
+        'details',
+        'prerequisites',
+        'corequisites'
+    ]
+    return keys, strings
