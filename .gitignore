@@ -7,3 +7,5 @@ __pycache__
 # exception to rules
 !wordart_dir/.gitkeep
 !wordart_dir/default_avatar.jpg
+
+bottest.py
