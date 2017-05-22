@@ -212,7 +212,7 @@ class RouletteLogic(GameLogic):
         else:
             self.turn -= 1
         
-        self.sendMsg("Its " + getName(self.players[self.turn]) + " turn now " + self.playerToGo.mention)
+        self.sendMsg("Its " + getName(self.players[self.turn]) + " turn now ")
         self.playerToGo = self.players[self.turn]
     
     def fire(self,player):
@@ -263,10 +263,12 @@ class RouletteLogic(GameLogic):
     
     
 def getName(player):
-    if player.nick == None:
-        return player.name
-    else:
-        return player.nick
+    return player.mention
+    
+    #if player.nick == None:
+    #    return player.name
+    #else:
+    #    return player.nick
 
 def wait(timeToSleep,toWake):
     time.sleep(timeToSleep)
