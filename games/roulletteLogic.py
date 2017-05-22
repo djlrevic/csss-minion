@@ -212,7 +212,7 @@ class RouletteLogic(GameLogic):
         else:
             self.turn -= 1
         
-        self.sendMsg("Its " + getName(self.players[self.turn]) + " turn now")
+        self.sendMsg("Its " + getName(self.players[self.turn]) + " turn now " + self.playerToGo.mention)
         self.playerToGo = self.players[self.turn]
     
     def fire(self,player):
