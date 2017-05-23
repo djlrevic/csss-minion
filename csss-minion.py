@@ -44,7 +44,8 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck", "outlines", "roads", "announce"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "outlines", "roads", "announce"]
+
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -110,10 +111,10 @@ async def reload(ctx, name):
         await bot.say("`{} cog reloaded`".format(name))
     else:
         await bot.say("`You ain't my master! Shoo!``")
-        
-@bot.command(pass_context = True)
-async def execute(ctx, query):
+
+async def exc(ctx, *args):
     if Henry(ctx):
+        query = " ".join(args)
         await bot.say("```"+subprocess.getoutput(query)+"```")
     else:
         await bot.say("You ain't my master! Shoo!")
@@ -242,6 +243,11 @@ async def rank(ctx):
     cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
     msg = cur.fetchone()
     await bot.say(msg)
+
+# testing if the bot is alive
+@bot.command()
+async def ping():
+    await bot.say("pong")
 
 if __name__ == "__main__":
     for extension in startup_extensions:

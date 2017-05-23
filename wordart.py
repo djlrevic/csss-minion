@@ -45,10 +45,13 @@ class WordArt:
             arr = []
             for i in range(0, len(entries)):
                 arr.append(entries[i][0])
-            self.serverCache = arr
+            if len(arr) < 1:
+                self.serverCache = self.backupArr
+            else:
+                self.serverCache = arr
         except:
             print("server cache retrieval error")
-            self.serverCache = backupArr
+            self.serverCache = self.backupArr
         text = " ".join(self.serverCache)
         wc = WordCloud(width=1024, height=1024, max_words=2000, stopwords=self.STOPWORDS).generate(text)
         wc.to_file(self.serverImage)

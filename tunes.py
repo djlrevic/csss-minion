@@ -1,20 +1,39 @@
 import discord
 from discord.ext import commands
 import asyncio
+import datetime
 import __main__
 
-
 # pip install PyNaCl
+# pip install youtube-dl
 # requires the appropriate opus library in the same dir
-
+# requires opus to be installed, apt-get install libopus0, or pacman -S opus
 
 # this script was originally written to work across multiple servers, it has been changed to work on only one server.
 
+# TODO 
+# cooldown for heat
+# dies when requester skips.
+# dies when queue with no song in queue
+# download entire song first
+
+
+if not discord.opus.is_loaded():
+    discord.opus.load_opus('opus')
+
+
 class VoiceEntry:
-    def __init__(self, message, player):
+    def __init__(self, message, player, datetime, heat):
         self.requester = message.author
         self.channel = message.channel
         self.player = player
+        self.datetime = datetime
+        self.heat = heat
+
+    def __lt__(self, other):
+        selfpriority = (self.heat, self.datetime)
+        otherpriority = (other.heat, other.datetime)
+        return selfpriority < otherpriority
 
     def __str__(self):
         fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
@@ -29,10 +48,14 @@ class VoiceState:
         self.voice = None
         self.bot = bot
         self.play_next_song = asyncio.Event()
-        self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
+        #self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
         self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
         self.playerheat = {} # keep track of how often each user requests. -------------
+        if self.bot.music_priorityqueue:
+            self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
+        else:
+            self.songs = asyncio.Queue()
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -66,11 +89,16 @@ class VoiceState:
     def toggle_next(self):
         self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
 
-    async def audio_player_task(self):
+    async def audio_player_task(self): # 'main' loop for tunes
         while True:
+            print("next through the loop")
+            self.skip_votes.clear()
             self.play_next_song.clear()
             jeff = await self.songs.get() # these lines are separate because async
-            self.current = jeff[1] #these twins are separate but never too far apart
+            if self.bot.music_priorityqueue:
+                self.current = jeff[1] #these twins are separate but never too far apart
+            else:
+                self.current = jeff
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
@@ -109,7 +137,7 @@ class Tunes:
     @commands.command(pass_context=True, no_pm=True)
     async def join(self, ctx, *, channel : discord.Channel):
         """Joins a voice channel."""
-        if str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
+        if str(ctx.message.author.voice_channel) is not null or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
             return False
         try:
@@ -148,36 +176,48 @@ class Tunes:
         The list of supported sites can be found here:
         https://rg3.github.io/youtube-dl/supportedsites.html
         """
-        if str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
+        if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
             return False
-        
+        if not self.bot.testing and   str(ctx.message.channel.id) != "293120981067890691":
+            await self.bot.say("You can only request from #bottesting")
+            return False
         
         state = self.get_voice_state(ctx.message.server)
+        beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         opts = {
             'default_search': 'auto',
-            'quiet': True,
+            'quiet': True
         }
 
         if state.voice is None:
             success = await ctx.invoke(self.summon)
             if not success:
+                print("could not summon")
                 return
 
         try:
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+        
+            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next, before_options=beforeArgs)
+            print("successfully created player")
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
         else:
+            if not state.is_playing() and state.current is not None:
+                print("shit gone south")
+            heat = state.getheat(ctx.message.author)
             player.volume = 0.6
-            entry = VoiceEntry(ctx.message, player)
+            entry = VoiceEntry(ctx.message, player, datetime.datetime.now(), heat)
             await self.bot.say('Enqueued ' + str(entry))
             state.updateheat(ctx.message)
-            heat = state.getheat(ctx.message.author)
+            
             print("current heat is "+str(heat))
             await self.bot.say("Your heat is now at "+str(heat))
-            await state.songs.put((heat,entry))
+            if self.bot.music_priorityqueue:
+                await state.songs.put((heat,entry))
+            else:
+                await state.songs.put(entry)
 
     @commands.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
@@ -187,12 +227,12 @@ class Tunes:
         if state.is_playing():
             player = state.player
             #player.volume = value / 100  # :P
-            await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
+            await self.bot.say('Set the volume to {:.0%}'.format(value / 100))
 
     @commands.command(pass_context=True, no_pm=True)
     async def pause(self, ctx):
         """Pauses the currently played song."""
-        if str(ctx.message.author.id) != "173702138122338305" and str(ctx.message.author.id) != "173177975045488640":
+        if str(ctx.message.author.id) not in self.bot.admins_dict and self.bot.music_authoritarian:
             await self.bot.say("If you don't like the music then !skip or leave the channel.")
             return False
         state = self.get_voice_state(ctx.message.server)
@@ -203,7 +243,7 @@ class Tunes:
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
         """Resumes the currently played song."""
-        if str(ctx.message.author.id) != "173702138122338305" and str(ctx.message.author.id) != "173177975045488640":
+        if str(ctx.message.author.id) not in self.bot.admins_dict and self.bot.music_authoritarian:
             await self.bot.say("If you don't like the music then !skip or leave the channel.")
             return False
         state = self.get_voice_state(ctx.message.server)
@@ -216,7 +256,7 @@ class Tunes:
         """Stops playing audio and leaves the voice channel.
         This also clears the queue.
         """
-        if str(ctx.message.author.id) != "173702138122338305" and str(ctx.message.author.id) != "173177975045488640":
+        if str(ctx.message.author.id) not in self.bot.admins_dict and self.bot.music_authoritarian:
             await self.bot.say("If you don't like the music then !skip or leave the channel.")
             return False
         server = ctx.message.server
@@ -232,6 +272,56 @@ class Tunes:
             await state.voice.disconnect()
         except:
             pass
+            
+            ### reset doesn't reset audio, this means the audio_player or voice states does the job
+    @commands.command(pass_context=True, no_pm=True)
+    async def reset(self, ctx):
+        """resets the audio, keeping the queue"""
+    
+        server = ctx.message.server
+        state = self.get_voice_state(server)
+    
+        if state.is_playing():
+            player = state.player
+            player.stop()
+            player.start()
+            
+    @commands.command(pass_context=True, no_pm=True)
+    async def queue(self, ctx):
+        """shows songs in the current queue"""
+        state = self.get_voice_state(ctx.message.server)
+        print("size of pre-main is: "+str(state.songs.qsize()))
+        arr = []
+        print("Printing type of current song: current, player, voice")
+        print(type(state.current)) 
+        print(type(state.player))
+        print(type(state.voice))
+        print(str(state.is_playing()))
+        # less logic in loops
+        if self.bot.music_priorityqueue:
+            q = asyncio.PriorityQueue()
+            while not state.songs.empty():
+                l = await state.songs.get()
+                await q.put(l)
+                arr.append(str(l[1]))
+        else:
+            q = asyncio.Queue()
+            while not state.songs.empty():
+                l = await state.songs.get()
+                await q.put(l)
+                arr.append(str(l))
+        
+        print("size of postpre-q is: "+str(q.qsize()))
+        state.songs = q
+        print("size of post-q is: "+str(q.qsize()))
+        print("size of post-main is: "+str(state.songs.qsize()))
+        if len(arr) == 0:
+            await self.bot.say("The queue is empty")
+        elif len(arr) < 5:
+            await self.bot.say("\n\n".join(arr))
+        else:
+            await self.bot.send_message(ctx.message.author, "\n".join(arr))
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
@@ -276,9 +366,17 @@ def setup(bot):
     bot.add_cog(Tunes(bot))
     if __main__.__file__ == "bot.py": # use test channels
         print("set to test channels")
+        bot.testing = True
         bot.request_channel = "304837708650643459"
         bot.music_channel = "312693106736889867"
     else: # use production channels
+        bot.testing = False
         print("set to production channels")
         bot.request_channel = "293120981067890691"
         bot.music_channel = "228761314644852737"
+    bot.music_priorityqueue = True
+    bot.music_authoritarian = False
+    bot.admins_dict = {"173702138122338305":"henry",
+     "173177975045488640":"nos"
+    }
+

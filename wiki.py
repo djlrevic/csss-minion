@@ -39,7 +39,8 @@ class Wiki:
            
         
     @commands.command()
-    async def wiki(self, query:str):
+    async def wiki(self, *msg):
+        query = " ".join(msg)
         link = None
         json = requests.get('https://en.wikipedia.org/w/api.php?action=opensearch&search='+query+'&limit=5&format=json&redirects=resolve')
         msg = json.json()

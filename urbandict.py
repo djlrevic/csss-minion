@@ -29,7 +29,8 @@ class UrbanDict:
         
         
     @commands.command()
-    async def urban(self, word:str):
+    async def urban(self, *msg:str):
+        word = " ".join(msg)
         query = "https://mashape-community-urban-dictionary.p.mashape.com/define?term="+word
         req = requests.get(query, headers=self.headers)
         ret = self.parseResponse(req)

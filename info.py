@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import datetime
 from mcstatus import MinecraftServer
+from pagination import Pages
 
 class Info():
     def __init__(self, bot):
@@ -45,31 +46,34 @@ class Info():
     async def help(self, ctx):
 
         if ctx.invoked_subcommand is None:
-            embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+            items = []
+            items.append([".help", "Displays this help menu."])
+            items.append([".newclass <class>", "Start a new class group. Great for notifying everyone in that particular class."])
+            items.append([".iam <class>", "Places yourself in an existing class."])
+            items.append([".wolf <query>", "Asks WolframAlpha a question! Wrap your questions in \"quotes\"!"])
+            # items.append([".vote", "Find voting details for the CSSS Exec election!."])
+            items.append([".voteresult", "Find out the winners of the CSSS annual election!"])
+            items.append([".help mc", "Displays commands for the CSSS Minecraft server. Only usable within #minecraft"])
+            items.append([".gameR help", "Displays commands for the for the Roullette game"])
+            items.append([".meaning <word>", "Display the meaning of an english word"])
+            items.append([".synonym <word>", "Display synonyms for an english word"])
+            items.append([".antonym <word>", "Display antonyms for an english word"])
+            items.append([".spell <word>", "Check the spelling of an english word"])
+            items.append([".poem <title> <author>", "Retrieve a poem from the poem database"])
+            items.append([".wiki <query>", "Retrieve summary of a wikipedia article"])
+            items.append([".wordart", "Make a wordcloud out of your common words"])
+            items.append([".avatart <invert> <colour>", "Turn your avatar into a wordcloud!"])
+            items.append(["Source Code", "https://github.com/henrymzhao/csss-minion/"])
 
-            embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
-            embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
-            embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+            p = Pages(self.bot, message = ctx.message, entries = items, per_page = 4)
+            p.embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+            p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+            p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+            p.embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
 
-            embed.add_field(name=".help", value="Displays this help menu.")
-            embed.add_field(name=".newclass <class>", value="Start a new class group. Great for notifying everyone in that particular class.")
-            embed.add_field(name=".iam <class>", value="Places yourself in an existing class.")
-            embed.add_field(name=".wolf <query>", value="Asks WolframAlpha a question! Wrap your questions in \"quotes\"!")
-            # embed.add_field(name=".vote", value="Find voting details for the CSSS Exec election!.")
-            embed.add_field(name=".voteresult", value="Find out the winners of the CSSS annual election!")
-            embed.add_field(name=".help mc", value="Displays commands for the CSSS Minecraft server. Only usable within #minecraft")
-            embed.add_field(name=".gameR help", value="Displays commands for the for the Roullette game")
-            embed.add_field(name=".meaning <word>", value="Display the meaning of an english word")
-            embed.add_field(name=".synonym <word>", value="Display synonyms for an english word")
-            embed.add_field(name=".antonym <word>", value="Display antonyms for an english word")
-            embed.add_field(name=".spell <word>", value="Check the spelling of an english word")
-            embed.add_field(name=".poem <title> <author>", value="Retrieve a poem from the poem database")
-            embed.add_field(name=".wiki <query>", value="Retrieve summary of a wikipedia article")
-            embed.add_field(name=".wordart", value="Make a wordcloud out of your common words")
-            embed.add_field(name=".avatart <invert> <colour>", value="Turn your avatar into a wordcloud!")
-            embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
+            await p.paginate()
 
-            await self.bot.say(embed=embed)
+            # await self.bot.say(embed=embed)
 
     @help.command(pass_context = True)
     async def mc(self, ctx):
