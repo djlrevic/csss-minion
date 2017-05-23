@@ -7,7 +7,7 @@ from datetime import date
 #Module for handling queries to the SFU Course Outlines API.
 #API URL: http://www.sfu.ca/bin/wcm/course-outlines
 
-#fetches data and returns a dictionary
+#fetches data and returns a listionary
 def get_outline(dept, num, sec, year = 'current', term = 'current'):
     #setup params
     params = "?{0}/{1}/{2}/{3}/{4}".format(year, term, dept, num, sec)

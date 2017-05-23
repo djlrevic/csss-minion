@@ -29,7 +29,7 @@ class Outlines:
         embed.set_thumbnail(url="http://www.sfu.ca/content/sfu/clf/jcr:content/main_content/image_0.img.1280.high.jpg/1468454298527.jpg")
         embed.set_footer(text= "Written by Brendan")
         for key, entry in zip(keys, data):
-            print(key)
+            #print(key)
             if entry != "":
                 embed.add_field(name = key.title(), value = entry, inline = False)
         if len(keys) != 1:
