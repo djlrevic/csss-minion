@@ -112,6 +112,7 @@ async def reload(ctx, name):
     else:
         await bot.say("`You ain't my master! Shoo!``")
 
+@bot.command(pass_context = True)
 async def exc(ctx, *args):
     if Henry(ctx):
         query = " ".join(args)
