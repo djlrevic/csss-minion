@@ -27,6 +27,7 @@ if not os.path.isfile(configFile):
     description = "Bot of the CSSS"
     postgrespass = getpass.getpass('Database Password: ')
     mashape_key = getpass.getpass('Mashape Key: ')
+    local_postgres_pw = getpass.getpass('Database Password: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
@@ -38,6 +39,7 @@ else:
     ip = "172.93.48.238:25565"
     postgrespass = config.get("Postgres", "Password")
     mashape_key = config.get("Mashape", "Token")
+    local_postgres_pw = config.get("LocalPG", 'Password')
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -60,7 +62,7 @@ def reloadConfig():
 qu = []
 global expTable
 expTable = []
-bot.conn_wc = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'") # second connection for wordcloud cog
+bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' password='"+local_postgres_pw+"'") # second connection for wordcloud cog
 
 @bot.event
 async def on_ready():
