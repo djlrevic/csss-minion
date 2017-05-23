@@ -12,7 +12,10 @@ class Announce:
     async def announce(self, ctx, title, desc):
         if ctx.message.author.permissions_in(ctx.message.channel).manage_channels:
             author = ctx.message.author
-            color = discord.Colour(r.randrange(0xffffff))
+            try:
+                color = author.colour
+            except Exception:
+                color = discord.Colour(r.randrange(0xffffff))
             embed = discord.Embed(title = title, description = desc, color = color, timestamp = datetime.datetime.utcnow())
             embed.set_thumbnail(url=author.avatar_url)
             embed.set_author(name=author.display_name, icon_url = author.avatar_url)
@@ -28,7 +31,10 @@ class Announce:
     async def em(self, ctx, *desc):
         if ctx.message.author.permissions_in(ctx.message.channel).manage_channels:
             author = ctx.message.author
-            color = discord.Colour(r.randrange(0xffffff))
+            try:
+                color = author.colour
+            except Exception:
+                color = discord.Colour(r.randrange(0xffffff))
             string = ""
             for w in desc:
                 string += w + " "
