@@ -99,6 +99,19 @@ async def unload(ctx, name):
         await bot.say("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
+async def reload(ctx, name):
+    if Henry(ctx):
+        bot.unload_extension(name)
+        try:
+            bot.load_extension(name)
+        except(AttributeError, ImportError) as e:
+            await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            return
+        await bot.say("`{} cog reloaded`".format(name))
+    else:
+        await bot.say("`You ain't my master! Shoo!``")
+        
+@bot.command(pass_context = True)
 async def execute(ctx, query):
     if Henry(ctx):
         await bot.say("```"+subprocess.getoutput(query)+"```")
