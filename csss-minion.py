@@ -44,7 +44,7 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck", "outlines", "roads", "announce"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -67,7 +67,7 @@ async def on_ready():
     print(bot.user.name)
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
-    global expTable 
+    global expTable
     expTable = getLevel() #pulling exp templates
 
 @bot.event
@@ -81,7 +81,7 @@ async def on_message(message):
 @bot.command(pass_context = True)
 async def load(ctx, name):
     if Henry(ctx):
-        try: 
+        try:
             bot.load_extension(name)
         except(AttributeError, ImportError) as e:
             await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
@@ -153,7 +153,7 @@ def calcLevel(x):
 async def update():
     await bot.wait_until_ready()
     print("ready")
-    while not bot.is_closed:        
+    while not bot.is_closed:
         for i, item in enumerate(qu):
             if time.time() - item[1] >= 60:
                 # print("entry expired")
@@ -167,7 +167,7 @@ async def add(message):
     entry = cur.fetchone()
     if entry == None:
         # user not in database
-        cur.execute("INSERT INTO "+database+" (name, user_id, exp) VALUES (%s, %s, %s)", 
+        cur.execute("INSERT INTO "+database+" (name, user_id, exp) VALUES (%s, %s, %s)",
             (message.author.name, str(message.author.id), random.randint(15, 25), ))
         conn.commit()
     else:
@@ -210,7 +210,7 @@ def userLevel(experience):
         if experience < foo[1]:
             upperBound = foo[0]
     return lowerBound
-    
+
 
 # detect if user is eligible for the next level
 def updateLevel(change, experience, currLevel):
@@ -222,13 +222,13 @@ def updateLevel(change, experience, currLevel):
     # print("afterChange : {}".format(afterChange))
     if afterChange != currLevel:
         return True
-    return False  
+    return False
 
 @bot.command(pass_context = True)
 async def rank(ctx):
     cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
     msg = cur.fetchone()
-    await bot.say(msg)  
+    await bot.say(msg)
 
 if __name__ == "__main__":
     for extension in startup_extensions:
@@ -242,7 +242,7 @@ if __name__ == "__main__":
 async def cogs():
     """Lists the currently loaded cogs."""
     cogs = list(bot.cogs.keys())
-    await bot.say("\n".join(cogs)) 
+    await bot.say("\n".join(cogs))
 
 bot.loop.create_task(update())
 bot.run(token)
