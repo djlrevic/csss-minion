@@ -7,7 +7,7 @@ from datetime import date
 #Module for handling queries to the SFU Course Outlines API.
 #API URL: http://www.sfu.ca/bin/wcm/course-outlines
 
-#fetches data and returns a dictionary
+#fetches data and returns a listionary
 def get_outline(dept, num, sec, year = 'current', term = 'current'):
     #setup params
     params = "?{0}/{1}/{2}/{3}/{4}".format(year, term, dept, num, sec)
@@ -41,11 +41,12 @@ def find_outline(dept, num, sec='placeholder', year = 'current', term = 'current
         if sec == None:
             return None
 
+    #print("sec = "  + sec)
     data = get_outline(dept, num, sec, year, term)
     return data
 
-#formats the outline JSON into readable string
-def format_outline(data:dict):
+#pulls data from outline JSON Dict
+def extract(data:dict):
     #data aliases
     try:
         info = data['info']
@@ -53,7 +54,7 @@ def format_outline(data:dict):
         schedule = data['courseSchedule']
 
     except Exception:
-        return "Error: Maybe the class doesn't exist? \nreturned data:\n" + json.dumps(data)
+        return ["Error: Maybe the class doesn't exist? \nreturned data:\n" + json.dumps(data)]
 
     #set up variable strings
     outlinepath = "{}".format(info['outlinePath'].upper())
@@ -67,7 +68,7 @@ def format_outline(data:dict):
 
     classtimes = ""
     for time in schedule:
-        classtimes += "[{}] {} {} - {}\n{} {}, {}\n".format(
+        classtimes += "[{}] {} {} - {}, {} {}, {}\n".format(
             time['sectionCode'],
             time['days'],
             time['startTime'],
@@ -97,7 +98,8 @@ def format_outline(data:dict):
         #fix html tags
         details = re.sub('<[^<]+?>', '', details)
         #truncate
-        details = (details[:700] + " (...)") if len(details) > 700 else details
+        limit = 200
+        details = (details[:limit] + " (...)") if len(details) > limit else details
 
     except Exception:
         details = ""
@@ -110,7 +112,16 @@ def format_outline(data:dict):
         coreq = info['corequisites']
     except Exception:
         coreq = ""
+    return [outlinepath, courseTitle, prof, classtimes, examtime, description, details, prereq, coreq]
 
+#formats the outline JSON into readable string
+def format_outline(data:dict):
+    strings= extract(data)
+
+    if len(strings) == 1:
+        return strings[0]
+
+    outlinepath, courseTitle, prof, classtimes, examtime, description, details, prereq, coreq = strings
     #setup final formatting
     doc = ""
     doc += "Outline for: {}\n".format(outlinepath)
@@ -130,6 +141,55 @@ def format_outline(data:dict):
 
     return doc
 
+#returns a fairly nicely formatted string for easy reading
 def print_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
     data = find_outline(dept, num, sec, year, term)
     return format_outline(data)
+
+#returns a dictionary with relevant information
+def dict_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
+    data = find_outline(dept, num, sec, year, term)
+    #print(data)
+    strings = extract(data)
+    #print(strings)
+    if len(strings) == 1:
+        return {
+            'Error': strings[0]
+        }
+    #if
+
+    ret = {
+        'outline': strings[0],
+        'title': strings[1],
+        'instructor': strings[2],
+        'class times':strings[3],
+        'exam time':strings[4],
+        'description':strings[5],
+        'details':strings[6],
+        'prerequisites':strings[7],
+        'corequisites':strings[8]
+    }
+    return ret
+
+#eturns two lists with relevant information
+def list_outline(dept, num, sec='placeholder', year = 'current', term = 'current'):
+    data = find_outline(dept, num, sec, year, term)
+    #print(data)
+    strings = extract(data)
+    #print(strings)
+    if len(strings) == 1:
+        return ['Error'], strings
+    #if
+
+    keys =[
+        'outline',
+        'title',
+        'instructor',
+        'class times',
+        'exam time',
+        'description',
+        'details',
+        'prerequisites',
+        'corequisites'
+    ]
+    return keys, strings
