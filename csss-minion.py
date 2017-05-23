@@ -28,6 +28,7 @@ if not os.path.isfile(configFile):
     postgrespass = getpass.getpass('Database Password: ')
     mashape_key = getpass.getpass('Mashape Key: ')
     local_postgres_pw = getpass.getpass('Database Password: ')
+    imgur_id = config.get('Imgur client id: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
@@ -40,6 +41,7 @@ else:
     postgrespass = config.get("Postgres", "Password")
     mashape_key = config.get("Mashape", "Token")
     local_postgres_pw = config.get("LocalPG", 'Password')
+    imgur_id = config.get("Imgur", "client_id")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -54,6 +56,7 @@ bot.wolframid = wolframid
 bot.mcip = ip
 bot.remove_command("help")
 bot.mashape_key = mashape_key
+bot.imgur_id = imgur_id
 
 def reloadConfig():
     pass
