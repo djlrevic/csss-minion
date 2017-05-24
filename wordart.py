@@ -86,7 +86,7 @@ class WordArt:
     async def on_message(self, message):   
         cur = self.bot.conn_wc.cursor()
         query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s)"
-        data = (message.author.id, message.content, message.timestamp)
+        data = (message.author.id, message.content.encode("utf-8"), message.timestamp)
         cur.execute(query, data)
         self.bot.conn_wc.commit()
         cur.close()
@@ -164,7 +164,7 @@ class WordArt:
 
 
     @commands.command(pass_context=True)
-    async def servart(self,ctx, *args):
+    async def servart(self,ctx):
         """Make a wordcloud out of the server's most common words."""
         await self.bot.send_file(ctx.message.channel, self.serverImage)
 
