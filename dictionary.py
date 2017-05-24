@@ -8,11 +8,14 @@ class Dictionary:
         self.bot = bot
         self.dictionary = PyDictionary('lxml')
        
-    @commands.command()
-    async def meaning(self, word:str):
+       #TODO passing in a string such as a;lskejf;laskjf;lkjvldskjrlgjslfgnhslkfnhsoifjosijosjeojsopejr gives a valid response instead of an error.
+    @commands.command(pass_context=True)
+    async def meaning(self,ctx, word:str):
+        """Return the meaning of a word"""
         ret = self.dictionary.meaning(word)
         if ret is None:
-            await self.bot.say("```Meaning for "+word+" not found.```")
+            #await self.bot.say("```Meaning for "+word+" not found.```")
+            await self.bot.embed_this_for_me("Meaning for *"+word+"* not found", ctx)
         else:
             def_str = ""
             for k in ret.keys():
@@ -20,7 +23,8 @@ class Dictionary:
                 for i in ret[k][:3]:
                      def_str += i + "\n"
                 def_str += "\n"
-            await self.bot.say("```"+def_str+"```")
+            #await self.bot.say("```"+def_str+"```")
+            await self.bot.embed_this_for_me(def_str, ctx)
        
     @commands.command(pass_context=True)
     async def stealthegg(self, ctx):
@@ -29,31 +33,39 @@ class Dictionary:
         
         
         
-    @commands.command()
-    async def synonym(self, word:str):
+    @commands.command(pass_context=True)
+    async def synonym(self,ctx, word:str):
+        """Return the synonym of a word"""
         ret = self.dictionary.synonym(word)
         if ret is None:
-            await self.bot.say("```Synonym for "+word+" not found.```")
+            #await self.bot.say("```Synonym for "+word+" not found.```")
+            await self.bot.embed_this_for_me("Synonym for *"+word+"* not found", ctx)
         else:
             def_str = "Synonyms for "+word+": "
             for j in ret:
                 def_str += j + ", "
-            await self.bot.say("```"+def_str+"```")
+#            await self.bot.say("```"+def_str+"```")
+            await self.bot.embed_this_for_me(def_str, ctx)
     
-    @commands.command()
-    async def antonym(self, word:str):
+    @commands.command(pass_context=True)
+    async def antonym(self,ctx, word:str):
+        """Return the antonym of a word"""
         ret = self.dictionary.antonym(word)
         if ret is None:
-            await self.bot.say("```Antonym for "+word+" not found.```")
+#            await self.bot.say("```Antonym for "+word+" not found.```")
+            await self.bot.embed_this_for_me("Antonym for *"+word+"* not found", ctx)
         else:
             def_str = "Antonyms for "+word+": "
             for j in ret:
                 def_str += j + ", "
-            await self.bot.say("```"+def_str+"```")
+#            await self.bot.say("```"+def_str+"```")
+            await self.bot.embed_this_for_me(def_str, ctx)
+ 
     
     #google translate broke this function
     @commands.command()
     async def translate(self, word:str, lang:str):
+        """Return the translation of a word into the specified language"""    
         ret = self.dictionary.translate(word, lang)
         #print(word)
         #print(lang)

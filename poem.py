@@ -106,6 +106,10 @@ class Poem:
          
     @commands.command(pass_context=True)
     async def poem(self,ctx, *args):
+        """Searches for a poem
+        usage: !poem <title> <author> <length>
+        
+        """
         #print(args)
         url = self.poetry_url(args)
         msg = self.poetry_json(url)

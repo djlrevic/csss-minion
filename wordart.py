@@ -91,31 +91,12 @@ class WordArt:
         self.bot.conn_wc.commit()
         cur.close()
 
-
-    # also this http://i.imgur.com/dmqYSvu.jpg
-    @commands.command()
-    async def impeach(self):
-        await self.bot.say("Yessir! Right away, sir!" + "http://imgur.com/pCQT0pm")
-        
-    @commands.command()
-    async def triggered(self):
-        await self.bot.say("Oh no you didn't!"+" http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
-
-
-    @commands.command(pass_context=True)
-    async def remindme(self, ctx, *args):
-        await self.bot.say("```Thanks for reminding me to write the rest of this function.```")
-
-    @commands.command()
-    async def kms(self):
-        await self.bot.say("http://i.imgur.com/XStaKp3.jpg")
-
-    @commands.command()
-    async def eggplant(self):
-        await self.bot.say("🍆My eggplant brings all the boys to the yard🍆")
-
     @commands.command(pass_context=True)
     async def avatart(self, ctx, *args):
+        """Make a wordcloud in the shape of your avatar.
+        usage: !avatart <invert> <bgcolor>
+        
+        """
         await self.bot.say("```Making artwork "+str(ctx.message.author)+", hold your horses!```")
         fin_img = path.join(self.d,self.e,"fin.png")
         
@@ -172,6 +153,7 @@ class WordArt:
     # only refresh cache if an authorized ID
     @commands.command(pass_context=True)
     async def refreshCache(self, ctx):
+        """Refresh the server wordart cache. Admin only."""
         if ctx.message.author.id == "173177975045488640" or ctx.message.author.id == "173702138122338305": #users authorized to refresh
             await self.bot.say("```Working...```")
             self.populateCaches()
@@ -183,10 +165,12 @@ class WordArt:
 
     @commands.command(pass_context=True)
     async def servart(self,ctx, *args):
+        """Make a wordcloud out of the server's most common words."""
         await self.bot.send_file(ctx.message.channel, self.serverImage)
 
     @commands.command(pass_context=True)
     async def wordart(self,ctx):
+        """Make a wordcloud out of your most common words."""
         words = self.wordsFromDB(ctx.message.author)
         filename = self.createImage(words, "wow.png")
         await self.bot.send_file(ctx.message.channel, filename)
