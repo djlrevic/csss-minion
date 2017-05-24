@@ -29,10 +29,12 @@ class WordArt:
     def __init__(self, bot):
         self.bot = bot
         cur = self.bot.conn_wc.cursor()
+        
         query = "CREATE TABLE IF NOT EXISTS "+self.tablename+"(user_id bigint, msgs varchar(2000), date text, UNIQUE(user_id, date))" # create table if doesn't exist
         cur.execute(query)
         self.bot.conn_wc.commit()
         cur.close()
+        print("Populating caches, prepare for major lagspike")
         self.populateCaches()
     
     # populates a word and image cache for the server's wordcloud
@@ -40,7 +42,7 @@ class WordArt:
     def populateCaches(self):
         try:
             cur = self.bot.conn_wc.cursor()
-            cur.execute("SELECT msgs FROM "+self.tablename+" LIMIT 2000") #yeah boy we're limiting
+            cur.execute("SELECT msgs FROM "+self.tablename) # hashtag no limits
             entries = cur.fetchall()
             arr = []
             for i in range(0, len(entries)):
@@ -53,7 +55,8 @@ class WordArt:
             print("server cache retrieval error")
             self.serverCache = self.backupArr
         text = " ".join(self.serverCache)
-        wc = WordCloud(width=1024, height=1024, max_words=2000, stopwords=self.STOPWORDS).generate(text)
+        print("generating word cloud")
+        wc = WordCloud(width=1024, height=1024, max_words=200000, stopwords=self.STOPWORDS).generate(text) # take it to the limit
         wc.to_file(self.serverImage)
     
        
@@ -77,7 +80,7 @@ class WordArt:
     def createImage(self, arr, saveName):
         text = " ".join(arr)
         savedir = path.join(self.d,self.e, saveName) # local image gets overwritten each time. will this break if too many requests?
-        wc = WordCloud(max_words=2000, stopwords=self.STOPWORDS).generate(text)
+        wc = WordCloud(max_words=20000, stopwords=self.STOPWORDS).generate(text)
         wc.to_file(savedir)
         return savedir
         
@@ -86,7 +89,7 @@ class WordArt:
     async def on_message(self, message):   
         cur = self.bot.conn_wc.cursor()
         query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s)"
-        data = (message.author.id, message.content.encode("utf-8"), message.timestamp)
+        data = (message.author.id, message.content, message.timestamp)
         cur.execute(query, data)
         self.bot.conn_wc.commit()
         cur.close()
