@@ -28,7 +28,7 @@ if not os.path.isfile(configFile):
     postgrespass = getpass.getpass('Database Password: ')
     mashape_key = getpass.getpass('Mashape Key: ')
     local_postgres_pw = getpass.getpass('Database Password: ')
-    imgur_id = config.get('Imgur client id: ')
+    imgur_id = getpass.getpass('Imgur client id: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
