@@ -28,18 +28,15 @@ class UrbanDict:
             return "Bad response from server  *shrugs*"
         
         
-    @commands.command()
-    async def urban(self, *msg:str):
+    @commands.command(pass_context=True)
+    async def urban(self,ctx, *msg:str):
+        """Lookup some jargon from the urban dictionary."""
         word = " ".join(msg)
         query = "https://mashape-community-urban-dictionary.p.mashape.com/define?term="+word
         req = requests.get(query, headers=self.headers)
         ret = self.parseResponse(req)
-        await self.bot.say(ret)
-        
-        
-    @commands.command()
-    async def goodluck(self):
-        await self.bot.say("http://i.imgur.com/sbY9DeH.jpg")
+        #await self.bot.say(ret)
+        await self.bot.embed_this_for_me(ret,ctx) #GAVIN FREE is too long to fit in embeds
         
         
 def setup(bot):

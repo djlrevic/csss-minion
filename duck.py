@@ -57,16 +57,18 @@ class Duck:
     
     
     
-    @commands.command()
-    async def search(self, *query):
+    @commands.command(pass_context=True)
+    async def search(self,ctx, *query):
+        """Search the internet using DuckDuckGo!"""
         word = " ".join(query)
         msg = self.parseResponse(word)
-        await self.bot.say(msg)
-        
-      #<:crabplant:314875003168489472>
+        await self.bot.embed_this_for_me(msg,ctx)
+       # await self.bot.say(msg)
+   
   
     @commands.command(pass_context=True)
     async def eggwrite(self, ctx, *msg):
+        """Use the bot to write with eggplant emojis!"""
         if self.emojis == None:
             self.emojis = ctx.message.server.emojis
         word = " ".join(msg)
@@ -75,26 +77,17 @@ class Duck:
             if s.isalpha():
                 #convert to eggplant letter
                 for em in self.emojis:
-                    if str(em)[2] == s.upper():
+                    if str(em)[3] == "_" and str(em)[2] == s.upper():
                         newstr += str(em)
+                        break;
             elif s == " ":
                 #change to 5 spaces
                 newstr += "     "
             else:
                 newstr += s
-        await self.bot.say(newstr)
+        #await self.bot.say(newstr)
+        await self.bot.embed_this_for_me(newstr,ctx)
         
-        
-   # @commands.command()
-   # async def eggwrite(self, *word):
-   #     newstr = ""
-   #     for s in word:
-   #         if s.isalpha():
-   #             newstr += "**:"+s.upper()+"_Eggplant:**"
-   #             #newstr += ":regional_indicator_"+s.lower()+":"
-   #         else:
-   #             newstr += s
-   #     await self.bot.say(newstr)
         
    
 def setup(bot):

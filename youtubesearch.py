@@ -34,6 +34,7 @@ class YoutubeSearch:
         
     @commands.command(pass_context=True)
     async def youtube(self, ctx, *query):
+        """Search for a youtube video"""
         query = " ".join(query)
         link = self.requestVid(query)
         await self.bot.say(link)

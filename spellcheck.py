@@ -9,15 +9,18 @@ class Spellcheck:
         self.spchk = dictionary
         
         
-    @commands.command()
-    async def spell(self, word: str):
+    @commands.command(pass_context=True)
+    async def spell(self,ctx, word: str):
+        """Check your spelling"""
         if self.spchk.check(word):
-            await self.bot.say("Yes! "+word+" is spelled correctly.")
+            #await self.bot.say("Yes! "+word+" is spelled correctly.")
+            await self.bot.embed_this_for_me("Yes! *"+word+"* is spelled correctly!",ctx)
         else:
             suggest = "Here are my suggestions for you: "
             for sgs in self.spchk.suggest(word):
                 suggest += sgs +", "
-            await self.bot.say(suggest)
+#            await self.bot.say(suggest)
+            await self.bot.embed_this_for_me(suggest,ctx)
         
         
 def setup(bot):

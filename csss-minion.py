@@ -13,6 +13,7 @@ import codecs as codex
 import math
 import time
 import subprocess
+import sys
 
 configFile = "botMain.settings"
 database = "experience" #database name used for exp
@@ -26,6 +27,8 @@ if not os.path.isfile(configFile):
     description = "Bot of the CSSS"
     postgrespass = getpass.getpass('Database Password: ')
     mashape_key = getpass.getpass('Mashape Key: ')
+    local_postgres_pw = getpass.getpass('Database Password: ')
+    imgur_id = getpass.getpass('Imgur client id: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
@@ -37,6 +40,8 @@ else:
     ip = "172.93.48.238:25565"
     postgrespass = config.get("Postgres", "Password")
     mashape_key = config.get("Mashape", "Token")
+    local_postgres_pw = config.get("LocalPG", 'Password')
+    imgur_id = config.get("Imgur", "client_id")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -44,13 +49,14 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
 bot.mcip = ip
 bot.remove_command("help")
 bot.mashape_key = mashape_key
+bot.imgur_id = imgur_id
 
 def reloadConfig():
     pass
@@ -59,7 +65,7 @@ def reloadConfig():
 qu = []
 global expTable
 expTable = []
-bot.conn_wc = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'") # second connection for wordcloud cog
+bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' password='"+local_postgres_pw+"'") # second connection for wordcloud cog
 
 @bot.event
 async def on_ready():
@@ -225,6 +231,14 @@ def updateLevel(change, experience, currLevel):
         return True
     return False  
 
+async def embed_this_for_me(text, ctx):
+    """Standardized embeddings across cogs"""
+    callingframe = sys._getframe(1)
+    em = discord.Embed(colour=0xfff)
+    em.add_field(name="Results from "+callingframe.f_code.co_name, value=text)
+    em.set_footer(text="Written by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
+    await bot.send_message(ctx.message.channel, embed=em)
+
 @bot.command(pass_context = True)
 async def rank(ctx):
     cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
@@ -244,11 +258,12 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-@bot.command()
-async def cogs():
+@bot.command(pass_context=True)
+async def cogs(ctx):
     """Lists the currently loaded cogs."""
     cogs = list(bot.cogs.keys())
-    await bot.say("\n".join(cogs)) 
+    await bot.embed_this_for_me("\n".join(cogs), ctx)
 
+bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.loop.create_task(update())
 bot.run(token)
