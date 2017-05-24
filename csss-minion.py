@@ -50,7 +50,7 @@ cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce", 'wordart']
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -282,3 +282,4 @@ async def cogs(ctx):
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.loop.create_task(update())
 bot.run(token)
+bot.load_extension("wordart") # bot can start and load wordart later.
