@@ -201,11 +201,11 @@ class Tunes:
         https://rg3.github.io/youtube-dl/supportedsites.html
         """
         if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
-            await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel))
+            await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
 #            await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
             return False
         if not self.bot.testing and   str(ctx.message.channel.id) != "293120981067890691":
-            await self.embed_for_me('You can only request from #bottesting') 
+            await self.embed_for_me('You can only request from #bottesting',ctx) 
  #           await self.bot.say("You can only request from #bottesting")
             return False
         
@@ -312,7 +312,7 @@ class Tunes:
         """shows songs in the current queue"""
         state = self.get_voice_state(ctx.message.server)
         em = discord.Embed(colour=0xfff, title="Dank Tune Song Queue")
-        em.set_footer(text="Written, produced, tested, and released by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
+        em.set_footer(text="Written, tested, and produced by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
         coolstr = 1
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order
