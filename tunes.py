@@ -316,7 +316,7 @@ class Tunes:
         """shows songs in the current queue"""
         state = self.get_voice_state(ctx.message.server)
         em = discord.Embed(colour=0xfff, title="Dank Tune Song Queue")
-        em.set_footer(text="Written, tested, and produced by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
+        em.set_footer(text="♪ DJ Minion Spinning The Decks ♪", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
         coolstr = 1
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order
