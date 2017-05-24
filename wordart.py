@@ -10,9 +10,13 @@ import numpy as np
 from colour import Color
 import io
 import os
+import time
+import asyncio
+import decimal
 #opencv-python is a dependency 
 
 #note to self... this will need refactoring one day. That day is not today.
+
 
 class WordArt:
     tablename = "wordartMessages"
@@ -27,6 +31,7 @@ class WordArt:
     
        
     def __init__(self, bot):
+        start = time.time()
         self.bot = bot
         cur = self.bot.conn_wc.cursor()
         
@@ -36,6 +41,7 @@ class WordArt:
         cur.close()
         print("Populating caches, prepare for major lagspike")
         self.populateCaches()
+        print("wordart took "+str(time.time()-start)+" seconds to initalize.")
     
     # populates a word and image cache for the server's wordcloud
     # calls are limited to __init__, nos, and henry
@@ -100,7 +106,8 @@ class WordArt:
         usage: !avatart <invert> <bgcolor>
         
         """
-        await self.bot.say("```Making artwork "+str(ctx.message.author)+", hold your horses!```")
+        fmt = "Making artwork {}, hold your horses!"
+        msg = await self.bot.say(fmt.format(ctx.message.author.mention))
         fin_img = path.join(self.d,self.e,"fin.png")
         
         # this whole block is lol
@@ -147,7 +154,8 @@ class WordArt:
             wc = WordCloud(background_color=bg_colour, max_words=20000,stopwords=self.STOPWORDS, mask=avatar_mask)
             wc.generate(text)
             wc.to_file(fin_img) # save masked wordart to file
-            await self.bot.send_file(ctx.message.channel, fin_img)
+            await self.bot.send_file(ctx.message.channel, fin_img, content=ctx.message.author.mention)
+            await self.bot.delete_message(msg)
         except:
             await self.bot.say("```Something has gone horribly wrong.```")
         
@@ -157,11 +165,14 @@ class WordArt:
     @commands.command(pass_context=True)
     async def refreshCache(self, ctx):
         """Refresh the server wordart cache. Admin only."""
+        start = time.time()
         if ctx.message.author.id == "173177975045488640" or ctx.message.author.id == "173702138122338305": #users authorized to refresh
-            await self.bot.say("```Working...```")
+            msg = await self.bot.say("```Working...```")
             self.populateCaches()
-            
-            await self.bot.say("```Repopulated the caches my master```")
+            fmt = "Refreshing cache took {0} seconds {1}."
+            await self.bot.delete_message(msg)
+            await self.bot.say(fmt.format(str(float(round((time.time()-start), 3)))
+, ctx.message.author.mention)) # what in god's name
         else:
             await self.bot.say("```Bad boy! Down!```")
 
@@ -169,14 +180,14 @@ class WordArt:
     @commands.command(pass_context=True)
     async def servart(self,ctx):
         """Make a wordcloud out of the server's most common words."""
-        await self.bot.send_file(ctx.message.channel, self.serverImage)
+        await self.bot.send_file(ctx.message.channel, self.serverImage, content=ctx.message.author.mention)
 
     @commands.command(pass_context=True)
     async def wordart(self,ctx):
         """Make a wordcloud out of your most common words."""
         words = self.wordsFromDB(ctx.message.author)
         filename = self.createImage(words, "wow.png")
-        await self.bot.send_file(ctx.message.channel, filename)
+        await self.bot.send_file(ctx.message.channel,filename,content=ctx.message.author.mention)
         
 def setup(bot):
     bot.add_cog(WordArt(bot))
