@@ -76,7 +76,10 @@ class VoiceState:
         if author in self.playerheat:
             return self.playerheat[author]
         else:
-            print("unable to retrieve playerheat")
+            self.playerheat[author] = 1
+            print("unable to retrieve playerheat. Creating new Heat")
+            return 1
+
         
     def updateheat(self, message):
         newheat = 1 if message.channel.id == self.bot.request_channel else 5 #I like the ternary more
@@ -242,6 +245,7 @@ class Tunes:
             #print("current heat is "+str(heat))
             #await self.bot.say("Your heat is now at "+str(heat))
             if self.bot.music_priorityqueue:
+#                print("Type of new song coming in!")
                 await state.songs.put((heat,entry))
                 state.queue.append(entry)
             else:
