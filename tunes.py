@@ -76,7 +76,10 @@ class VoiceState:
         if author in self.playerheat:
             return self.playerheat[author]
         else:
-            print("unable to retrieve playerheat")
+            self.playerheat[author] = 1
+            print("unable to retrieve playerheat. Creating new Heat")
+            return 1
+
         
     def updateheat(self, message):
         newheat = 1 if message.channel.id == self.bot.request_channel else 5 #I like the ternary more
@@ -242,6 +245,7 @@ class Tunes:
             #print("current heat is "+str(heat))
             #await self.bot.say("Your heat is now at "+str(heat))
             if self.bot.music_priorityqueue:
+#                print("Type of new song coming in!")
                 await state.songs.put((heat,entry))
                 state.queue.append(entry)
             else:
@@ -312,7 +316,7 @@ class Tunes:
         """shows songs in the current queue"""
         state = self.get_voice_state(ctx.message.server)
         em = discord.Embed(colour=0xfff, title="Dank Tune Song Queue")
-        em.set_footer(text="Written, tested, and produced by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
+        em.set_footer(text="♪ DJ Minion Spinning The Decks ♪", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
         coolstr = 1
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order

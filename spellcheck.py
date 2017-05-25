@@ -24,5 +24,5 @@ class Spellcheck:
         
         
 def setup(bot):
-    dictionary = enchant.Dict("en_US") # should crash here if no dictionary installed. See comments above
+    dictionary = enchant.Dict("en_CA") # should crash here if no dictionary installed. See comments above
     bot.add_cog(Spellcheck(bot, dictionary))

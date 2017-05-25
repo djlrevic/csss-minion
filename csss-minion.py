@@ -250,7 +250,7 @@ async def embed_this_for_me(text, ctx):
     callingframe = sys._getframe(1)
     em = discord.Embed(colour=0xfff)
     em.add_field(name="Results from "+callingframe.f_code.co_name, value=text)
-    em.set_footer(text="Written by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
+    #em.set_footer(text="Written by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
     await bot.send_message(ctx.message.channel, embed=em)
 
 @bot.command(pass_context = True)
@@ -282,3 +282,4 @@ async def cogs(ctx):
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.loop.create_task(update())
 bot.run(token)
+bot.load_extension("wordart") # bot can start and load wordart later.

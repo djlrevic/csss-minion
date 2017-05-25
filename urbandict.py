@@ -4,6 +4,8 @@ from discord.ext import commands
 
 class UrbanDict:
 
+
+# TODO gavin free messes this up still
     def __init__(self, bot):
         self.bot = bot
         self.key = self.bot.mashape_key #this key is your key, this key is my key.
@@ -15,15 +17,18 @@ class UrbanDict:
             r = json.json()
             if r['result_type'] == "exact":
                 msg = " " #python strings are funny sometimes
-                msg += "**"+r['list'][0]['word']+"**"
+                msg += r['list'][0]['word']
                 msg +="```"+ r['list'][0]['definition'] +"```"
                 msg += "**example: **"+r['list'][0]['example']
                 msg += "\n<"+r['list'][0]['permalink']+">"
                 return msg
+                
             elif r['result_type'] == "no_results":
                 return "You probably typed in some dumb shit, cuz I can't find it." 
+                
             else:
-                return "Contact Nos ASAP cuz shit's broke"  
+                return "Contact Nos ASAP cuz shit's broke"
+                  
         else:
             return "Bad response from server  *shrugs*"
         
@@ -36,8 +41,10 @@ class UrbanDict:
         req = requests.get(query, headers=self.headers)
         ret = self.parseResponse(req)
         #await self.bot.say(ret)
-        await self.bot.embed_this_for_me(ret,ctx) #GAVIN FREE is too long to fit in embeds
-        
+        try:
+            await self.bot.embed_this_for_me(ret,ctx) #GAVIN FREE is too long to fit in embeds
+        except:
+            await self.bot.say("The content is probably too long for discord to handle")
         
 def setup(bot):
     bot.add_cog(UrbanDict(bot))

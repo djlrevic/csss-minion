@@ -12,7 +12,7 @@ class Memes:
     @commands.command(pass_context=True)
     async def impeach(self,ctx):
         """Impeach our dear leader"""
-        em = discord.Embed(colour=0xfff)
+        em = discord.Embed(colour=0xfff, title="Little did they know he was in peach the whole time.")
         em.set_image(url="http://i.imgur.com/pCQT0pm.png")
         await self.bot.send_message(ctx.message.channel, embed=em)
         #await self.bot.say("Yessir! Right away, sir!" + "http://imgur.com/pCQT0pm")
