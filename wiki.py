@@ -8,36 +8,7 @@ import json
 class Wiki:
     
     def __init__(self, bot):
-        self.bot = bot
-        
-    #fits any string into <2k size and plop into arr
-    def fit_msg(self, msg):
-        msgs = []
-        # split on "\n" or " " if possible.
-        splitSymbol = "\n"
-        simpleSplit = False
-        suc = msg.find(splitSymbol,0,2000)
-        if suc == -1:
-            splitSymbol = " "
-        suc = msg.find(splitSymbol,0,2000)
-        if suc == -1:
-            simpleSplit = True
-        
-        while len(msg) >= 2000:
-            for x in range(2000,0,-1):
-                if simpleSplit:
-                    #print("Simple splitting at: "+str(x))
-                    msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
-                    msg = msg[x:] #put everything after newline back into str 
-                    break;
-                elif msg[x] == splitSymbol:
-                    #print("FOUND A SPLITSYMBOL: "+ str(x))
-                    msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
-                    msg = msg[x:] #put everything after newline back into str
-                    break;
-        else: # append msg if too short ALSO adds final part of string after looping
-            msgs.append(msg)
-        return msgs    
+        self.bot = bot 
            
         
     @commands.command(pass_context=True)
@@ -58,7 +29,7 @@ class Wiki:
                 link = msg[3][0]
         else:
             definition_str = "There was an error "+str(json.status_code)+". There is no page for this."
-        msgs = self.fit_msg(definition_str)
+        msgs = self.bot.fit_msg(definition_str)
         await self.bot.embed_this_for_me(definition_str +"\n"+link, ctx)
        # for msg in msgs:
        #     await self.bot.say("```"+msg+"```")
