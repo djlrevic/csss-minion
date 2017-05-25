@@ -42,6 +42,7 @@ else:
     mashape_key = config.get("Mashape", "Token")
     local_postgres_pw = config.get("LocalPG", 'Password')
     imgur_id = config.get("Imgur", "client_id")
+    bot.lang_url = config.get("Translate","url")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
