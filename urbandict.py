@@ -4,8 +4,6 @@ from discord.ext import commands
 
 class UrbanDict:
 
-
-# TODO gavin free messes this up still
     def __init__(self, bot):
         self.bot = bot
         self.key = self.bot.mashape_key #this key is your key, this key is my key.
@@ -31,7 +29,7 @@ class UrbanDict:
                   
         else:
             return "Bad response from server  *shrugs*"
-        
+     
         
     @commands.command(pass_context=True)
     async def urban(self,ctx, *msg:str):
@@ -40,9 +38,9 @@ class UrbanDict:
         query = "https://mashape-community-urban-dictionary.p.mashape.com/define?term="+word
         req = requests.get(query, headers=self.headers)
         ret = self.parseResponse(req)
-        #await self.bot.say(ret)
+        msgs = self.bot.fit_msg(ret,1024)
         try:
-            await self.bot.embed_this_for_me(ret,ctx) #GAVIN FREE is too long to fit in embeds
+            await self.bot.embed_this_for_me(msgs[0],ctx)
         except:
             await self.bot.say("The content is probably too long for discord to handle")
         
