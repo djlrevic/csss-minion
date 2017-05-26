@@ -51,11 +51,11 @@ class Misc():
         await self.bot.say("You joined this server on {}".format(ctx.message.author.joined_at))
 
     @commands.command()
-    async def wolf(self, query : str):
+    async def wolf(self, *args):
         """Get wolfram alpha to help with your homework
         Usage: wolf <query>
         """
-        res = wClient.query(query)
+        res = wClient.query(" ".join(args))
         try:
             await self.bot.say("```"+(next(res.results).text)+"```")
         except AttributeError:
