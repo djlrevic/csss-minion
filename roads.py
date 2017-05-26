@@ -10,6 +10,9 @@ class Roads:
 
     @commands.command()
     async def roads(self, *args):
+        """Display road conditions for SFU
+        Usage: roads <city>
+        """
         if len(args) >= 1:
             text = road.conditions(args[0])
         else:

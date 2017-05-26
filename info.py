@@ -24,6 +24,7 @@ class Info():
 
     @commands.command(pass_context = True)
     async def voteresult(self, ctx):
+        """Return the voting results from the previous CSSS election."""
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(title="CSSS Exec Positions", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
 
@@ -44,7 +45,7 @@ class Info():
 
     @commands.group(pass_context = True)
     async def help(self, ctx):
-
+        """Display the help menu"""
         if ctx.invoked_subcommand is None:
             items = []
             items.append([".help", "Displays this help menu."])
@@ -77,6 +78,7 @@ class Info():
 
     @help.command(pass_context = True)
     async def mc(self, ctx):
+        """Display the help menu for the minecraft server"""
         if ctx.message.channel.name != "minecraft":
             await self.bot.say("Please move to #minecraft for this command.")
         else:
@@ -95,6 +97,7 @@ class Info():
 
     @commands.command(pass_context = True)
     async def status(self, ctx):
+        """Display the number of players on the minecraft server"""
         if ctx.message.channel.name != "minecraft":
             await self.bot.say("Please move to #minecraft for this command.")
         else: 
@@ -114,6 +117,7 @@ class Info():
 
     @commands.command(pass_context = True)
     async def info(self, ctx):
+        """Display the minecraft server information"""
         if ctx.message.channel.name != "minecraft":
             await self.bot.say("Please move to #minecraft for this command.")
         else:    

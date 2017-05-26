@@ -10,6 +10,10 @@ class Announce:
 
     @commands.command(pass_context = True)
     async def announce(self, ctx, title, desc):
+        """Make an announcement
+        Usage: announce <title> <body>
+        Restricted command
+        """
         author = ctx.message.author
         if author.permissions_in(ctx.message.channel).manage_channels or author.server_permissions.manage_channels:
 
@@ -30,6 +34,10 @@ class Announce:
 
     @commands.command(pass_context = True)
     async def em(self, ctx, *desc):
+        """Make an embedded message
+        Usage: em <body>
+        Restricted command
+        """
         author = ctx.message.author
         if author.permissions_in(ctx.message.channel).manage_channels or author.server_permissions.manage_channels:
 
