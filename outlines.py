@@ -33,7 +33,7 @@ class Outlines:
             if entry != "":
                 embed.add_field(name = key.title(), value = entry, inline = False)
         if len(keys) != 1:
-            embed.add_field(name = "URL", value = "https://www.sfu.ca/outlines.html?" + data[0].lower())
+            embed.add_field(name = "URL", value = "[here](https://www.sfu.ca/outlines.html?" + data[0].lower()+ ")")
         await self.bot.say( embed=embed)
 
 
