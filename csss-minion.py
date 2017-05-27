@@ -42,7 +42,6 @@ else:
     mashape_key = config.get("Mashape", "Token")
     local_postgres_pw = config.get("LocalPG", 'Password')
     imgur_id = config.get("Imgur", "client_id")
-    bot.lang_url = config.get("Translate","url")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -59,6 +58,7 @@ bot.mcip = ip
 bot.remove_command("help")
 bot.mashape_key = mashape_key
 bot.imgur_id = imgur_id
+bot.lang_url = config.get("Translate","url")
 
 def reloadConfig():
     pass
@@ -260,7 +260,7 @@ def fit_msg(msg, maxlen:int=2000):
             newline > space > any char
         """
     msgs = []
-        
+
     while len(msg) >= maxlen:
         if '\n' in msg[:maxlen]:
             for x in range(maxlen,0,-1):
@@ -268,20 +268,20 @@ def fit_msg(msg, maxlen:int=2000):
                     msgs.append(msg[:x])
                     msg = msg[x:]
                     break;
-                        
+
         elif ' ' in msg[:maxlen]:
             for x in range(maxlen,0,-1):
                 if msg[x] == ' ':
                     msgs.append(msg[:x])
                     msg = msg[x:]
                     break;
-                        
+
         else:
             for x in range(maxlen,0,-1):
                 msgs.append(msg[:x])
                 msg = msg[x:]
                 break;
-                    
+
     msgs.append(msg)
     return msgs
 
