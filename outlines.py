@@ -10,6 +10,9 @@ class Outlines:
 
     @commands.command()
     async def outline(self, *args):
+        """Display an SFU course's outline
+        Usage: outline <department> <number> (section) (year) (semester)
+        """
         #probably a better way to do this
         #await self.bot.say(args)
         try:

@@ -42,6 +42,7 @@ else:
     mashape_key = config.get("Mashape", "Token")
     local_postgres_pw = config.get("LocalPG", 'Password')
     imgur_id = config.get("Imgur", "client_id")
+    bot.lang_url = config.get("Translate","url")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -50,7 +51,7 @@ cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -253,6 +254,38 @@ async def embed_this_for_me(text, ctx):
     #em.set_footer(text="Written by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
     await bot.send_message(ctx.message.channel, embed=em)
 
+def fit_msg(msg, maxlen:int=2000):
+    """Split a long message to fit within discord's limits.
+            Uses the following order of division for natural splits:
+            newline > space > any char
+        """
+    msgs = []
+        
+    while len(msg) >= maxlen:
+        if '\n' in msg[:maxlen]:
+            for x in range(maxlen,0,-1):
+                if msg[x] == '\n':
+                    msgs.append(msg[:x])
+                    msg = msg[x:]
+                    break;
+                        
+        elif ' ' in msg[:maxlen]:
+            for x in range(maxlen,0,-1):
+                if msg[x] == ' ':
+                    msgs.append(msg[:x])
+                    msg = msg[x:]
+                    break;
+                        
+        else:
+            for x in range(maxlen,0,-1):
+                msgs.append(msg[:x])
+                msg = msg[x:]
+                break;
+                    
+    msgs.append(msg)
+    return msgs
+
+
 @bot.command(pass_context = True)
 async def rank(ctx):
     cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
@@ -280,6 +313,7 @@ async def cogs(ctx):
     await bot.embed_this_for_me("\n".join(cogs), ctx)
 
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
+bot.fit_msg = fit_msg # attach fit_msg to bot object
 bot.loop.create_task(update())
 bot.run(token)
 bot.load_extension("wordart") # bot can start and load wordart later.

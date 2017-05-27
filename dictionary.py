@@ -8,7 +8,7 @@ class Dictionary:
         self.bot = bot
         self.dictionary = PyDictionary('lxml')
        
-       #TODO passing in a string such as a;lskejf;laskjf;lkjvldskjrlgjslfgnhslkfnhsoifjosijosjeojsopejr gives a valid response instead of an error.
+       #TODO a query like 'a;lskejf;laskjf;lkjvldskjrlgjslfgnhslkfnhsoifjosijosjeojsopejr' gives a valid response with an unknown subject. UNKNOWN FIX
     @commands.command(pass_context=True)
     async def meaning(self,ctx, word:str):
         """Return the meaning of a word"""
@@ -61,18 +61,6 @@ class Dictionary:
 #            await self.bot.say("```"+def_str+"```")
             await self.bot.embed_this_for_me(def_str, ctx)
  
-    
-    #google translate broke this function
-    @commands.command()
-    async def translate(self, word:str, lang:str):
-        """Return the translation of a word into the specified language"""    
-        ret = self.dictionary.translate(word, lang)
-        #print(word)
-        #print(lang)
-        if ret is None:
-            await self.bot.say(word+" not found.")
-        else:
-            await self.bot.say("```"+ret+"```")
         
 def setup(bot):
     bot.add_cog(Dictionary(bot))

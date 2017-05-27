@@ -13,7 +13,6 @@ import __main__
 
 # TODO 
 # cooldown for heat
-# dies when queue with no song in queue
 
 
 if not discord.opus.is_loaded():
@@ -35,7 +34,6 @@ class VoiceEntry:
         return selfpriority < otherpriority
 
     def __str__(self):
-        #fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
         fmt = '*{0.title}* requested by {1.display_name}'
         duration = self.player.duration
         if duration:
@@ -48,17 +46,15 @@ class VoiceState:
         self.voice = None
         self.bot = bot
         self.play_next_song = asyncio.Event()
-        #self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
         self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
         self.playerheat = {} # keep track of how often each user requests. -------------
+        self.queue = [] # easily track the songs without messing with threads
         if self.bot.music_priorityqueue:
             self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
-            #self.queue = queue.PriorityQueue()
-            self.queue = []
         else:
             self.songs = asyncio.Queue()
-            self.queue = []
+            
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -75,14 +71,13 @@ class VoiceState:
     def getheat(self, author):
         if author in self.playerheat:
             return self.playerheat[author]
-        else:
+        else:  # unable to retrieve heat, create new
             self.playerheat[author] = 1
-            print("unable to retrieve playerheat. Creating new Heat")
             return 1
 
         
     def updateheat(self, message):
-        newheat = 1 if message.channel.id == self.bot.request_channel else 5 #I like the ternary more
+        newheat = 1 if message.channel.id == self.bot.request_channel else 5 # higher heat tax if wrong channel
         if message.author in self.playerheat:
             self.playerheat[message.author] += newheat
         else:
@@ -159,33 +154,32 @@ class Tunes:
     async def join(self, ctx, *, channel : discord.Channel):
         """Joins a voice channel."""
         if str(ctx.message.author.voice_channel) is not null or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
-            await self.embed_for_me('I can only play in Music voicechannel. This is '+str(ctx.message.author.voice_channel))
-            #await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
+            await self.embed_for_me('I can only play in Music voicechannel. This is '+str(ctx.message.author.voice_channel),ctx)
             return False
+            
         try:
             await self.create_voice_client(channel)
         except discord.ClientException:
-            await self.embed_for_me('Already in a voice channel...')
-            #await self.bot.say('Already in a voice channel...')
+            await self.embed_for_me('Already in a voice channel...',ctx)
         except discord.InvalidArgument:
-            await self.embed_for_me('This is not a voice channel...')
-#            await self.bot.say('This is not a voice channel...')
+            await self.embed_for_me('This is not a voice channel...',ctx)
         else:
-            await self.embed_for_me('Ready to play audio in '+channel.name)
-#            await self.bot.say('Ready to play audio in ' + channel.name)
+            await self.embed_for_me('Ready to play audio in '+channel.name,ctx)
+            
 
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         """Summons the bot to join your voice channel."""
+        
         summoned_channel = ctx.message.author.voice_channel
         if summoned_channel is None:
-            await self.embed_for_me('You are not in a voice channel.')
-#            await self.bot.say('You are not in a voice channel.')
+            await self.embed_for_me('You are not in a voice channel.',ctx)
             return False
+            
         if str(summoned_channel.id) != self.bot.music_channel:
-            await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(summoned_channel))
-            #await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(summoned_channel))
+            await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(summoned_channel),ctx)
             return False
+            
         state = self.get_voice_state(ctx.message.server)
         if state.voice is None:
             state.voice = await self.bot.join_voice_channel(summoned_channel)
@@ -205,11 +199,10 @@ class Tunes:
         """
         if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
-#            await self.bot.say('I can only play in Music voicechannel, this voicechannel is '+str(ctx.message.author.voice_channel))
             return False
-        if not self.bot.testing and   str(ctx.message.channel.id) != "293120981067890691":
+            
+        if not self.bot.testing and str(ctx.message.channel.id) != "293120981067890691":
             await self.embed_for_me('You can only request from #bottesting',ctx) 
- #           await self.bot.say("You can only request from #bottesting")
             return False
         
         state = self.get_voice_state(ctx.message.server)
@@ -226,31 +219,26 @@ class Tunes:
                 return
 
         try:
-        
             player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next, before_options=beforeArgs)
-            #print("successfully created player")
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
         else:
             if not state.is_playing() and state.current is not None:
-                print("shit gone south")
+                print("There might be an error")
             heat = state.getheat(ctx.message.author)
             player.volume = 0.6
             entry = VoiceEntry(ctx.message, player, datetime.datetime.now(), heat)
             await self.embed_for_me('Enqueued ' +str(entry)+'. Your heat is now '+str(heat), ctx)
-            #await self.bot.say('Enqueued ' + str(entry))
             state.updateheat(ctx.message)
             
-            #print("current heat is "+str(heat))
-            #await self.bot.say("Your heat is now at "+str(heat))
             if self.bot.music_priorityqueue:
-#                print("Type of new song coming in!")
                 await state.songs.put((heat,entry))
                 state.queue.append(entry)
             else:
                 await state.songs.put(entry)
                 state.queue.append(entry)
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
@@ -260,27 +248,26 @@ class Tunes:
         if state.is_playing():
             player = state.player
             #player.volume = value / 100  # :P
-#            await self.bot.say('Set the volume to {:.0%}'.format(value / 100))
             await self.embed_for_me('Set the volume to {:.0%}'.format(value/100), ctx)            
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def pause(self, ctx):
         """Pauses the currently played song."""
         if str(ctx.message.author.id) not in self.bot.admins_dict and self.bot.music_authoritarian:
             await self.embed_for_me(self.msg_unauthorized,ctx)
-            #await self.bot.say("If you don't like the music then !skip or leave the channel.")
             return False
         state = self.get_voice_state(ctx.message.server)
         if state.is_playing():
             player = state.player
             player.pause()
 
+
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
         """Resumes the currently played song."""
         if str(ctx.message.author.id) not in self.bot.admins_dict and self.bot.music_authoritarian:
             await self.embed_for_me(self.msg_unauthorized,ctx)
-            #await self.bot.say("If you don't like the music then !skip or leave the channel.")
             return False
         state = self.get_voice_state(ctx.message.server)
         if state.is_playing():
@@ -294,7 +281,6 @@ class Tunes:
         """
         if str(ctx.message.author.id) not in self.bot.admins_dict and self.bot.music_authoritarian:
             await self.embed_for_me(self.msg_unauthorized,ctx)
-            #await self.bot.say("If you don't like the music then !skip or leave the channel.")
             return False
         server = ctx.message.server
         state = self.get_voice_state(server)
@@ -317,14 +303,14 @@ class Tunes:
         state = self.get_voice_state(ctx.message.server)
         em = discord.Embed(colour=0xfff, title="Dank Tune Song Queue")
         em.set_footer(text="♪ DJ Minion Spinning The Decks ♪", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
-        coolstr = 1
+        spot_in_line = 1
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order
         for text in state.queue:
-            em.add_field(name=str(coolstr)+'st in queue', value=text)
-            coolstr+=1
+            em.add_field(name=str(spot_in_line)+'st in queue', value=text)
+            spot_in_line+=1
         await self.bot.send_message(ctx.message.channel, embed=em)
-        #await self.bot.embed_this_for_me(coolstr,ctx)
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
@@ -335,27 +321,23 @@ class Tunes:
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
             await self.embed_for_me('Not playing any music right now...',ctx)
-#            await self.bot.say('Not playing any music right now...')
             return
 
         voter = ctx.message.author
         if voter == state.current.requester:
             await self.embed_for_me('Requester requested skipping song...',ctx)        
-            #await self.bot.say('Requester requested skipping song...')
             state.skip()
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
             if total_votes >= 3:
                 await self.embed_for_me('Skip vote passed, skipping song...',ctx)
-#                await self.bot.say('Skip vote passed, skipping song...')
                 state.skip()
             else:
                 await self.embed_for_me('Skip vote added, currently at [{}/3]'.format(total_votes),ctx)
-                #await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
         else:
-#            await self.bot.say('You have already voted to skip this song.')
             await self.embed_for_me('You have already voted to skip this song.',ctx)
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):
@@ -364,11 +346,9 @@ class Tunes:
         state = self.get_voice_state(ctx.message.server)
         if state.current is None:
             await self.embed_for_me('Not playing anything.',ctx)
-#            await self.bot.say('Not playing anything.')
         else:
             skip_count = len(state.skip_votes)
             await self.embed_for_me('Now playing {} [skips: {}/3]'.format(state.current, skip_count),ctx)
-            #await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count),ctx)
         
         
         

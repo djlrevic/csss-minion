@@ -11,6 +11,10 @@ class Misc():
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *args):
+        """Create an instant poll
+        Usage: poll <subject> [choices]...
+        Defaults to yes/no if no choices supplied.
+        """
         if len(args) == 0:
             # no question
             await self.bot.say("Give me a question!")
@@ -36,15 +40,22 @@ class Misc():
 
     @commands.command()
     async def playmsg(self, msg):
+        """Change minion's playing message
+        Usage: playing <msg>
+        """
         await self.bot.change_presence(game = discord.Game(name=msg))
 
     @commands.command(pass_context=True)
     async def howoldami(self, ctx):
+        """Display when you joined the server"""
         await self.bot.say("You joined this server on {}".format(ctx.message.author.joined_at))
 
     @commands.command()
-    async def wolf(self, query : str):
-        res = wClient.query(query)
+    async def wolf(self, *args):
+        """Get wolfram alpha to help with your homework
+        Usage: wolf <query>
+        """
+        res = wClient.query(" ".join(args))
         try:
             await self.bot.say("```"+(next(res.results).text)+"```")
         except AttributeError:
