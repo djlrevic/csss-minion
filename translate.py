@@ -16,10 +16,9 @@ class Translate:
     def sneakpastgooglesecurity(self, msg, tlang, slang='en'): # default to english
         fmt = self.bot.lang_url.format(slang,tlang,urllib.parse.quote_plus(msg))
         #fmt = self.url.format(slang,tlang,msg)
-        req = requests.get(fmt)
+        req = requests.get(fmt) # reponse is in ascii?
         if req.status_code == 200:
             ret = req.json()
-            print(ret)
             newm = ''
             for tr in ret[0]:
                 newm += tr[0]
