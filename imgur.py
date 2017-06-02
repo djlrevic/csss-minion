@@ -12,6 +12,7 @@ class Imgur:
     def imgur_api(self, search):
         querystring={'q':search}
         img = None
+        desc = None
         res = requests.request('GET', self.url, headers=self.headers, params=querystring)
         if res.status_code == 200:
             ret = res.json()
