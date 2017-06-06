@@ -309,11 +309,11 @@ if __name__ == "__main__":
 async def cogs(ctx):
     """Lists the currently loaded cogs."""
     cogs = list(bot.cogs.keys())
-
+    cogs.sort()
     await bot.embed_this_for_me("\n".join(cogs), ctx)
-
+    
+bot.load_extension("wordart") # bot can start and load wordart later.
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.fit_msg = fit_msg # attach fit_msg to bot object
 bot.loop.create_task(update())
 bot.run(token)
-bot.load_extension("wordart") # bot can start and load wordart later.
