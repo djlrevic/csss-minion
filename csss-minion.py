@@ -14,7 +14,16 @@ import math
 import time
 import subprocess
 import sys
+from io import StringIO
+import logging
 
+saveout = sys.stdout
+saveerr = sys.stderr
+fsock = open('logs.txt', 'w', 1)
+sys.stdout = sys.stderr = fsock
+
+f = open('logs.txt', 'r')
+f.seek(0)
 configFile = "botMain.settings"
 database = "experience" #database name used for exp
 
@@ -180,6 +189,11 @@ async def update():
             if time.time() - item[1] >= 60:
                 # print("entry expired")
                 del qu[i]
+        f.flush()
+        line = f.readline()
+        while line:
+            await bot.send_message(bot.get_channel('321832332279676928'), line)
+            line = f.readline()
         await asyncio.sleep(1)
 
 # handles adding new users and updating existing user exp to database
