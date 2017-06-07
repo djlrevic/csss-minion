@@ -43,31 +43,77 @@ class Info():
 
             await self.bot.say(embed=embed)    
 
+
+    # the following several functions are inspired by formatterhelper and default_help command
+    def is_cog(self,ctx, command):
+        return not self.is_bot(ctx,command) and not isinstance(command, Command)
+
+
+    def is_bot(self,ctx,command):
+        return command is ctx.bot
+
+
+    def clean_prefix(self,context):
+        """The cleaned up invoke prefix. i.e. mentions are ``@name`` instead of ``<@id>``."""
+        user = context.bot.user
+        # this breaks if the prefix mention is not the bot itself but I
+        # consider this to be an *incredibly* strange use case. I'd rather go
+        # for this common use case rather than waste performance for the
+        # odd one.
+        return context.prefix.replace(user.mention, '@' + user.name)
+
+
+
+    def get_command_signature(self,ctx, command):
+        """Retrieves the signature portion of the help page."""
+        result = []
+        prefix = self.clean_prefix(ctx)
+        cmd = command
+        parent = cmd.full_parent_name
+        if len(cmd.aliases) > 0:
+            aliases = '|'.join(cmd.aliases)
+            fmt = '{0}[{1.name}|{2}]'
+            if parent:
+                fmt = '{0}{3} [{1.name}|{2}]'
+            result.append(fmt.format(prefix, cmd, aliases, parent))
+        else:
+            name = prefix + cmd.name if not parent else prefix + parent + ' ' + cmd.name
+            result.append(name)
+
+        params = cmd.clean_params
+        if len(params) > 0:
+            for name, param in params.items():
+                if param.default is not param.empty:
+                    # We don't want None or '' to trigger the [name=value] case and instead it should
+                    # do [name] since [name=None] or [name=] are not exactly useful for the user.
+                    should_print = param.default if isinstance(param.default, str) else param.default is not None
+                    if should_print:
+                        result.append('[{}={}]'.format(name, param.default))
+                    else:
+                        result.append('[{}]'.format(name))
+                elif param.kind == param.VAR_POSITIONAL:
+                    result.append('[{}...]'.format(name))
+                else:
+                    result.append('<{}>'.format(name))
+
+        return ' '.join(result)
+
+
     @commands.group(pass_context = True)
     async def help(self, ctx):
-        """Display the help menu"""
+        """Display this help menu"""
         if ctx.invoked_subcommand is None:
             items = []
-            items.append([".help", "Displays this help menu."])
-            items.append([".newclass <class>", "Start a new class group. Great for notifying everyone in that particular class."])
-            items.append([".iam <class>", "Places yourself in an existing class."])
-            items.append([".wolf <query>", "Asks WolframAlpha a question! Wrap your questions in \"quotes\"!"])
-            # items.append([".vote", "Find voting details for the CSSS Exec election!."])
-            items.append([".voteresult", "Find out the winners of the CSSS annual election!"])
-            items.append([".help mc", "Displays commands for the CSSS Minecraft server. Only usable within #minecraft"])
-            items.append([".gameR help", "Displays commands for the for the Roullette game"])
-            items.append([".meaning <word>", "Display the meaning of an english word"])
-            items.append([".synonym <word>", "Display synonyms for an english word"])
-            items.append([".antonym <word>", "Display antonyms for an english word"])
-            items.append([".spell <word>", "Check the spelling of an english word"])
-            items.append([".poem <title> <author>", "Retrieve a poem from the poem database"])
-            items.append([".wiki <query>", "Retrieve summary of a wikipedia article"])
-            items.append([".wordart", "Make a wordcloud out of your common words"])
-            items.append([".avatart <invert> <colour>", "Turn your avatar into a wordcloud!"])
-            items.append(["Source Code", "https://github.com/henrymzhao/csss-minion/"])
-
-            p = Pages(self.bot, message = ctx.message, entries = items, per_page = 4)
-            p.embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+            print(type(self.bot.commands))
+            for k in self.bot.commands: # grab all commands registered with the bot
+                com = self.bot.commands[k]
+                sig = self.get_command_signature(ctx,com) # grabs command signature
+                items.append([sig,com.help]) # append command signature and pydoc to list
+            
+            
+            items.append(["Source Code", "https://github.com/henrymzhao/csss-minion/"]) # keep src as last entry            
+            p = Pages(self.bot, message=ctx.message, entries = items, per_page=4)
+            p.embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643),timestamp=datetime.datetime.utcfromtimestamp(1490339531))
             p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
             p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
             p.embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")

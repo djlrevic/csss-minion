@@ -17,6 +17,24 @@ import decimal
 
 #note to self... this will need refactoring one day. That day is not today.
 
+query_spam_reduction = """ WITH numbers AS
+(
+         SELECT   date,
+                  Count(DISTINCT r)
+         FROM     (
+                         SELECT date,
+                                unnest(regexp_split_to_array(msgs, e'\\s+')) AS r
+                         FROM   "public"."wordartmessages") c
+         GROUP BY date
+         HAVING   count(distinct r) = 1)
+DELETE
+FROM   wordartmessages
+WHERE  date IN
+       (
+              SELECT date
+              FROM   numbers) """
+
+
 
 class WordArt:
     tablename = "wordartMessages"
@@ -42,6 +60,18 @@ class WordArt:
         print("Populating caches, prepare for major lagspike")
         self.populateCaches()
         print("wordart took "+str(time.time()-start)+" seconds to initalize.")
+    
+    @commands.command(pass_context=True)
+    async def clearspam(self, ctx):
+        cur = self.bot.conn_wc.cursor()
+        msg = await self.bot.say("Clearing the spam your mightyness")
+       # cur.callproc('spam_reduction')
+        cur.execute(query_spam_reduction)
+        self.bot.conn_wc.commit()
+        cur.close()
+        await self.bot.edit_message(msg, "Spam is cleared your mightyness")
+    
+    
     
     # populates a word and image cache for the server's wordcloud
     # calls are limited to __init__, nos, and henry
