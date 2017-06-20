@@ -28,37 +28,7 @@ class Poem:
                 print("Cache not filled")
         else:
             print("Error populating poetry cache: "+ json.status_code)    
-        
-        
-        #fits any string into <2k size and plop into arr
-    def fit_msg(self, msg):
-        msgs = []
-        # split on "\n" or " " if possible.
-        splitSymbol = "\n"
-        simpleSplit = False
-        suc = msg.find(splitSymbol,0,2000)
-        if suc == -1:
-            splitSymbol = " "
-        suc = msg.find(splitSymbol,0,2000)
-        if suc == -1:
-            simpleSplit = True
-        
-        while len(msg) >= 2000:
-            for x in range(2000,0,-1):
-                if simpleSplit:
-                    #print("Simple splitting at: "+str(x))
-                    msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
-                    msg = msg[x:] #put everything after newline back into str 
-                    break;
-                elif msg[x] == splitSymbol:
-                    #print("FOUND A SPLITSYMBOL: "+ str(x))
-                
-                    msgs.append(msg[:x]) # the first newline before 2k chars is cutoff point
-                    msg = msg[x:] #put everything after newline back into str
-                    break;
-        else: # append msg if too short ALSO adds final part of string after looping
-            msgs.append(msg)
-        return msgs        
+            
     
     def poetry_url(self, args):
         length = len(args)
@@ -106,10 +76,14 @@ class Poem:
          
     @commands.command(pass_context=True)
     async def poem(self,ctx, *args):
+        """Searches for a poem
+        usage: !poem <title> <author> <length>
+        
+        """
         #print(args)
         url = self.poetry_url(args)
         msg = self.poetry_json(url)
-        msgs = self.fit_msg(msg[0]+"\n"+msg[1])
+        msgs = self.bot.fit_msg(msg[0]+"\n"+msg[1])
         #print("There are "+str(len(msgs))+" parts to this msg")
         if msg[0] == "error":
             await self.bot.say("Spelling error or not in database.")

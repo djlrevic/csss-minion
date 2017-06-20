@@ -13,7 +13,17 @@ import codecs as codex
 import math
 import time
 import subprocess
+import sys
+from io import StringIO
+import logging
 
+saveout = sys.stdout
+saveerr = sys.stderr
+fsock = open('logs.txt', 'w', 1)
+sys.stdout = sys.stderr = fsock
+
+f = open('logs.txt', 'r')
+f.seek(0)
 configFile = "botMain.settings"
 database = "experience" #database name used for exp
 
@@ -26,6 +36,8 @@ if not os.path.isfile(configFile):
     description = "Bot of the CSSS"
     postgrespass = getpass.getpass('Database Password: ')
     mashape_key = getpass.getpass('Mashape Key: ')
+    local_postgres_pw = getpass.getpass('Database Password: ')
+    imgur_id = getpass.getpass('Imgur client id: ')
 else:
     #Load the config file
     config = configparser.ConfigParser()
@@ -37,6 +49,8 @@ else:
     ip = "172.93.48.238:25565"
     postgrespass = config.get("Postgres", "Password")
     mashape_key = config.get("Mashape", "Token")
+    local_postgres_pw = config.get("LocalPG", 'Password')
+    imgur_id = config.get("Imgur", "client_id")
 
 # SQL SETUP------------------------------------------------------------------------------
 urllib.parse.uses_netloc.append("postgres")
@@ -44,13 +58,16 @@ conn = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql
 cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck"]
+
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
 bot.mcip = ip
 bot.remove_command("help")
 bot.mashape_key = mashape_key
+bot.imgur_id = imgur_id
+bot.lang_url = config.get("Translate","url")
 
 def reloadConfig():
     pass
@@ -59,7 +76,7 @@ def reloadConfig():
 qu = []
 global expTable
 expTable = []
-bot.conn_wc = psycopg2.connect("port='5432' user='zocnciwk' host='tantor.db.elephantsql.com' password='"+postgrespass+"'") # second connection for wordcloud cog
+bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' password='"+local_postgres_pw+"'") # second connection for wordcloud cog
 
 @bot.event
 async def on_ready():
@@ -67,7 +84,7 @@ async def on_ready():
     print(bot.user.name)
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
-    global expTable 
+    global expTable
     expTable = getLevel() #pulling exp templates
 
 @bot.event
@@ -81,7 +98,7 @@ async def on_message(message):
 @bot.command(pass_context = True)
 async def load(ctx, name):
     if Henry(ctx):
-        try: 
+        try:
             bot.load_extension(name)
         except(AttributeError, ImportError) as e:
             await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
@@ -99,8 +116,22 @@ async def unload(ctx, name):
         await bot.say("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
-async def execute(ctx, query):
+async def reload(ctx, name):
     if Henry(ctx):
+        bot.unload_extension(name)
+        try:
+            bot.load_extension(name)
+        except(AttributeError, ImportError) as e:
+            await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            return
+        await bot.say("`{} cog reloaded`".format(name))
+    else:
+        await bot.say("`You ain't my master! Shoo!``")
+
+@bot.command(pass_context = True)
+async def exc(ctx, *args):
+    if Henry(ctx):
+        query = " ".join(args)
         await bot.say("```"+subprocess.getoutput(query)+"```")
     else:
         await bot.say("You ain't my master! Shoo!")
@@ -153,11 +184,16 @@ def calcLevel(x):
 async def update():
     await bot.wait_until_ready()
     print("ready")
-    while not bot.is_closed:        
+    while not bot.is_closed:
         for i, item in enumerate(qu):
             if time.time() - item[1] >= 60:
                 # print("entry expired")
                 del qu[i]
+        f.flush()
+        line = f.readline()
+        while line:
+            await bot.send_message(bot.get_channel('321832332279676928'), line)
+            line = f.readline()
         await asyncio.sleep(1)
 
 # handles adding new users and updating existing user exp to database
@@ -167,7 +203,7 @@ async def add(message):
     entry = cur.fetchone()
     if entry == None:
         # user not in database
-        cur.execute("INSERT INTO "+database+" (name, user_id, exp) VALUES (%s, %s, %s)", 
+        cur.execute("INSERT INTO "+database+" (name, user_id, exp) VALUES (%s, %s, %s)",
             (message.author.name, str(message.author.id), random.randint(15, 25), ))
         conn.commit()
     else:
@@ -210,7 +246,7 @@ def userLevel(experience):
         if experience < foo[1]:
             upperBound = foo[0]
     return lowerBound
-    
+
 
 # detect if user is eligible for the next level
 def updateLevel(change, experience, currLevel):
@@ -222,13 +258,53 @@ def updateLevel(change, experience, currLevel):
     # print("afterChange : {}".format(afterChange))
     if afterChange != currLevel:
         return True
-    return False  
+    return False
+
+async def embed_this_for_me(text, ctx):
+    """Standardized embeddings across cogs"""
+    callingframe = sys._getframe(1)
+    em = discord.Embed(colour=0xfff)
+    em.add_field(name="Results from "+callingframe.f_code.co_name, value=text)
+    #em.set_footer(text="Written by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
+    await bot.send_message(ctx.message.channel, embed=em)
+
+def fit_msg(msg, maxlen:int=2000):
+    """Split a long message to fit within discord's limits.
+            Uses the following order of division for natural splits:
+            newline > space > any char
+        """
+    msgs = []
+
+    while len(msg) >= maxlen:
+        if '\n' in msg[:maxlen]:
+            for x in range(maxlen,0,-1):
+                if msg[x] == '\n':
+                    msgs.append(msg[:x])
+                    msg = msg[x:]
+                    break;
+
+        elif ' ' in msg[:maxlen]:
+            for x in range(maxlen,0,-1):
+                if msg[x] == ' ':
+                    msgs.append(msg[:x])
+                    msg = msg[x:]
+                    break;
+
+        else:
+            for x in range(maxlen,0,-1):
+                msgs.append(msg[:x])
+                msg = msg[x:]
+                break;
+
+    msgs.append(msg)
+    return msgs
+
 
 @bot.command(pass_context = True)
 async def rank(ctx):
     cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
     msg = cur.fetchone()
-    await bot.say(msg)  
+    await bot.say(msg)
 
 # testing if the bot is alive
 @bot.command()
@@ -243,11 +319,15 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-@bot.command()
-async def cogs():
+@bot.command(pass_context=True)
+async def cogs(ctx):
     """Lists the currently loaded cogs."""
     cogs = list(bot.cogs.keys())
-    await bot.say("\n".join(cogs)) 
-
+    cogs.sort()
+    await bot.embed_this_for_me("\n".join(cogs), ctx)
+    
+bot.load_extension("wordart") # bot can start and load wordart later.
+bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
+bot.fit_msg = fit_msg # attach fit_msg to bot object
 bot.loop.create_task(update())
 bot.run(token)

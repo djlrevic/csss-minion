@@ -8,6 +8,11 @@ class Classes():
 
     @commands.command(pass_context = True)
     async def newclass(self, ctx, course):
+        """Create a new discord class/role
+        Usage: newclass <someclass>
+        Creating a class/role places you in that class/role
+        """
+        
         course = course.lower()
         dupe = False
         for j in range(0, len(ctx.message.server.roles)):
@@ -33,6 +38,9 @@ class Classes():
 
     @commands.command(pass_context = True)
     async def whois(self, ctx, course):
+        """List people in a discord class/role
+        Usage: whois <someclass>
+        """
         get = 0
         for i in ctx.message.server.roles:
             if i.name == course:
@@ -63,6 +71,9 @@ class Classes():
     # Remove user from role
     @commands.command(pass_context = True)
     async def iamn(self, ctx, course : str):
+        """Remove yourself from a discord class/role
+        Usage: iamn <someclass>
+        """
         course = course.lower()
         found = 0
         for i in range(0, len(ctx.message.author.roles)):
@@ -76,6 +87,9 @@ class Classes():
 
     @commands.command(pass_context = True)
     async def iam(self, ctx, course : str):
+        """Place yourself into a discord class/role
+        Usage: iam <someclass>
+        """
         course = course.lower()
         found = 0
         for i in range(0, len(ctx.message.server.roles)):

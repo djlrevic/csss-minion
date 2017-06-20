@@ -10,9 +10,31 @@ import numpy as np
 from colour import Color
 import io
 import os
+import time
+import asyncio
+import decimal
 #opencv-python is a dependency 
 
 #note to self... this will need refactoring one day. That day is not today.
+
+query_spam_reduction = """ WITH numbers AS
+(
+         SELECT   date,
+                  Count(DISTINCT r)
+         FROM     (
+                         SELECT date,
+                                unnest(regexp_split_to_array(msgs, e'\\s+')) AS r
+                         FROM   "public"."wordartmessages") c
+         GROUP BY date
+         HAVING   count(distinct r) = 1)
+DELETE
+FROM   wordartmessages
+WHERE  date IN
+       (
+              SELECT date
+              FROM   numbers) """
+
+
 
 class WordArt:
     tablename = "wordartMessages"
@@ -27,30 +49,50 @@ class WordArt:
     
        
     def __init__(self, bot):
+        start = time.time()
         self.bot = bot
         cur = self.bot.conn_wc.cursor()
+        
         query = "CREATE TABLE IF NOT EXISTS "+self.tablename+"(user_id bigint, msgs varchar(2000), date text, UNIQUE(user_id, date))" # create table if doesn't exist
         cur.execute(query)
         self.bot.conn_wc.commit()
         cur.close()
+        print("Populating caches, prepare for major lagspike")
         self.populateCaches()
+        print("wordart took "+str(time.time()-start)+" seconds to initalize.")
+    
+    @commands.command(pass_context=True)
+    async def clearspam(self, ctx):
+        cur = self.bot.conn_wc.cursor()
+        msg = await self.bot.say("Clearing the spam your mightyness")
+       # cur.callproc('spam_reduction')
+        cur.execute(query_spam_reduction)
+        self.bot.conn_wc.commit()
+        cur.close()
+        await self.bot.edit_message(msg, "Spam is cleared your mightyness")
+    
+    
     
     # populates a word and image cache for the server's wordcloud
     # calls are limited to __init__, nos, and henry
     def populateCaches(self):
         try:
             cur = self.bot.conn_wc.cursor()
-            cur.execute("SELECT msgs FROM "+self.tablename+" LIMIT 2000") #yeah boy we're limiting
+            cur.execute("SELECT msgs FROM "+self.tablename) # hashtag no limits
             entries = cur.fetchall()
             arr = []
             for i in range(0, len(entries)):
                 arr.append(entries[i][0])
-            self.serverCache = arr
+            if len(arr) < 1:
+                self.serverCache = self.backupArr
+            else:
+                self.serverCache = arr
         except:
             print("server cache retrieval error")
-            self.serverCache = backupArr
+            self.serverCache = self.backupArr
         text = " ".join(self.serverCache)
-        wc = WordCloud(width=1024, height=1024, max_words=2000, stopwords=self.STOPWORDS).generate(text)
+        print("generating word cloud")
+        wc = WordCloud(width=1024, height=1024, max_words=200000, stopwords=self.STOPWORDS).generate(text) # take it to the limit
         wc.to_file(self.serverImage)
     
        
@@ -74,7 +116,7 @@ class WordArt:
     def createImage(self, arr, saveName):
         text = " ".join(arr)
         savedir = path.join(self.d,self.e, saveName) # local image gets overwritten each time. will this break if too many requests?
-        wc = WordCloud(max_words=2000, stopwords=self.STOPWORDS).generate(text)
+        wc = WordCloud(max_words=20000, stopwords=self.STOPWORDS).generate(text)
         wc.to_file(savedir)
         return savedir
         
@@ -88,32 +130,14 @@ class WordArt:
         self.bot.conn_wc.commit()
         cur.close()
 
-
-    # also this http://i.imgur.com/dmqYSvu.jpg
-    @commands.command()
-    async def impeach(self):
-        await self.bot.say("Yessir! Right away, sir!" + "http://imgur.com/pCQT0pm")
-        
-    @commands.command()
-    async def triggered(self):
-        await self.bot.say("Oh no you didn't!"+" http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
-
-
-    @commands.command(pass_context=True)
-    async def remindme(self, ctx, *args):
-        await self.bot.say("```Thanks for reminding me to write the rest of this function.```")
-
-    @commands.command()
-    async def kms(self):
-        await self.bot.say("http://i.imgur.com/XStaKp3.jpg")
-
-    @commands.command()
-    async def eggplant(self):
-        await self.bot.say("🍆My eggplant brings all the boys to the yard🍆")
-
     @commands.command(pass_context=True)
     async def avatart(self, ctx, *args):
-        await self.bot.say("```Making artwork "+str(ctx.message.author)+", hold your horses!```")
+        """Make a wordcloud in the shape of your avatar.
+        usage: !avatart <invert> <bgcolor>
+        
+        """
+        fmt = "Making artwork {}, hold your horses!"
+        msg = await self.bot.say(fmt.format(ctx.message.author.mention))
         fin_img = path.join(self.d,self.e,"fin.png")
         
         # this whole block is lol
@@ -160,7 +184,8 @@ class WordArt:
             wc = WordCloud(background_color=bg_colour, max_words=20000,stopwords=self.STOPWORDS, mask=avatar_mask)
             wc.generate(text)
             wc.to_file(fin_img) # save masked wordart to file
-            await self.bot.send_file(ctx.message.channel, fin_img)
+            await self.bot.send_file(ctx.message.channel, fin_img, content=ctx.message.author.mention)
+            await self.bot.delete_message(msg)
         except:
             await self.bot.say("```Something has gone horribly wrong.```")
         
@@ -169,24 +194,30 @@ class WordArt:
     # only refresh cache if an authorized ID
     @commands.command(pass_context=True)
     async def refreshCache(self, ctx):
+        """Refresh the server wordart cache. Admin only."""
+        start = time.time()
         if ctx.message.author.id == "173177975045488640" or ctx.message.author.id == "173702138122338305": #users authorized to refresh
-            await self.bot.say("```Working...```")
+            msg = await self.bot.say("```Working...```")
             self.populateCaches()
-            
-            await self.bot.say("```Repopulated the caches my master```")
+            fmt = "Refreshing cache took {0} seconds {1}."
+            await self.bot.delete_message(msg)
+            await self.bot.say(fmt.format(str(float(round((time.time()-start), 3)))
+, ctx.message.author.mention)) # what in god's name
         else:
             await self.bot.say("```Bad boy! Down!```")
 
 
     @commands.command(pass_context=True)
-    async def servart(self,ctx, *args):
-        await self.bot.send_file(ctx.message.channel, self.serverImage)
+    async def servart(self,ctx):
+        """Make a wordcloud out of the server's most common words."""
+        await self.bot.send_file(ctx.message.channel, self.serverImage, content=ctx.message.author.mention)
 
     @commands.command(pass_context=True)
     async def wordart(self,ctx):
+        """Make a wordcloud out of your most common words."""
         words = self.wordsFromDB(ctx.message.author)
         filename = self.createImage(words, "wow.png")
-        await self.bot.send_file(ctx.message.channel, filename)
+        await self.bot.send_file(ctx.message.channel,filename,content=ctx.message.author.mention)
         
 def setup(bot):
     bot.add_cog(WordArt(bot))

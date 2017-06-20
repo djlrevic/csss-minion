@@ -11,7 +11,7 @@ class Duck:
 
     def __init__(self, bot):
         self.bot = bot
-   
+        self.emojis = None
    
     # take raw json response and return appropriate message for bot to say    
     def parseResponse(self, word):
@@ -57,23 +57,37 @@ class Duck:
     
     
     
-    @commands.command()
-    async def search(self, word):
-        
+    @commands.command(pass_context=True)
+    async def search(self,ctx, *query):
+        """Search the internet using DuckDuckGo!"""
+        word = " ".join(query)
         msg = self.parseResponse(word)
-        await self.bot.say(msg)
-        
-    # so broke, so sad        
-    @commands.command()
-    async def eggwrite(self, word:str):
+        await self.bot.embed_this_for_me(msg,ctx)
+       # await self.bot.say(msg)
+   
+  
+    @commands.command(pass_context=True)
+    async def eggwrite(self, ctx, *msg):
+        """Use the bot to write with eggplant emojis!"""
+        if self.emojis == None:
+            self.emojis = ctx.message.server.emojis
+        word = " ".join(msg)
         newstr = ""
         for s in word:
             if s.isalpha():
-                newstr += "**:"+s.upper()+"_Eggplant:**"
-                #newstr += ":regional_indicator_"+s.lower()+":"
+                #convert to eggplant letter
+                for em in self.emojis:
+                    if str(em)[3] == "_" and str(em)[2] == s.upper():
+                        newstr += str(em)
+                        break;
+            elif s == " ":
+                #change to 5 spaces
+                newstr += "     "
             else:
                 newstr += s
-        await self.bot.say(newstr)
+        #await self.bot.say(newstr)
+        await self.bot.embed_this_for_me(newstr,ctx)
+        
         
    
 def setup(bot):

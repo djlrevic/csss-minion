@@ -15,31 +15,34 @@ class UrbanDict:
             r = json.json()
             if r['result_type'] == "exact":
                 msg = " " #python strings are funny sometimes
-                msg += "**"+r['list'][0]['word']+"**"
+                msg += r['list'][0]['word']
                 msg +="```"+ r['list'][0]['definition'] +"```"
                 msg += "**example: **"+r['list'][0]['example']
                 msg += "\n<"+r['list'][0]['permalink']+">"
                 return msg
+                
             elif r['result_type'] == "no_results":
                 return "You probably typed in some dumb shit, cuz I can't find it." 
+                
             else:
-                return "Contact Nos ASAP cuz shit's broke"  
+                return "Contact Nos ASAP cuz shit's broke"
+                  
         else:
             return "Bad response from server  *shrugs*"
+     
         
-        
-    @commands.command()
-    async def urban(self, word:str):
+    @commands.command(pass_context=True)
+    async def urban(self,ctx, *msg:str):
+        """Lookup some jargon from the urban dictionary."""
+        word = " ".join(msg)
         query = "https://mashape-community-urban-dictionary.p.mashape.com/define?term="+word
         req = requests.get(query, headers=self.headers)
         ret = self.parseResponse(req)
-        await self.bot.say(ret)
-        
-        
-    @commands.command()
-    async def goodluck(self):
-        await self.bot.say("http://i.imgur.com/sbY9DeH.jpg")
-        
+        msgs = self.bot.fit_msg(ret,1024)
+        try:
+            await self.bot.embed_this_for_me(msgs[0],ctx)
+        except:
+            await self.bot.say("The content is probably too long for discord to handle")
         
 def setup(bot):
     bot.add_cog(UrbanDict(bot))
