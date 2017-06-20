@@ -154,8 +154,8 @@ class SfuSearch:
         url = self.createurl(words)
         msg = self.parseResponse(url)
         mg = msg + "\n"+url
-        #await self.bot.embed_this_for_me(mg,ctx)
-        await self.bot.say(mg)
+        await self.bot.embed_this_for_me(mg,ctx)
+        #await self.bot.say(mg)
 #        await self.bot.say(url)
     
     
