@@ -21,9 +21,41 @@ class GameLogic():
         self.readToStart = False
         self.bot = bot
         self.gameName = gameName
+        self.newMsg = True
+        self.curMsg = None
+        self.curMsgTxt = ""
+        self.future = None
         
+    #Because all of thease run in a courutine I need to run in in this weird way
+    #I think its basically queueing an action on the thread the bot uses for server interaction
+    #But I could be wrong, either way with out asyncio call it wont work
     def sendMsg(self,txt):
-        asyncio.run_coroutine_threadsafe(self.bot.send_message(self.channel, txt), self.bot.loop)
+        #Do we need to send a new msg? Or just edit the old one
+        if self.newMsg:
+            #Lets hope this works
+            #Eventually create a new msg, and give us the result at self.curMsg
+            self.curMsg = asyncio.run_coroutine_threadsafe(self.bot.send_message(self.channel, txt), self.bot.loop)
+            
+            self.newMsg = False
+        else:
+            #First we need to check if the Msg has been sent yet, if not guess we just miss out on a msg
+            if self.curMsg.done():
+                #When I edit I only edit the original messege, so keep track of our additions
+                self.curMsgTxt = self.curMsgTxt + " \n" + txt
+                self.editMsg(self.curMsg.result(),self.curMsgTxt)
+            else:
+                print("Message not done yet")
+            
+    def setNewMsg(self):
+        #Clear curMsg so we dont spam
+        self.newMsg = True
+        self.curMsgTxt = ""
+ 
+    def editMsg(self,msg,txt):
+        asyncio.run_coroutine_threadsafe(self.bot.edit_message(msg,txt), self.bot.loop)
+        
+    def removeMsg(self,msg):
+        asyncio.run_coroutine_threadsafe(self.bot.delete_message(msg), self.bot.loop)   
     
     def isReady(self):
         return self.gameState != self.gameState_running
@@ -33,19 +65,9 @@ class GameLogic():
     
     def startGame(self):
         self.gameState = self.gameState_running
-        #self.sendMsg("Game " + self.gameName + " has started")
-        await self.bot.send_message(self.channel, "HENRY THE GREATEST")
-        pass   
-    
-    def command(self,player,com):
-        com = com.lower()    
-        if com == "help" :
-            self.sendMsg("This is the abstract bot, server owner dun goofed")
-        if com == "players" :
-            people = ""
-            for per in self.players:
-                people += "\n" + getName(per)
-            self.sendMsg("Current players in the game : " + people)
+        self.sendMsg("Game " + self.gameName + " has started")
+        #await self.bot.send_message(self.channel, "HENRY THE GREATEST")
+        #pass      
             
     def getPlayers(self):
         playersStr = ""
@@ -190,7 +212,7 @@ class RouletteLogic(GameLogic):
         else:
             self.turn -= 1
         
-        self.sendMsg("Its " + getName(self.players[self.turn]) + " turn now")
+        self.sendMsg("Its " + getName(self.players[self.turn]) + " turn now ")
         self.playerToGo = self.players[self.turn]
     
     def fire(self,player):
@@ -237,14 +259,16 @@ class RouletteLogic(GameLogic):
                 
             self.gameState = self.gameState_wait
             self.bulletPos = randint(0,5)
-            self.sendMsg("Game has reset, start when your ready")
-                      
+            self.sendMsg("Game has reset, start when your ready")                      
+    
     
 def getName(player):
-    if player.nick == None:
-        return player.name
-    else:
-        return player.nick
+    return player.mention
+    
+    #if player.nick == None:
+    #    return player.name
+    #else:
+    #    return player.nick
 
 def wait(timeToSleep,toWake):
     time.sleep(timeToSleep)

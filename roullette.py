@@ -1,4 +1,7 @@
 import discord
+import time
+import threading
+import asyncio
 from games.roulletteLogic import RouletteLogic
 from games.roulletteLogic import getName
 from discord.ext import commands
@@ -52,6 +55,7 @@ class Roulette():
         embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
         await self.bot.say(embed=embed)
+        await removeAfterDelay(self.bot,ctx.message)
 
         
     
@@ -63,45 +67,55 @@ class Roulette():
             await self.bot.say("Your not in any of the rooms")
             return
         
-        self.bot.say(getName(ctx.message.author) + " in Room " + game.gameName + " on channel " + game.channel.name)   
+        self.bot.say(getName(ctx.message.author) + " in Room " + game.gameName + " on channel " + game.channel.name)
+        await removeAfterDelay(self.bot,ctx.message)
+        
     
     @gameR.command(pass_context = True)
     async def start(self,ctx):
+        
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
             return
         
         game.start()
+        await removeAfterDelay(self.bot,ctx.message)
     
     @gameR.command(pass_context = True)
     async def fire(self,ctx):
+        
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
             return      
         game.fire(ctx.message.author)
+        await removeAfterDelay(self.bot,ctx.message)
      
     @gameR.command(pass_context = True)
     async def spin(self,ctx):
+       
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
             return       
         game.spin(ctx.message.author)
+        await removeAfterDelay(self.bot,ctx.message)
      
     @gameR.command(pass_context = True)
     async def restart(self,ctx):
+       
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
             return
         
         game.restart()
-    
+        await removeAfterDelay(self.bot,ctx.message)
     
     @gameR.command(pass_context = True)
     async def afk(self,ctx):
+        await removeAfterDelay(self.bot,ctx.message)
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -111,14 +125,17 @@ class Roulette():
      
     @gameR.command(pass_context = True)
     async def list(self):
+        #self.bot.delete_message(ctx.message)
         if len(self.games) > 0:
             keys = self.games.keys()
             await self.bot.say("Current Running games  : " + '\n'.join(keys))
         else:
             await self.bot.say("No games running right now")
+        await removeAfterDelay(self.bot,ctx.message)
     
     @gameR.command(pass_context = True)
     async def new(self,ctx,gameNameInput : str):
+        
         if self.inGame(ctx.message.author) != None:
             await self.bot.say("Your already in a game cant create a new one!")
         else:
@@ -126,10 +143,12 @@ class Roulette():
             gme.addPlayer(ctx.message.author)
             self.games[gameNameInput] = gme
             await self.bot.say("Starting Game " + gameNameInput)
+            
+        await removeAfterDelay(self.bot,ctx.message)
         
     @gameR.command(pass_context = True)
     async def join(self,ctx,gameId : str):
-    
+        #self.bot.delete_message(ctx.message)
         if self.inGame(ctx.message.author) != None:
             await self.bot.say("Your already in a game cant join a new one!")
             return   
@@ -141,17 +160,32 @@ class Roulette():
                 await self.bot.say("Game is running and cant be joined")
         else:
             await self.bot.say("Game not found")
+        await removeAfterDelay(self.bot,ctx.message)
     
     @gameR.command(pass_context = True)
     async def players(self,ctx,gameId : str):
+        
         if gameId in self.games:
             await self.bot.say("Current players in this game : " + self.games[gameId].getPlayers())
         else:
             await self.bot.say("Game not found")
+            
+        await removeAfterDelay(self.bot,ctx.message)
     
     @gameR.command(pass_context = True)
+    async def newMsg(self,ctx):
+        
+        game = self.inGame(ctx.message.author)
+        if game == None:
+            await self.bot.say("Your not in a game!")
+        else:
+            game.setNewMsg()
+        
+        await removeAfterDelay(self.bot,ctx.message)
+        
+    @gameR.command(pass_context = True)
     async def leave(self,ctx):
-    
+        
         game = self.inGame(ctx.message.author)
         if game == None:
             await self.bot.say("Your not in a game!")
@@ -165,7 +199,16 @@ class Roulette():
                  await self.bot.say("Game : " + game.gameName + " was deleted due to no players")  
         else:
             await self.bot.say("Game is running you cant leave")
-            
+        await removeAfterDelay(self.bot,ctx.message)
+        
+    
+#The asyc process that will sleep for x sec then delete the msg
+async def removeAfterDelay(bot,msg):
+    #How long to sleep
+    delay = 2
+    await asyncio.sleep(delay)
+    await bot.delete_message(msg)
+        
             
 def setup(bot):
     bot.add_cog(Roulette(bot))

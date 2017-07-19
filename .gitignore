@@ -1,6 +1,7 @@
 # exclusion rules
 botMain.settings
 bot.log
+csssLocal.py
 wordart_dir/*
 __pycache__
 logs.txt

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import requests
+import re
 from bs4 import BeautifulSoup
 from urllib import parse
 import datetime
@@ -25,14 +26,23 @@ class SfuSearch:
             res = None
             html = ret.text
             soup = BeautifulSoup(html, "html.parser")
+            
+            msg =  ""
+
+            for title in soup.find_all('h1'):            
+                #parr.append(re.sub('\s'," ",title.text))
+                msg = re.sub('\s'," ",title.text) + "\n"            
+
             for paragraph in soup.find_all('p'):
                 parr.append(paragraph.text)   
+          
             if len(parr) < 1:
-                return "Unable to retrieve data from SFU page"
+	                return "Unable to retrieve data from SFU page"
             elif len(parr) < 2:
                 return "Unable to find page"
             else:
-                return parr[1]    
+                return msg + parr[1]
+                #return parr[1]    
             
         else:
             return "SFU Server Error "+str(ret.status_code)
@@ -145,7 +155,7 @@ class SfuSearch:
         msg = self.parseResponse(url)
         mg = msg + "\n"+url
         await self.bot.embed_this_for_me(mg,ctx)
-#        await self.bot.say(msg)
+        #await self.bot.say(mg)
 #        await self.bot.say(url)
     
     
