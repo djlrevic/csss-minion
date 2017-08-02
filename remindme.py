@@ -20,7 +20,8 @@ class Remindme:
         self.mass_populate()
         main_loop = asyncio.get_event_loop()
         main_loop.create_task(self.loop_remindme())
-        self.remindmechannel = "304837708650643459" #hardcoded because idk.
+        #self.remindmechannel = "304837708650643459" #testing channel
+        self.remindmechannel = "228761314644852736"  #production channel
 
     async def loop_remindme(self):    
         """This loop is subscribed to check the time.
