@@ -59,7 +59,7 @@ cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid

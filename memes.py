@@ -25,13 +25,6 @@ class Memes:
         await self.bot.send_message(ctx.message.channel, embed=em)
         #await self.bot.say("Oh no you didn't!"+" http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
 
-
-    @commands.command(pass_context=True)
-    async def remindme(self, ctx, *args):
-        """Remindme function"""
-        await self.bot.embed_this_for_me("Thanks for reminding me to write the rest of this function", ctx)
-        #await self.bot.say("```Thanks for reminding me to write the rest of this function.```")
-
     @commands.command(pass_context=True)
     async def kms(self,ctx):
         """Don't"""
