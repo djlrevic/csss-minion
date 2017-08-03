@@ -7,6 +7,7 @@ import asyncio
 import sqlite3
 import discord.client
 import __main__
+import sys
 
 #TODO
 #proper errors for unit types.
@@ -77,6 +78,9 @@ class Remindme:
         unit = int(word[0])
         unittype = word[1]
         msg = " ".join(word[2:])
+        if int(unit) > pow(2,32):
+            print("unit too big for max size.")
+            await self.bot.say("Your unit might be too big")
         time = await self.parse_time_relative(unit, unittype)
         if False == time:
             await self.bot.say("I cannot remember this.")
