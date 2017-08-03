@@ -6,6 +6,13 @@ import time
 import asyncio
 import sqlite3
 import discord.client
+import __main__
+
+#TODO
+#proper errors for unit types.
+#add cron jobs
+#stop isvan
+
 
 class Remindme:
     
@@ -20,8 +27,10 @@ class Remindme:
         self.mass_populate()
         main_loop = asyncio.get_event_loop()
         main_loop.create_task(self.loop_remindme())
-        self.remindmechannel = "304837708650643459" #testing channel
-        #self.remindmechannel = "228761314644852736"  #production channel
+        if __main__.__file__ == "bot.py":
+            self.remindmechannel = "304837708650643459" #testing channel
+        else:
+            self.remindmechannel = "228761314644852736"  #production channel
 
     async def loop_remindme(self):    
         """This loop is subscribed to check the time.
@@ -67,11 +76,14 @@ class Remindme:
         """
         unit = int(word[0])
         unittype = word[1]
-        msg = word[2]
+        msg = " ".join(word[2:])
         time = await self.parse_time_relative(unit, unittype)
+        if False == time:
+            await self.bot.say("I cannot remember this.")
+            return
         self.add_to_storage(ctx.message.author.id, msg, time)
         self.add_to_queue(ctx.message.author.id, msg, time)
-        await self.bot.send_message(self.bot.get_channel(self.remindmechannel), "Remembering: "+msg+" until "+str(time))
+        await self.bot.send_message(self.bot.get_channel(self.remindmechannel), "Remembering: "+msg+" until "+str(time)[:19])
         
     
     @commands.command(pass_context=True)
@@ -157,7 +169,7 @@ class Remindme:
             
     async def parse_time_relative(self, unit, unittype):
         now = datetime.datetime.now()
-        
+        unit = int(round(unit))
         if unittype == "year" or unittype == "years":
             future = now + datetime.timedelta(weeks=unit*12*4)
         elif unittype == "month" or unittype == "months":
@@ -173,9 +185,10 @@ class Remindme:
         elif unittype == "second" or unittype == "seconds":
             future = now + datetime.timedelta(seconds=unit)
         else:
-            print("there is no proper unit type, warning!")
-            await self.bot.say("Not given a proper unit type!")
-            future = now
+            print("There is no proper unit type, warning!")
+            await self.bot.say("There is no proper unit type, warning!\nyear(s), month(s), week(s), day(s), hour(s), minute(s), and second(s) are accepted time units.")
+            return False
+            #future = now
         return future.isoformat(' ')                  
         
         
