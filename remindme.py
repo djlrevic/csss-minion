@@ -20,8 +20,8 @@ class Remindme:
         self.mass_populate()
         main_loop = asyncio.get_event_loop()
         main_loop.create_task(self.loop_remindme())
-        #self.remindmechannel = "304837708650643459" #testing channel
-        self.remindmechannel = "228761314644852736"  #production channel
+        self.remindmechannel = "304837708650643459" #testing channel
+        #self.remindmechannel = "228761314644852736"  #production channel
 
     async def loop_remindme(self):    
         """This loop is subscribed to check the time.
@@ -159,11 +159,11 @@ class Remindme:
         now = datetime.datetime.now()
         
         if unittype == "year" or unittype == "years":
-            future = now + datetime.timedelta(years=unit)
+            future = now + datetime.timedelta(weeks=unit*12*4)
         elif unittype == "month" or unittype == "months":
-            future = now + datetime.timedelta(months=unit)
+            future = now + datetime.timedelta(weeks=unit*4)
         elif unittype == "week" or unittype == "weeks":
-            future = now + datetime.timedelta(week=unit)
+            future = now + datetime.timedelta(weeks=unit)
         elif unittype == "day" or unittype == "days":
             future = now + datetime.timedelta(days=unit)
         elif unittype == "hour" or unittype == "hours":
