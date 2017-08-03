@@ -61,7 +61,7 @@ class Remindme:
         time = self.parse_time(word[1:]) #ignore msg and parse the time
         msg = word[0]
         if False == time or None == time: # bad input
-            await self.bot.say("I cannot remember this.")
+            await self.bot.say("I cannot remember this.\n.format: remindme (message) year month day [hour] [minute] [second]")
             return
         #add to long term queue. probably using sqlite.
         self.add_to_storage(ctx.message.author.id, msg, time)
