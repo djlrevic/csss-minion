@@ -33,9 +33,9 @@ class Remindme:
         while True:
             #check time against items in loop
             now = dt.now().isoformat(' ')
-            print("checking for current remindmes")
+            #print("checking for current remindmes")
             for item in self.remindmelist:
-                print(item)
+                #print(item)
                 if now > item[2]:
                     await self.notify_user(item[0],item[1])
                     self.remindmelist.remove(item)  
