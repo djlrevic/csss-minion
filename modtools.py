@@ -44,7 +44,7 @@ class ModTools:
             for user in ctx.message.mentions:
                 await self.bot.say("Unrestricting user "+user.name)
                 for ch in channels:
-                await self.ch_perms(ch, user, None) #None sets to default(inherited) value.
+                    await self.ch_perms(ch, user, None) #None sets to default(inherited) value.
             else:
                 await self.bot.say("You ain't no mod, shoo!")
 
