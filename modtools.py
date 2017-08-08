@@ -5,10 +5,10 @@ class ModTools:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True)
-    async def lock(self, ctx):
-        ch = ctx.message.channel
-        ch.permissions_for()
+    # @commands.command(pass_context=True)
+    # async def lock(self, ctx):
+    #     ch = ctx.message.channel
+    #     ch.permissions_for()
 
     @commands.command(pass_context=True)
     async def lock(self, ctx):
