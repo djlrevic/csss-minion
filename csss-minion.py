@@ -59,7 +59,7 @@ cur = conn.cursor()
 # SQL SETUP------------------------------------------------------------------------------
 
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme", "nazimod"]
+startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme", "modtools"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -325,7 +325,7 @@ async def cogs(ctx):
     cogs = list(bot.cogs.keys())
     cogs.sort()
     await bot.embed_this_for_me("\n".join(cogs), ctx)
-    
+
 bot.load_extension("wordart") # bot can start and load wordart later.
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.fit_msg = fit_msg # attach fit_msg to bot object
