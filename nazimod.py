@@ -68,7 +68,7 @@ class Nazimod:
         else:
             await self.bot.say("You ain't my master! Shoo!")
     
-    async def Henry(ctx):
+    def Henry(ctx):
     if ctx.message.author.id == "173702138122338305":
         return True
     else:
