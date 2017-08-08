@@ -12,15 +12,21 @@ class Nazimod:
     
     @commands.command(pass_context=True)
     async def lock(self, ctx):
-        everyone = ctx.message.server.default_role
-        await ch_perms(ctx.message.channel, everyone, False)
-        await self.bot.say("Locking Channel")        
+        if Henry(ctx):
+            everyone = ctx.message.server.default_role
+            await ch_perms(ctx.message.channel, everyone, False)
+            await self.bot.say("Locking Channel")        
+        else:
+            await self.bot.say("You ain't my master! Shoo!")
       
     @commands.command(pass_context=True)
     async def unlock(self, ctx):
-        everyone = ctx.message.server.default_role
-        await ch_perms(ctx.message.channel, everyone, True)
-        await self.bot.say("Unlocking Channel")
+        if Henry(ctx):
+            everyone = ctx.message.server.default_role
+            await ch_perms(ctx.message.channel, everyone, True)
+            await self.bot.say("Unlocking Channel")
+        else:
+            await self.bot.say("You ain't my master! Shoo!")
     
     async def ch_perms(self, channel, user, value):
         """Helper function"""
@@ -34,11 +40,14 @@ class Nazimod:
         """Undo any restrictions on a user for all channels.
         Usage: !unrestrict [users..]
         """
-        channels = ctx.message.server.channels
-        for user in ctx.message.mentions:
+        if Henry(ctx):
+            channels = ctx.message.server.channels
+            for user in ctx.message.mentions:
             await self.bot.say("Unrestricting user "+user.name)
             for ch in channels:
                 await self.ch_perms(ch, user, None) #None sets to default(inherited) value.
+        else:
+            await self.bot.say("You ain't my master! Shoo!")
       
     @commands.command(pass_context=True)
     async def restrict(self, ctx, *msg):
@@ -47,16 +56,23 @@ class Nazimod:
         Example: !restrict @Henry @Roo #offtopic #bottesting
         
         """  
-        channels = ctx.message.server.channels
-        
-        for user in ctx.message.mentions:
-            await self.bot.say("Restricting user "+user.name)
-            for ch in channels:
-                if ch not in ctx.message.channel_mentions:
-                    #print(ch.name,user.nick, "banning user in this channel")
-                    #DO NOT PRINT A LIST OF ALL CHANNELS IN PRODUCTION
-                    await self.ch_perms(ch, user, False)   #ban user from channel.
-        
+        if Henry(ctx):
+            channels = ctx.message.server.channels
+            for user in ctx.message.mentions:
+                await self.bot.say("Restricting user "+user.name)
+                for ch in channels:
+                    if ch not in ctx.message.channel_mentions:
+                        #print(ch.name,user.nick, "banning user in this channel")
+                        #DO NOT PRINT A LIST OF ALL CHANNELS IN PRODUCTION
+                        await self.ch_perms(ch, user, False)   #ban user from channel.
+        else:
+            await self.bot.say("You ain't my master! Shoo!")
+    
+    async def Henry(ctx):
+    if ctx.message.author.id == "173702138122338305":
+        return True
+    else:
+        return False    
         
 def setup(bot):
     bot.add_cog(Nazimod(bot))
