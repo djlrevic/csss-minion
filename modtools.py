@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-class ModTools:
+class Modtools:
     def __init__(self, bot):
         self.bot = bot
 
@@ -12,18 +12,20 @@ class ModTools:
 
     @commands.command(pass_context=True)
     async def lock(self, ctx):
-        if Minion(ctx):
+        """Locks the current channel."""
+        if self.minion(ctx):
             everyone = ctx.message.server.default_role
-            await ch_perms(ctx.message.channel, everyone, False)
+            await self.ch_perms(ctx.message.channel, everyone, False)
             await self.bot.say("Locking Channel")
         else:
             await self.bot.say("You ain't no mod, shoo!")
 
     @commands.command(pass_context=True)
     async def unlock(self, ctx):
-        if Minion(ctx):
+       """Unlocks the current channel."""
+        if self.minion(ctx):
             everyone = ctx.message.server.default_role
-            await ch_perms(ctx.message.channel, everyone, True)
+            await self.ch_perms(ctx.message.channel, everyone, True)
             await self.bot.say("Unlocking Channel")
         else:
             await self.bot.say("You ain't no mod, shoo!")
@@ -39,14 +41,14 @@ class ModTools:
         """Undo any restrictions on a user for all channels.
         Usage: !unrestrict [users..]
         """
-        if Minion(ctx):
+        if self.minion(ctx):
             channels = ctx.message.server.channels
             for user in ctx.message.mentions:
                 await self.bot.say("Unrestricting user "+user.name)
                 for ch in channels:
                     await self.ch_perms(ch, user, None) #None sets to default(inherited) value.
-            else:
-                await self.bot.say("You ain't no mod, shoo!")
+        else:
+            await self.bot.say("You ain't no mod, shoo!")
 
     @commands.command(pass_context=True)
     async def restrict(self, ctx, *msg):
@@ -55,7 +57,7 @@ class ModTools:
         Example: !restrict @Henry @Roo #offtopic #bottesting
 
         """
-        if Minion(ctx):
+        if self.minion(ctx):
             channels = ctx.message.server.channels
             for user in ctx.message.mentions:
                 await self.bot.say("Restricting user "+user.name)
@@ -67,11 +69,11 @@ class ModTools:
                     else:
                         await self.bot.say("You ain't no mod, shoo!")
 
-    def Minion(ctx):
-        if "&314296819272122368" in ctx.message.author.roles.id: # >.>
-            return True
-        else:
-            return False
+    def minion(self, ctx):
+        for role in ctx.message.author.roles:
+            if "314296819272122368" == role.id:
+                return True
+        return False
 
-            def setup(bot):
-                bot.add_cog(modtools(bot))
+def setup(bot):
+    bot.add_cog(Modtools(bot))
