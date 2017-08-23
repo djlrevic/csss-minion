@@ -22,7 +22,7 @@ class Modtools:
 
     @commands.command(pass_context=True)
     async def unlock(self, ctx):
-       """Unlocks the current channel."""
+        """Unlocks the current channel."""
         if self.minion(ctx):
             everyone = ctx.message.server.default_role
             await self.ch_perms(ctx.message.channel, everyone, True)
