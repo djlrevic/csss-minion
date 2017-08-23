@@ -68,7 +68,7 @@ class ModTools:
                         await self.bot.say("You ain't no mod, shoo!")
 
     def Minion(ctx):
-        if "&314296819272122368" in ctx.message.author.roles.id
+        if "&314296819272122368" in ctx.message.author.roles.id: # >.>
             return True
         else:
             return False
