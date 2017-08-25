@@ -13,6 +13,7 @@ import os
 import time
 import asyncio
 import decimal
+from collections import Counter
 #opencv-python is a dependency 
 
 #note to self... this will need refactoring one day. That day is not today.
@@ -95,7 +96,17 @@ class WordArt:
         wc = WordCloud(width=1024, height=1024, max_words=200000, stopwords=self.STOPWORDS).generate(text) # take it to the limit
         wc.to_file(self.serverImage)
     
-       
+    @commands.command(pass_context=True)
+    async def top10(self, ctx):
+        test= " ".join(self.serverCache)
+        r = Counter(test.split()).most_common()
+        msg = ""
+        for rank in r[:10]:
+            msg += str(rank[1])            
+            msg += "\t\t"
+            msg += rank[0]
+            msg += "\n"
+        await self.bot.embed_this_for_me(msg, ctx)
        
        # open DB and retrieve messages from a userID
     def wordsFromDB(self, author):
