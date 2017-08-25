@@ -92,7 +92,6 @@ class Classes():
         """Place yourself into a discord class/role
         Usage: iam <someclass>
         """
-        print(ctx.message.author.name+ 'has requested role ' + course)
         course = course.lower()
         found = 0
         for i in range(0, len(ctx.message.server.roles)):
