@@ -92,13 +92,16 @@ class Classes():
         """Place yourself into a discord class/role
         Usage: iam <someclass>
         """
+        print(ctx.message.author+ 'has requested role ' + course)
         course = course.lower()
         found = 0
         for i in range(0, len(ctx.message.server.roles)):
             if course == ctx.message.server.roles[i].name:
+
                 if ctx.message.server.roles[i].id in FROZEN_ROLES:
                     await self.bot.say("This role is locked.")
                 else:
+                    print(ctx.message.server.roles[i]+', '+ctx.message.server.roles[i].id+' has been found.')
                     found = i
         if found == 0:
             await self.bot.say("This class doesn't exist. Try creating it with .newclass name")
