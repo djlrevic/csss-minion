@@ -2,6 +2,8 @@
 import discord
 from discord.ext import commands
 
+FROZEN_ROLES = [228765603756900352, 289285166436843521, 314296819272122368, 296466915235332106, 228985701792743424, 229014335299649536]
+
 class Classes():
     def __init__(self, bot):
         self.bot = bot
@@ -12,7 +14,7 @@ class Classes():
         Usage: newclass <someclass>
         Creating a class/role places you in that class/role
         """
-        
+
         course = course.lower()
         dupe = False
         for j in range(0, len(ctx.message.server.roles)):
@@ -94,7 +96,10 @@ class Classes():
         found = 0
         for i in range(0, len(ctx.message.server.roles)):
             if course == ctx.message.server.roles[i].name:
-                found = i
+                if ctx.message.server.roles[i].id in FROZEN_ROLES:
+                    await self.bot.say("This role is locked.")
+                else:
+                    found = i
         if found == 0:
             await self.bot.say("This class doesn't exist. Try creating it with .newclass name")
         else:
