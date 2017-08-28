@@ -43,7 +43,7 @@ class Misc():
         """Change minion's playing message
         Usage: playing <msg>
         """
-        await self.bot.change_presence(game = discord.Game(name=msg))
+        await self.bot.change_presence(game = discord.Game(name=msg, type=0))
 
     @commands.command(pass_context=True)
     async def howoldami(self, ctx):
