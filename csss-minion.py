@@ -277,18 +277,14 @@ def fit_msg(msg, maxlen:int=2000):
 
     while len(msg) >= maxlen:
         if '\n' in msg[:maxlen]:
-            for x in range(maxlen,0,-1):
-                if msg[x] == '\n':
-                    msgs.append(msg[:x])
-                    msg = msg[x:]
-                    break;
+            idx = msg[:maxlen].rfind('\n') #find last occurance of newline
+            msgs.append(msg[:idx])
+            msg = msg[idx+1:] #careful which side gets the newline
 
         elif ' ' in msg[:maxlen]:
-            for x in range(maxlen,0,-1):
-                if msg[x] == ' ':
-                    msgs.append(msg[:x])
-                    msg = msg[x:]
-                    break;
+            idx = msg[:maxlen].rfind(' ')
+            msgs.append(msg[:idx])
+            msg = msg[idx+1:]
 
         else:
             for x in range(maxlen,0,-1):

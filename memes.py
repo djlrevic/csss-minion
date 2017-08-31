@@ -47,6 +47,16 @@ class Memes:
         await self.bot.send_message(ctx.message.channel, embed=em)
         #await self.bot.say("http://i.imgur.com/sbY9DeH.jpg")
         
+    @commands.command(pass_context=True)
+    async def prettygood(self,ctx):
+        em = discord.Embed(colour=0xfff)
+        em.set_image(url='https://img.memesuper.com/bd0f44643ba40759f4e9f89bbaf577e3_heyyyy-thats-pretty-good-meme-hey-thats-pretty-good_1130-500.jpeg')
+        await self.bot.send_message(ctx.message.channel, embed=em)
+
+    @commands.command()
+    async def beep(self):    
+        await self.bot.say("boop")
+
         
 def setup(bot):
     bot.add_cog(Memes(bot))
