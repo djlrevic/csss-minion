@@ -22,7 +22,7 @@ class Remindme:
         self.remindmelist = list()
         self.remindmedb = sqlite3.connect("remindmedb")
         c = self.remindmedb.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS remindme (user_id bigint, msg varchar(2000), datetime datetime)")
+        c.execute("CREATE TABLE IF NOT EXISTS remindme (user_id bigint, msg varchar(2000), datetime datetime, channel_id varchar(20))")
         self.remindmedb.commit()
         c.close()
         self.mass_populate()
@@ -47,7 +47,7 @@ class Remindme:
             for item in self.remindmelist:
                 #print(item)
                 if now > item[2]:
-                    await self.notify_user(item[0],item[1])
+                    await self.notify_user(item[0],item[1], item[3])
                     self.remindmelist.remove(item)  
                     self.remove_from_db(item)
             await asyncio.sleep(5)        
@@ -65,11 +65,11 @@ class Remindme:
             await self.bot.say("I cannot remember this.\n.format: remindme (message) year month day [hour] [minute] [second]")
             return
         #add to long term queue. probably using sqlite.
-        self.add_to_storage(ctx.message.author.id, msg, time)
+        self.add_to_storage(ctx.message.author.id, msg, time, ctx.message.channel.id)
         #add to short term queue. probably using list.
-        self.add_to_queue(ctx.message.author.id, msg, time)
+        self.add_to_queue(ctx.message.author.id, msg, time, ctx.message.channel.id)
         #print(self.bot.get_user_info(173177975045488640))
-        await self.bot.send_message(self.bot.get_channel(self.remindmechannel), "Remembering: "+msg+" until "+str(time))
+        await self.bot.send_message(ctx.message.channel, "Remembering: "+msg+" until "+str(time) + " for "+ ctx.message.author.name)
    
     @commands.command(pass_context=True)
     async def remindmein(self, ctx, *word:str):
@@ -85,9 +85,9 @@ class Remindme:
         if False == time:
             await self.bot.say("I cannot remember this.")
             return
-        self.add_to_storage(ctx.message.author.id, msg, time)
-        self.add_to_queue(ctx.message.author.id, msg, time)
-        await self.bot.send_message(self.bot.get_channel(self.remindmechannel), "Remembering: "+msg+" until "+str(time)[:19])
+        self.add_to_storage(ctx.message.author.id, msg, time, ctx.message.channel.id)
+        self.add_to_queue(ctx.message.author.id, msg, time, ctx.message.channel.id)
+        await self.bot.send_message(ctx.message.channel, "Remembering: "+msg+" until "+str(time)[:19] + " for "+ ctx.message.author.name)
         
     
     @commands.command(pass_context=True)
@@ -108,34 +108,38 @@ class Remindme:
 
  
     
-    async def notify_user(self, userid, msg):
+    async def notify_user(self, userid, msg, channel):
         """send the message to remind the user"""
-        user = await self.bot.get_user_info(userid)
-        await self.bot.send_message(self.bot.get_channel(self.remindmechannel),user.mention+"\nReminder: "+msg)
+        user = await self.bot.get_user_info(userid) 
+        #mgiht break here
+        try:    
+            await self.bot.send_message(self.bot.get_channel(channel),user.mention+"\nReminder: "+msg)
+        except:
+            await self.bot.send_message(self.bot.get_channel(self.remindmechannel),user.mention+"\nReminder: "+msg)
         
         
     def mass_populate(self):
-        """retrieve all and populate queue."""
+        """retrieve all reminders from SQLite database and populate queue."""
         c = self.remindmedb.cursor()
         c.execute("SELECT * FROM remindme")
         alist = c.fetchall()
         for item in alist:
-            self.add_to_queue(item[0],item[1],item[2])
+            self.add_to_queue(item[0],item[1],item[2], item[3])
         c.close()
         
         
-    def add_to_storage(self, userid, msg, time):
+    def add_to_storage(self, userid, msg, time, channel):
         """store in database so you can populate later."""
         c = self.remindmedb.cursor()
-        data = (userid, msg, time)
-        c.execute("INSERT INTO remindme VALUES (?,?,?)", data)
+        data = (userid, msg, time, channel)
+        c.execute("INSERT INTO remindme VALUES (?,?,?,?)", data)
         self.remindmedb.commit()
         c.close()
         
         
-    def add_to_queue(self, userid, msg, time):    
+    def add_to_queue(self, userid, msg, time, channel):    
         """add to list so you can remember now."""
-        self.remindmelist.append((userid, msg, time))
+        self.remindmelist.append((userid, msg, time, channel))
     
     
     def remove_from_db(self, item):
