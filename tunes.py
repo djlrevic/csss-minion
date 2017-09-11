@@ -362,7 +362,7 @@ def setup(bot):
     else: # use production channels
         bot.testing = False
         print("set to production channels")
-        bot.request_channel = "293120981067890691"
+        bot.request_channel = "354084037465473025"
         bot.music_channel = "228761314644852737"
     bot.music_priorityqueue = True
     bot.music_authoritarian = False
