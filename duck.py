@@ -6,7 +6,7 @@ from urllib import parse
 # note to self, do not use mashape API for duckduckgo. It has malformed JSON
 # note to self, duckduckgo API doesn't return search results... just scrape
 
-
+# TODO instant answers
 class Duck:
 
     def __init__(self, bot):
@@ -46,7 +46,7 @@ class Duck:
                             #print("Adding cutoff: "+cutoff)
                             results.append(cutoff)    
             res = results[0]
-            for r in results[1:11]: # return 10 results
+            for r in results[1:6]: # return 6 results
                 res += "\n<"+r+">"  # escape discord embedding       
             if len(results) == 1:
                 return "DuckDuckGo could not find any results"
@@ -72,7 +72,8 @@ class Duck:
         if self.emojis == None:
             self.emojis = ctx.message.server.emojis
         word = " ".join(msg)
-        newstr = ""
+        newstr = ctx.message.author.name + " says: "
+        origin = ctx.message
         for s in word:
             if s.isalpha():
                 #convert to eggplant letter
@@ -85,8 +86,12 @@ class Duck:
                 newstr += "     "
             else:
                 newstr += s
-        #await self.bot.say(newstr)
-        await self.bot.embed_this_for_me(newstr,ctx)
+        try:
+            await self.bot.say(newstr)
+            await self.bot.delete_message(origin)
+        except:
+            await self.bot.say("Your message was likely too long.")
+        #await self.bot.embed_this_for_me(newstr,ctx) #do not do this :/
         
         
    
