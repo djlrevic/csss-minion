@@ -60,8 +60,6 @@ bot.lang_url = config.get("Translate","url")
 
 # creating a 2D empty array for exp queues
 expQueue = []
-global expTable
-expTable = []
 
 @bot.event
 async def on_ready():
@@ -69,7 +67,6 @@ async def on_ready():
   print(bot.user.name)
   print('------')
   await bot.change_presence(game=discord.Game(name='Yes my master'))
-  global expTable
 
 @bot.event
 async def on_message(message):
@@ -83,25 +80,81 @@ async def on_message(message):
 async def test():
   await bot.say('testing')
 
+# used to update the queue
+async def update():
+  await bot.wait_until_ready()
+  print("ready")
+  while not bot.is_closed:
+      for i, item in enumerate(expQueue):
+          if time.time() - item[1] >= 5:
+              print("entry expired")
+              del expQueue[i]
+      await asyncio.sleep(1)
+
 # Check if author is currently on cooldown
-async def validate(message):
+def validate(message):
   for item in expQueue:
     if message.author.id == item[0]:
       # author on cooldown
       return False
   # author not on cooldown, add author id and current time to queue
+  print("entry added to queue")
   expQueue.append([message.author.id, time.time()])
   return True
 
 # handles adding new users and updating existing user exp to database
 async def add(message):
   database = 'experience'
-
   entry = db_select(database, message.author.id)
+  if entry == None:
+    # user not in database
+    exp_amount = random.randint(15, 25)
+    print("entry added to db")
+    db_insert(database, ['name', 'user_id', 'exp', 'level'], [message.author.name, message.author.id, exp_amount, currentLevel(exp_amount)])
+  else:
+    list(entry)
+    changeInExp = random.randint(15, 25)
+    if changeInLevel(changeInExp, entry[3], entry[4]) == 'levelup':
+      # user's levelled up
+      db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
+    # if changeInLevel(changeInExp, entry[3], entry[4]) == 'leveldown':
+    #   # user's levelled down
+      # db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
+    # update user new experience
+    print("entry update exp")
+
+    db_update(database, 'exp', entry[3]+changeInExp, 'user_id', message.author.id)
+
+
+def changeInLevel(change, experience, currLevel):
+  curr_experience = experience + change
+  new_level = currentLevel(experience)
+  if new_level > currLevel:
+    # user has leveled up
+    return 'levelup'
+
+
+# outputs closest level based on total experience
+def currentLevel(experience):
+  return 61
+
+# formula used to calculate exact experience needed for next level
+# x = level
+def calcLevel(x):
+    return 5*math.pow(x, 2) + 40*x + 55
+
+
+def db_update(database, column, value, where, query):
+  cur.execute("UPDATE {} SET {} = {} WHERE {} = {}".format(database, column, value, where, query))
+  conn.commit()
+
+def db_insert(database, name, value):
+  cur.execute("INSERT INTO {} ({}) VALUES ({})".format(database, ', '.join(str(n) for n in name), "'{0}'".format("','".join( str(v) for v in value))))
+  conn.commit()
 
 def db_select(database, query):
-  cur.execute("SELECT * FROM (%s) WHERE user_id = (%s)", (str(database), str(query),))
+  cur.execute("SELECT * FROM {} WHERE user_id = ({})".format(database, query))
   return cur.fetchone()
 
-
+bot.loop.create_task(update())
 bot.run(token)
