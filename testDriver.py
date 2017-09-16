@@ -57,6 +57,7 @@ bot.remove_command("help")
 bot.mashape_key = mashape_key
 bot.imgur_id = imgur_id
 bot.lang_url = config.get("Translate","url")
+EXP_COOLDOWN_TIMER = 3 #seconds
 
 # creating a 2D empty array for exp queues
 expQueue = []
@@ -86,7 +87,7 @@ async def update():
   print("ready")
   while not bot.is_closed:
       for i, item in enumerate(expQueue):
-          if time.time() - item[1] >= 5:
+          if time.time() - item[1] >= EXP_COOLDOWN_TIMER:
               print("entry expired")
               del expQueue[i]
       await asyncio.sleep(1)
@@ -117,6 +118,8 @@ async def add(message):
     if changeInLevel(changeInExp, entry[3], entry[4]) == 'levelup':
       # user's levelled up
       db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
+      await bot.send_message(message.channel, "{} has leveled up to {}".format(message.author.name, currentLevel(entry[3])))
+
     # if changeInLevel(changeInExp, entry[3], entry[4]) == 'leveldown':
     #   # user's levelled down
       # db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
@@ -136,14 +139,45 @@ def changeInLevel(change, experience, currLevel):
 
 # outputs closest level based on total experience
 def currentLevel(experience):
-  return 61
+  if experience is 0:
+    return 0
+  # grab the template experience list from database
+  cur.execute("SELECT level, total_experience FROM template ORDER BY level")
+  templateList = cur.fetchall()
+  for level in templateList:
+    if experience <= level[1]:
+      return level[0]-1
+  # should never reach here, error out with -1
+  bot.say("Something went wrong.")
+  return -1
+
+# outputs current exp for level (not total exp)
+def currentExp(level, experience):
+  cur.execute("SELECT total_experience FROM template WHERE level = {}".format(level))
+  return experience - cur.fetchone()[0]
 
 # formula used to calculate exact experience needed for next level
 # x = level
 def calcLevel(x):
-    return 5*math.pow(x, 2) + 40*x + 55
+  return 5*math.pow(x, 2) + 50*x + 100
+
+@bot.command(pass_context = True)
+async def rank(ctx):
+  level = db_select('experience', ctx.message.author.id, 'level')[0]
+  totalExperience = db_select('experience', ctx.message.author.id, 'exp')[0]
+  currentExperience = currentExp(level, totalExperience)
+  print(level)
+  print(int(level))
+  nextLevel = calcLevel(int(level)+1)
+  await bot.say('{} is level {} and has {}/{} experience for next level'.format(ctx.message.author.name, level, currentExperience, nextLevel))
+
+@bot.command(pass_context = True)
+async def levels(ctx):
+  cur.execute("SELECT * FROM experience ORDER BY level")
+  experienceList = cur.fetchall()
 
 
+# database accessors ----------------------------------------------------------------------------
 def db_update(database, column, value, where, query):
   cur.execute("UPDATE {} SET {} = {} WHERE {} = {}".format(database, column, value, where, query))
   conn.commit()
@@ -152,8 +186,8 @@ def db_insert(database, name, value):
   cur.execute("INSERT INTO {} ({}) VALUES ({})".format(database, ', '.join(str(n) for n in name), "'{0}'".format("','".join( str(v) for v in value))))
   conn.commit()
 
-def db_select(database, query):
-  cur.execute("SELECT * FROM {} WHERE user_id = ({})".format(database, query))
+def db_select(database, query, item = '*'):
+  cur.execute("SELECT {} FROM {} WHERE user_id = ({})".format(', '.join(str(n) for n in item), database, query))
   return cur.fetchone()
 
 bot.loop.create_task(update())
