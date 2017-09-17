@@ -111,7 +111,7 @@ async def add(message):
     # user not in database
     exp_amount = random.randint(15, 25)
     print("entry added to db")
-    db_insert(database, ['name', 'user_id', 'exp', 'level'], [message.author.name, message.author.id, exp_amount, currentLevel(exp_amount)])
+    db_insert(database, ['name', 'user_id', 'exp', 'level', 'true_experience'], [message.author.name, message.author.id, exp_amount, currentLevel(exp_amount), exp_amount])
   else:
     list(entry)
     changeInExp = random.randint(15, 25)
@@ -127,6 +127,7 @@ async def add(message):
     print("entry update exp")
 
     db_update(database, 'exp', entry[3]+changeInExp, 'user_id', message.author.id)
+    db_update(database, 'true_experience', entry[3]+changeInExp, 'user_id', message.author.id)
 
 
 def changeInLevel(change, experience, currLevel):
@@ -163,18 +164,28 @@ def calcLevel(x):
 
 @bot.command(pass_context = True)
 async def rank(ctx):
-  level = db_select('experience', ctx.message.author.id, 'level')[0]
-  totalExperience = db_select('experience', ctx.message.author.id, 'exp')[0]
+  cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter WHERE filter.user_id={}'.format(ctx.message.author.id))
+  res = list(cur.fetchone())
+  cur.execute('SELECT count(*) from experience')
+  totalUsers = cur.fetchone()[0]
+  level = res[4]
+  totalExperience = res[3]
   currentExperience = currentExp(level, totalExperience)
-  print(level)
-  print(int(level))
+  rank = res[6]
   nextLevel = calcLevel(int(level)+1)
-  await bot.say('{} is level {} and has {}/{} experience for next level'.format(ctx.message.author.name, level, currentExperience, nextLevel))
+
+  embed = discord.Embed(colour=discord.Colour(0x1d86c9))
+  embed.set_author(name=ctx.message.author.nick, icon_url=ctx.message.author.avatar_url)
+  embed.set_footer(text="CSSS-Minion")
+  embed.add_field(name="Rank", value="{}/{}".format(rank, totalUsers), inline=True)
+  embed.add_field(name="Level", value=level, inline=True)
+  embed.add_field(name="Experience", value="{} / {} XP [{} total]".format(currentExperience, nextLevel, totalExperience), inline=True)
+
+  await bot.say(embed=embed)
 
 @bot.command(pass_context = True)
 async def levels(ctx):
-  cur.execute("SELECT * FROM experience ORDER BY level")
-  experienceList = cur.fetchall()
+  await bot.say("Henry hasn't gotten around to making this yet :(")
 
 
 # database accessors ----------------------------------------------------------------------------
