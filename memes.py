@@ -60,20 +60,22 @@ class Memes:
 
     @commands.command(pass_context=True)
     async def doraemon(self, ctx):
-        rand = random.randint(0,5)
-        em = discord.Embed(colour=0xfff, title="I am doraemon!")
-        if rand == 0:
-            em.set_image(url='https://i.imgur.com/uPTZgf2.png')
-        elif rand == 1:
-            em.set_image(url='https://i.imgur.com/S5h6PLQ.png')
-        elif rand == 2:
-            em.set_image(url='https://i.imgur.com/Uh8S2Ao.png')
-        elif rand == 3:
-            em.set_image(url='https://i.imgur.com/uCPV26a.png')
-        elif rand == 4:
-            em.set_image(url='https://i.pinimg.com/236x/84/e2/e1/84e2e129c8f9345561418f4ff27fecaa.jpg')
+        images = ['https://i.imgur.com/uPTZgf2.png',
+                    'https://i.imgur.com/S5h6PLQ.png',
+                    'https://i.imgur.com/Uh8S2Ao.png',
+                    'https://i.imgur.com/uCPV26a.png',
+                    'https://i.pinimg.com/236x/84/e2/e1/84e2e129c8f9345561418f4ff27fecaa.jpg',
+                    'https://i.pinimg.com/736x/fb/b7/f2/fbb7f2f68a3901723c9c63d7d26b4e53--funny-animal-humor-cat-cat.jpg']
+        rand = random.randint(0, len(images) - 1)
+        if rand == 5:
+            temp = random.randint(0, 1)
+            if temp % 2 == 0:
+                rand = random.randint(0, len(images) - 1)
+        if rand == 5:
+            em = discord.Embed(colour=0xfff, title = "Really? Do you still doubt I am doraemon?")
         else:
-            em.set_image(url='https://i.pinimg.com/736x/fb/b7/f2/fbb7f2f68a3901723c9c63d7d26b4e53--funny-animal-humor-cat-cat.jpg')
+            em = discord.Embed(colour=0xfff, title="I am doraemon!")
+        em.set_image(url=images[rand])
         await self.bot.send_message(ctx.message.channel, embed=em)
 
 
