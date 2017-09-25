@@ -99,5 +99,28 @@ class Modtools:
                 return True
         return False
 
+    @commands.command(pass_context=True)
+    async def modsay(self, ctx, *msg):
+        """Give a stern message.
+           Heavily inspired by brenfan's .em code <3
+        """
+        author = ctx.message.author
+        if author.permissions_in(ctx.message.channel).manage_channels or author.server_permissions.manage_channels:
+            
+            try:
+                color = red
+            except Exception:
+                color = discord.Colour(0xff0000)
+            string = "\n\n["+" ".join(msg)+"]()"
+            embed = discord.Embed(description = string, color = color, title="An Echo From the Heavens Says...", footer="Moderator Warning")
+            embed.set_author(name=author.display_name, icon_url = author.avatar_url)
+            embed.set_footer(text="Moderator Warning")
+            await self.bot.say(embed=embed)
+        try:
+            await self.bot.delete_message(ctx.message)
+        except Exception:
+            print("Not allowed to delete message")
+
+
 def setup(bot):
     bot.add_cog(Modtools(bot))
