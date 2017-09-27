@@ -305,7 +305,7 @@ async def rank(ctx):
   totalExperience = res[3]
   currentExperience = currentExp(level, totalExperience)
   rank = res[6]
-  nextLevel = calcLevel(int(level)+1)
+  nextLevel = calcLevel(int(level))
 
   embed = discord.Embed(colour=discord.Colour(0x1d86c9))
   embed.set_author(name=ctx.message.author.nick, icon_url=ctx.message.author.avatar_url)
