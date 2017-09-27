@@ -319,14 +319,12 @@ async def rank(ctx):
 
 @bot.command(pass_context = True)
 async def levels(ctx):
-  # await bot.say("Henry hasn't gotten around to making this yet :(")
   cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter')
   res = list(cur.fetchall())
   print(res)
   items = []
   for item in res:
-    items.append('#{}. {}'.format(str(item[6]), str(item[1])))
-    items.append('Level: {} \n Experience: {}'.format(str(item[4]), str(item[3])))
+    items.append(['#{}. {}'.format(str(item[6]), str(item[1])), 'Level: {} \n Experience: {}'.format(str(item[4]), str(item[3]))])
 
   p = Pages(self.bot, message=ctx.message, entries = items, per_page=10)
   p.embed = discord.Embed(title="Server Level Rankings", colour=discord.Colour(0xdc4643))
