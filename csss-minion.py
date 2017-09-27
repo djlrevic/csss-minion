@@ -310,8 +310,7 @@ async def rank(ctx):
   embed.set_footer(text="CSSS-Minion")
   embed.add_field(name="Rank", value="{}/{}".format(rank, totalUsers), inline=True)
   embed.add_field(name="Level", value=level, inline=True)
-  embed.add_field(name="Experience", value="{} / {} XP [{} total]".format(currentExperience, nextLevel, totalExperience), inline=True)
-
+  embed.add_field(name="Experience", value="{} / {} XP [{} total]".format(int(currentExperience), int(nextLevel), int(totalExperience)), inline=True)
   await bot.say(embed=embed)
 
 @bot.command(pass_context = True)
