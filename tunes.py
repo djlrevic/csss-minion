@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import datetime
 import __main__
+import math
 
 # pip install PyNaCl
 # pip install youtube-dl
@@ -54,6 +55,18 @@ class VoiceState:
             self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
         else:
             self.songs = asyncio.Queue()
+        main_loop = asyncio.get_event_loop()
+        main_loop.create_task(self.loop_cooldown())
+
+    async def loop_cooldown(self):
+        """This function will decrease the user's heat every 10mins"""
+        await asyncio.sleep(600) # wait 600 seconds / 10minutes
+        while True:
+            # decrement heat if greater value than 0
+            for k,v in self.playerheat.items():
+                if(self.playerheat[k] > 0):
+                    self.playerheat[k] = self.playerheat[k]-1
+            await asyncio.sleep(10) # wait 10 more seconds.
             
 
     def is_playing(self):
@@ -77,7 +90,7 @@ class VoiceState:
 
         
     def updateheat(self, message):
-        newheat = 0 if message.channel.id == self.bot.request_channel else 0 # higher heat tax if wrong channel
+        newheat = 1 if message.channel.id == self.bot.request_channel else 5 # higher heat tax if wrong channel
         if message.author in self.playerheat:
             self.playerheat[message.author] += newheat
         else:
@@ -123,6 +136,10 @@ class Tunes:
         self.voice_states = {}
         self.msg_badchannel = ""
         self.msg_unauthorized = "If you don't like the music then !skip or leave the channel."
+
+
+
+
 
     def get_voice_state(self, server):
         state = self.voice_states.get(server.id)
@@ -201,7 +218,7 @@ class Tunes:
             await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
             return False
             
-        if not self.bot.testing and str(ctx.message.channel.id) != self.bot.request_channel:
+        if not self.bot.testing and str(ctx.message.channel.id) != "293120981067890691":
             await self.embed_for_me('You can only request from #bottesting',ctx) 
             return False
         
@@ -306,9 +323,11 @@ class Tunes:
         spot_in_line = 1
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order
+        msg = ""
         for text in state.queue:
-            em.add_field(name=str(spot_in_line)+'st in queue', value=text)
+            msg += "**"+str(spot_in_line)+"**: "+str(text)+"\n"
             spot_in_line+=1
+        em.add_field(name="The best of the worst", value=msg)
         await self.bot.send_message(ctx.message.channel, embed=em)
 
 
@@ -317,7 +336,10 @@ class Tunes:
         """Vote to skip a song. The song requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
-
+        if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
+            await self.embed_for_me('You can only skip in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
+            return False        
+        
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
             await self.embed_for_me('Not playing any music right now...',ctx)
@@ -330,7 +352,8 @@ class Tunes:
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
-            if total_votes >= 3:
+            skipnum = len(self.bot.get_channel(self.bot.music_channel).voice_members)
+            if total_votes >= math.floor(skipnum/2):
                 await self.embed_for_me('Skip vote passed, skipping song...',ctx)
                 state.skip()
             else:
@@ -338,6 +361,19 @@ class Tunes:
         else:
             await self.embed_for_me('You have already voted to skip this song.',ctx)
 
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def bump(self, ctx):
+        """vote to bump the indexed song to the front."""
+        # TODO
+        if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
+            await self.embed_for_me('You can only skip in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
+            return False   
+        state = self.get_voice_state(ctx.message.server)
+        if not state.is_playing():
+            await self.embed_for_me('Not playing any music right now...',ctx)
+            return
+           
 
     @commands.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):
@@ -364,7 +400,7 @@ def setup(bot):
         print("set to production channels")
         bot.request_channel = "354084037465473025"
         bot.music_channel = "228761314644852737"
-    bot.music_priorityqueue = True
+    bot.music_priorityqueue = False
     bot.music_authoritarian = False
     bot.admins_dict = {"173702138122338305":"henry",
      "173177975045488640":"nos"
