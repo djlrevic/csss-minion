@@ -218,7 +218,7 @@ class Tunes:
             await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
             return False
             
-        if not self.bot.testing and str(ctx.message.channel.id) != "293120981067890691":
+        if not self.bot.testing and str(ctx.message.channel.id) != self.bot.request_channel:
             await self.embed_for_me('You can only request from #bottesting',ctx) 
             return False
         
