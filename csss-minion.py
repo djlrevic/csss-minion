@@ -69,6 +69,7 @@ bot.remove_command("help")
 bot.mashape_key = mashape_key
 bot.imgur_id = imgur_id
 bot.lang_url = config.get("Translate","url")
+EXP_COOLDOWN_TIMER = 60 #seconds
 
 def reloadConfig():
     pass
@@ -321,7 +322,7 @@ async def levels(ctx):
   # await bot.say("Henry hasn't gotten around to making this yet :(")
   cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter')
   res = list(cur.fetchall())
-
+  print(res)
   items = []
   for item in res:
     items.append('#{}. {}'.format(str(item[6]), str(item[1])))
