@@ -6,26 +6,8 @@ AVOID = ['342891382584770560', '300564141096304650', '360722519860445184', '3120
 class Modtools:
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(pass_context=True)
-    async def lock(self, ctx):
-        """Locks the current channel."""
-        for role in ctx.message.server.roles:
-            if role.id == '338575090847580160':
-                MUTED_ROLE = role
-            if role.id == '296466915235332106':
-                BOTS_ROLE = role
-        if self.minion(ctx):
-            everyone = []
-            for user in ctx.message.server.members:
-                if ctx.message.channel.permissions_for(user).send_messages and BOTS_ROLE not in user.roles: #don't mute bots
-                    everyone.append(user)
-            for user in everyone:
-                await self.bot.add_roles(user, MUTED_ROLE)
-            await self.bot.say("Locking Channel")
-        else:
-            await self.bot.say("You ain't no mod, shoo!")
-
+        
+        
     @commands.command(pass_context=True)
     async def propagateMute(self, ctx):
         for role in ctx.message.server.roles:
@@ -42,6 +24,27 @@ class Modtools:
         for channel in ctx.message.server.channels:
             if channel.id not in AVOID:
                 await self.bot.edit_channel_permissions(channel, MUTED_ROLE, overwrite)
+
+#    @commands.command(pass_context=True)
+#    async def lock(self, ctx):
+#        """Locks the current channel."""
+#        for role in ctx.message.server.roles:
+#            if role.id == '338575090847580160':
+#                MUTED_ROLE = role
+#            if role.id == '296466915235332106':
+#                BOTS_ROLE = role
+#        if self.minion(ctx):
+#            everyone = []
+#            for user in ctx.message.server.members:
+#                if ctx.message.channel.permissions_for(user).send_messages and BOTS_ROLE not in user.roles: #don't mute bots
+#                    everyone.append(user)
+#            for user in everyone:
+#                await self.bot.add_roles(user, MUTED_ROLE)
+#            await self.bot.say("Locking Channel")
+#        else:
+#            await self.bot.say("You ain't no mod, shoo!")
+
+
 
     @commands.command(pass_context=True)
     async def unlock(self, ctx):
@@ -81,30 +84,53 @@ class Modtools:
         else:
             await self.bot.say("You ain't no mod, shoo!")
 
-    @commands.command(pass_context=True)
-    async def restrict(self, ctx, *msg):
-        """Restrict user(s) to only post in certain channels.
-        Usage: !restrict [users..] [channels..]
-        Example: !restrict @Henry @Roo #offtopic #bottesting
-
-        """
-        if self.minion(ctx):
-            channels = ctx.message.server.channels
-            for user in ctx.message.mentions:
-                await self.bot.say("Restricting user "+user.name)
-                for ch in channels:
-                    if ch not in ctx.message.channel_mentions:
-                        #print(ch.name,user.nick, "banning user in this channel")
-                        #DO NOT PRINT A LIST OF ALL CHANNELS IN PRODUCTION
-                        await self.ch_perms(ch, user, False)   #ban user from channel.
-                    else:
-                        await self.bot.say("You ain't no mod, shoo!")
+#    @commands.command(pass_context=True)
+#    async def restrict(self, ctx, *msg):
+#        """Restrict user(s) to only post in certain channels.
+#        Usage: !restrict [users..] [channels..]
+#        Example: !restrict @Henry @Roo #offtopic #bottesting
+#
+#        """
+#        if self.minion(ctx):
+#            channels = ctx.message.server.channels
+#            for user in ctx.message.mentions:
+#                await self.bot.say("Restricting user "+user.name)
+#                for ch in channels:
+#                    if ch not in ctx.message.channel_mentions:
+#                        #print(ch.name,user.nick, "banning user in this channel")
+#                        #DO NOT PRINT A LIST OF ALL CHANNELS IN PRODUCTION
+#                        await self.ch_perms(ch, user, False)   #ban user from channel.
+#                    else:
+#                        await self.bot.say("You ain't no mod, shoo!")
 
     def minion(self, ctx):
         for role in ctx.message.author.roles:
             if "314296819272122368" == role.id:
                 return True
         return False
+
+    @commands.command(pass_context=True)
+    async def modsay(self, ctx, *msg):
+        """Give a stern message.
+           Heavily inspired by brenfan's .em code <3
+        """
+        author = ctx.message.author
+        if author.permissions_in(ctx.message.channel).manage_channels or author.server_permissions.manage_channels:
+            
+            try:
+                color = red
+            except Exception:
+                color = discord.Colour(0xff0000)
+            string = "\n\n["+" ".join(msg)+"]()"
+            embed = discord.Embed(description = string, color = color, title="An Echo From the Heavens Says...", footer="Moderator Warning")
+            embed.set_author(name=author.display_name, icon_url = author.avatar_url)
+            embed.set_footer(text="Moderator Warning")
+            await self.bot.say(embed=embed)
+        try:
+            await self.bot.delete_message(ctx.message)
+        except Exception:
+            print("Not allowed to delete message")
+
 
 def setup(bot):
     bot.add_cog(Modtools(bot))

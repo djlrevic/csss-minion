@@ -98,8 +98,20 @@ class WordArt:
     
     @commands.command(pass_context=True)
     async def top10(self, ctx):
-        test= " ".join(self.serverCache)
-        r = Counter(test.split()).most_common()
+        test = " ".join(self.serverCache)
+        small = []
+        # yes I know that servercache is already an array,
+        # yes I know that it is strange that I am joining into a string
+        # and then splitting it again.
+        # I just don't know why it breaks if I don't do this :/
+        # Henry I know you will see this and ask questions...
+        # Please let it be. Same with mytop10
+        for i in test.split():
+            if(len(i) < 50):
+                small.append(i)
+        
+        r = list(filter(lambda x: x not in self.STOPWORDS, small))
+        r = Counter(r).most_common()
         msg = ""
         for rank in r[:10]:
             msg += str(rank[1])            
@@ -107,6 +119,25 @@ class WordArt:
             msg += rank[0]
             msg += "\n"
         await self.bot.embed_this_for_me(msg, ctx)
+    
+    @commands.command(pass_context=True)
+    async def mytop10(self, ctx):
+        words = self.wordsFromDB(ctx.message.author)
+        test= " ".join(words)
+        small = []
+        for i in test.split():
+            if(len(i) < 50):
+                small.append(i)
+        r = list(filter(lambda x: x not in self.STOPWORDS, small))
+        r = Counter(r).most_common()
+        msg = ""
+        for rank in r[:10]:
+            msg += str(rank[1])            
+            msg += "\t\t"
+            msg += rank[0]
+            msg += "\n"
+        await self.bot.embed_this_for_me(msg, ctx)    
+    
        
        # open DB and retrieve messages from a userID
     def wordsFromDB(self, author):
