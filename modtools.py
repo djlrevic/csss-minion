@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+AVOID = ['342891382584770560', '300564141096304650', '360722519860445184', '312038519294001152', '321832332279676928']
+
 class Modtools:
     def __init__(self, bot):
         self.bot = bot
@@ -31,10 +33,15 @@ class Modtools:
                 MUTED_ROLE = role
 
         overwrite = discord.PermissionOverwrite()
-        for perm, _ in overwrite:
-            setattr(overwrite, perm, False)
+        setattr(overwrite, 'send_messages', False)
+        setattr(overwrite, 'manage_messages', False)
+        setattr(overwrite, 'manage_channels', False)
+        setattr(overwrite, 'manage_server', False)
+        setattr(overwrite, 'manage_nicknames', False)
+        setattr(overwrite, 'manage_roles', False)
         for channel in ctx.message.server.channels:
-            await self.bot.edit_channel_permissions(channel, MUTED_ROLE, overwrite)
+            if channel.id not in AVOID:
+                await self.bot.edit_channel_permissions(channel, MUTED_ROLE, overwrite)
 
     @commands.command(pass_context=True)
     async def unlock(self, ctx):
