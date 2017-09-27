@@ -295,6 +295,8 @@ def calcLevel(x):
 
 @bot.command(pass_context = True)
 async def rank(ctx):
+  if len(ctx.message.mentions) > 0:
+    ctx.message.author = ctx.message.mentions[0]
   cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter WHERE filter.user_id={}'.format(ctx.message.author.id))
   res = list(cur.fetchone())
   cur.execute('SELECT count(*) from experience')
