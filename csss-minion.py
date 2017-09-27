@@ -326,7 +326,7 @@ async def levels(ctx):
   for item in res:
     items.append(['#{}. {}'.format(str(item[6]), str(item[1])), 'Level: {} \n Experience: {}'.format(str(item[4]), str(item[3]))])
 
-  p = Pages(self.bot, message=ctx.message, entries = items, per_page=10)
+  p = Pages(bot, message=ctx.message, entries = items, per_page=10)
   p.embed = discord.Embed(title="Server Level Rankings", colour=discord.Colour(0xdc4643))
   p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
   p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
