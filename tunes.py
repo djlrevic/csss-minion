@@ -77,7 +77,7 @@ class VoiceState:
 
         
     def updateheat(self, message):
-        newheat = 1 if message.channel.id == self.bot.request_channel else 5 # higher heat tax if wrong channel
+        newheat = 0 if message.channel.id == self.bot.request_channel else 0 # higher heat tax if wrong channel
         if message.author in self.playerheat:
             self.playerheat[message.author] += newheat
         else:

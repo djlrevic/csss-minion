@@ -16,6 +16,7 @@ import subprocess
 import sys
 from io import StringIO
 import logging
+from pagination import Pages
 
 saveout = sys.stdout
 saveerr = sys.stderr
@@ -73,9 +74,7 @@ def reloadConfig():
     pass
 
 # creating a 2D empty array for exp queues
-qu = []
-global expTable
-expTable = []
+expQueue = []
 bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' password='"+local_postgres_pw+"'") # second connection for wordcloud cog
 
 @bot.event
@@ -84,8 +83,6 @@ async def on_ready():
     print(bot.user.name)
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
-    global expTable
-    expTable = getLevel() #pulling exp templates
 
 @bot.event
 async def on_message(message):
@@ -160,106 +157,6 @@ def Henry(ctx):
 #     with codex.open('ids.txt', 'a', 'utf-8') as log:
 #             log.write(']')
 
-# handle 60 second cooldown timer for exp gain
-def validate(message):
-    # check if user is in queue
-    flag = False
-    for i in qu:
-        if i[0] == message.author.id:
-            # user already in queue
-            flag = True
-    if flag == True:
-        # print("dupe found")
-        return False
-    # user not in queue
-    qu.append([message.author.id, time.time()])
-    # print("added to array")
-    return True
-
-# formula used to calculate exact experience needed for next level
-def calcLevel(x):
-    return 5*math.pow(x, 2) + 40*x + 55
-
-# used to update the queue
-async def update():
-    await bot.wait_until_ready()
-    print("ready")
-    while not bot.is_closed:
-        for i, item in enumerate(qu):
-            if time.time() - item[1] >= 60:
-                # print("entry expired")
-                del qu[i]
-        f.flush()
-        line = f.readline()
-        while line:
-            await bot.send_message(bot.get_channel('321832332279676928'), line)
-            line = f.readline()
-        await asyncio.sleep(1)
-
-# handles adding new users and updating existing user exp to database
-async def add(message):
-    # check if user is in database
-    cur.execute("SELECT * FROM "+database+" WHERE user_id = (%s)", (str(message.author.id),))
-    entry = cur.fetchone()
-    if entry == None:
-        # user not in database
-        cur.execute("INSERT INTO "+database+" (name, user_id, exp) VALUES (%s, %s, %s)",
-            (message.author.name, str(message.author.id), random.randint(15, 25), ))
-        conn.commit()
-    else:
-        list(entry)
-        # user in database
-        changeInExp = random.randint(15, 25)
-        if updateLevel(changeInExp, entry[3], entry[4]) == True:
-            # user has leveled up, perform special operations
-            cur.execute("UPDATE "+database+" SET level = {} WHERE user_id = {}".format(userLevel(changeInExp+entry[3]), message.author.id))
-            # await bot.send_message(message.channel, "<@"+str(message.author.id)+"> is now level **"+str(userLevel(entry[3]+changeInExp))+"**!")
-        # else user has not leveled, just add exp
-        cur.execute("UPDATE "+database+" SET exp = exp+(%s) WHERE user_id = (%s)", (changeInExp, int(message.author.id), ))
-        cur.execute("UPDATE experience E SET level = (SELECT MAX(T.level) FROM template T, experience E1 WHERE T.exp <= E1.exp AND E.user_id = E1.user_id)")
-        conn.commit()
-
-# used to pull template levels and exp goals from db
-def getLevel():
-    cur.execute("SELECT level, exp FROM template ORDER BY level")
-    i = 0
-    table = []
-    stop = False
-    while stop == False:
-        temp = cur.fetchone()
-        if temp == None:
-            stop = True
-        else:
-            table.append(temp)
-            i = i+1
-    return table
-
-# used to find the current level of user given experience
-def userLevel(experience):
-    global expTable
-    # print(expTable[5][1])
-    lowerBound = 0
-    upperBound = 0
-    for foo in expTable:
-        if experience > foo[1]:
-            lowerBound = foo[0]
-        if experience < foo[1]:
-            upperBound = foo[0]
-    return lowerBound
-
-
-# detect if user is eligible for the next level
-def updateLevel(change, experience, currLevel):
-    # print("Experience : {} and Change : {}".format(experience, change))
-    # print("CurrLevel: {}".format(currLevel))
-    foo = change + experience
-    # print("foo : {}".format(foo))
-    afterChange = userLevel(foo)
-    # print("afterChange : {}".format(afterChange))
-    if afterChange != currLevel:
-        return True
-    return False
-
 async def embed_this_for_me(text, ctx):
     """Standardized embeddings across cogs"""
     callingframe = sys._getframe(1)
@@ -295,13 +192,6 @@ def fit_msg(msg, maxlen:int=2000):
     msgs.append(msg)
     return msgs
 
-
-@bot.command(pass_context = True)
-async def rank(ctx):
-    cur.execute("SELECT exp FROM experience WHERE user_id = {}".format(ctx.message.author.id))
-    msg = cur.fetchone()
-    await bot.say(msg)
-
 # testing if the bot is alive
 @bot.command()
 async def ping():
@@ -321,6 +211,143 @@ async def cogs(ctx):
     cogs = list(bot.cogs.keys())
     cogs.sort()
     await bot.embed_this_for_me("\n".join(cogs), ctx)
+
+
+# used to update the queue
+async def update():
+  await bot.wait_until_ready()
+  print("ready")
+  while not bot.is_closed:
+      for i, item in enumerate(expQueue):
+          if time.time() - item[1] >= EXP_COOLDOWN_TIMER:
+              print("entry expired")
+              del expQueue[i]
+      await asyncio.sleep(1)
+
+# Check if author is currently on cooldown
+def validate(message):
+  for item in expQueue:
+    if message.author.id == item[0]:
+      # author on cooldown
+      return False
+  # author not on cooldown, add author id and current time to queue
+  print("entry added to queue")
+  expQueue.append([message.author.id, time.time()])
+  return True
+
+# handles adding new users and updating existing user exp to database
+async def add(message):
+  database = 'experience'
+  entry = db_select(database, message.author.id)
+  if entry == None:
+    # user not in database
+    exp_amount = random.randint(15, 25)
+    print("entry added to db")
+    db_insert(database, ['name', 'user_id', 'exp', 'level', 'true_experience'], [message.author.name, message.author.id, exp_amount, currentLevel(exp_amount), exp_amount])
+  else:
+    list(entry)
+    changeInExp = random.randint(15, 25)
+    if changeInLevel(changeInExp, entry[3], entry[4]) == 'levelup':
+      # user's levelled up
+      db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
+      await bot.send_message(message.channel, "{} has leveled up to {}".format(message.author.name, currentLevel(entry[3])))
+
+    # if changeInLevel(changeInExp, entry[3], entry[4]) == 'leveldown':
+    #   # user's levelled down
+      # db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
+    # update user new experience
+    print("entry update exp")
+
+    db_update(database, 'exp', entry[3]+changeInExp, 'user_id', message.author.id)
+    db_update(database, 'true_experience', entry[3]+changeInExp, 'user_id', message.author.id)
+
+
+def changeInLevel(change, experience, currLevel):
+  curr_experience = experience + change
+  new_level = currentLevel(experience)
+  if new_level > currLevel:
+    # user has leveled up
+    return 'levelup'
+
+
+# outputs closest level based on total experience
+def currentLevel(experience):
+  if experience is 0:
+    return 0
+  # grab the template experience list from database
+  cur.execute("SELECT level, total_experience FROM template ORDER BY level")
+  templateList = cur.fetchall()
+  for level in templateList:
+    if experience <= level[1]:
+      return level[0]-1
+  # should never reach here, error out with -1
+  bot.say("Something went wrong.")
+  return -1
+
+# outputs current exp for level (not total exp)
+def currentExp(level, experience):
+  cur.execute("SELECT total_experience FROM template WHERE level = {}".format(level))
+  return experience - cur.fetchone()[0]
+
+# formula used to calculate exact experience needed for next level
+# x = level
+def calcLevel(x):
+  return 5*math.pow(x, 2) + 50*x + 100
+
+@bot.command(pass_context = True)
+async def rank(ctx):
+  if len(ctx.message.mentions) > 0:
+    ctx.message.author = ctx.message.mentions[0]
+  cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter WHERE filter.user_id={}'.format(ctx.message.author.id))
+  res = list(cur.fetchone())
+  cur.execute('SELECT count(*) from experience')
+  totalUsers = cur.fetchone()[0]
+  level = res[4]
+  totalExperience = res[3]
+  currentExperience = currentExp(level, totalExperience)
+  rank = res[6]
+  nextLevel = calcLevel(int(level))
+
+  embed = discord.Embed(colour=discord.Colour(0x1d86c9))
+  embed.set_author(name=ctx.message.author.nick, icon_url=ctx.message.author.avatar_url)
+  embed.set_footer(text="CSSS-Minion")
+  embed.add_field(name="Rank", value="{}/{}".format(rank, totalUsers), inline=True)
+  embed.add_field(name="Level", value=level, inline=True)
+  embed.add_field(name="Experience", value="{} / {} XP [{} total]".format(int(currentExperience), int(nextLevel), int(totalExperience)), inline=True)
+  await bot.say(embed=embed)
+
+@bot.command(pass_context = True)
+async def levels(ctx):
+  # await bot.say("Henry hasn't gotten around to making this yet :(")
+  cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter')
+  res = list(cur.fetchall())
+
+  items = []
+  for item in res:
+    items.append('#{}. {}'.format(str(item[6]), str(item[1])))
+    items.append('Level: {} \n Experience: {}'.format(str(item[4]), str(item[3])))
+
+  p = Pages(self.bot, message=ctx.message, entries = items, per_page=10)
+  p.embed = discord.Embed(title="Server Level Rankings", colour=discord.Colour(0xdc4643))
+  p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+  p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+  p.embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+
+  await p.paginate()
+
+
+# database accessors ----------------------------------------------------------------------------
+def db_update(database, column, value, where, query):
+  cur.execute("UPDATE {} SET {} = {} WHERE {} = {}".format(database, column, value, where, query))
+  conn.commit()
+
+def db_insert(database, name, value):
+  cur.execute("INSERT INTO {} ({}) VALUES ({})".format(database, ', '.join(str(n) for n in name), "'{0}'".format("','".join( str(v) for v in value))))
+  conn.commit()
+
+def db_select(database, query, item = '*'):
+  cur.execute("SELECT {} FROM {} WHERE user_id = ({})".format(', '.join(str(n) for n in item), database, query))
+  return cur.fetchone()
 
 bot.load_extension("wordart") # bot can start and load wordart later.
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main

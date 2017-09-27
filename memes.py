@@ -20,9 +20,17 @@ class Memes:
         
     @commands.command(pass_context=True)
     async def triggered(self,ctx):
+        images = ['https://cdn.discordapp.com/attachments/228761314644852736/361739947876548608/tenor.gif',
+                    'https://giphy.com/gifs/ZEVc9uplCUJFu',
+                    'https://i.imgur.com/P6XduSJ.gif',
+                    'https://media.tenor.com/images/d213cc0fadd5b0aa5d088c2b8cd6dc47/tenor.gif',
+                    'https://thumbs.gfycat.com/DearestSpiffyAlpaca-small.gif',
+                    'https://media.giphy.com/media/oCdScruZnEHfy/source.gif',
+                    'http://i0.kym-cdn.com/photos/images/newsfeed/001/034/138/cd0.gif',
+                    'http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png']
         """When someone has a mildly different opinion."""
         em = discord.Embed(colour=0xfff, title="Oh no you didn't!")
-        em.set_image(url="http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
+        em.set_image(url= images[random.randint(0, len(images) - 1)])
         await self.bot.send_message(ctx.message.channel, embed=em)
         #await self.bot.say("Oh no you didn't!"+" http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
 
