@@ -1,4 +1,5 @@
 import discord
+import random
 from discord.ext import commands
 
 
@@ -19,9 +20,17 @@ class Memes:
         
     @commands.command(pass_context=True)
     async def triggered(self,ctx):
+        images = ['https://cdn.discordapp.com/attachments/228761314644852736/361739947876548608/tenor.gif',
+                    'https://giphy.com/gifs/ZEVc9uplCUJFu',
+                    'https://i.imgur.com/P6XduSJ.gif',
+                    'https://media.tenor.com/images/d213cc0fadd5b0aa5d088c2b8cd6dc47/tenor.gif',
+                    'https://thumbs.gfycat.com/DearestSpiffyAlpaca-small.gif',
+                    'https://media.giphy.com/media/oCdScruZnEHfy/source.gif',
+                    'http://i0.kym-cdn.com/photos/images/newsfeed/001/034/138/cd0.gif',
+                    'http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png']
         """When someone has a mildly different opinion."""
         em = discord.Embed(colour=0xfff, title="Oh no you didn't!")
-        em.set_image(url="http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
+        em.set_image(url= images[random.randint(0, len(images) - 1)])
         await self.bot.send_message(ctx.message.channel, embed=em)
         #await self.bot.say("Oh no you didn't!"+" http://orig09.deviantart.net/dfb2/f/2015/263/6/3/triggered_by_mrlorgin-d9aahmc.png")
 
@@ -56,6 +65,27 @@ class Memes:
     @commands.command()
     async def beep(self):    
         await self.bot.say("boop")
+
+    @commands.command(pass_context=True)
+    async def doraemon(self, ctx):
+        images = ['https://i.imgur.com/uPTZgf2.png',
+                    'https://i.imgur.com/S5h6PLQ.png',
+                    'https://i.imgur.com/Uh8S2Ao.png',
+                    'https://i.imgur.com/uCPV26a.png',
+                    'https://i.pinimg.com/236x/84/e2/e1/84e2e129c8f9345561418f4ff27fecaa.jpg',
+                    'https://i.pinimg.com/736x/fb/b7/f2/fbb7f2f68a3901723c9c63d7d26b4e53--funny-animal-humor-cat-cat.jpg']
+        rand = random.randint(0, len(images) - 1)
+        if rand == 5:
+            temp = random.randint(0, 1)
+            if temp % 2 == 0:
+                rand = random.randint(0, len(images) - 1)
+        if rand == 5:
+            em = discord.Embed(colour=0xfff, title = "Really? Do you still doubt I am doraemon?")
+        else:
+            em = discord.Embed(colour=0xfff, title="I am doraemon!")
+        em.set_image(url=images[rand])
+        await self.bot.send_message(ctx.message.channel, embed=em)
+
 
         
 def setup(bot):
