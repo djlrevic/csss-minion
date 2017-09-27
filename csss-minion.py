@@ -324,7 +324,7 @@ async def levels(ctx):
   print(res)
   items = []
   for item in res:
-    items.append(['#{}. {}'.format(str(item[6]), str(item[1])), 'Level: {} \n Experience: {}'.format(str(item[4]), str(item[3]))])
+    items.append(['#{}. {}'.format(str(item[6]), str(item[1])), 'Level: {} \nExperience: {}'.format(str(item[4]), str(int(item[3])))])
 
   p = Pages(bot, message=ctx.message, entries = items, per_page=10)
   p.embed = discord.Embed(title="Server Level Rankings", colour=discord.Colour(0xdc4643))
