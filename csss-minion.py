@@ -16,6 +16,7 @@ import subprocess
 import sys
 from io import StringIO
 import logging
+from pagination import Pages
 
 saveout = sys.stdout
 saveerr = sys.stderr
@@ -317,7 +318,22 @@ async def rank(ctx):
 
 @bot.command(pass_context = True)
 async def levels(ctx):
-  await bot.say("Henry hasn't gotten around to making this yet :(")
+  # await bot.say("Henry hasn't gotten around to making this yet :(")
+  cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter')
+  res = list(cur.fetchall())
+
+  items = []
+  for item in res:
+    items.append('#{}. {}'.format(str(item[6]), str(item[1])))
+    items.append('Level: {} \n Experience: {}'.format(str(item[4]), str(item[3])))
+
+  p = Pages(self.bot, message=ctx.message, entries = items, per_page=10)
+  p.embed = discord.Embed(title="Server Level Rankings", colour=discord.Colour(0xdc4643))
+  p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+  p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+  p.embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+
+  await p.paginate()
 
 
 # database accessors ----------------------------------------------------------------------------
