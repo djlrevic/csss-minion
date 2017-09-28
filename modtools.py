@@ -86,14 +86,14 @@ class Modtools:
 
   @commands.command(pass_context=True)
   async def restrict(self, ctx):
-  if self.minion(ctx):
-    for role in ctx.message.server.roles:
-      if role.id == '338575090847580160':
-        MUTED_ROLE = role
-    await self.bot.add_roles(ctx.message.mentions[0], MUTED_ROLE)
-    await self.bot.say("{} has been muted.".format(ctx.message.mentions[0].mention))
-  else:
-    await self.bot.say("You ain't no mod, shoo!")
+    if self.minion(ctx):
+      for role in ctx.message.server.roles:
+        if role.id == '338575090847580160':
+          MUTED_ROLE = role
+      await self.bot.add_roles(ctx.message.mentions[0], MUTED_ROLE)
+      await self.bot.say("{} has been muted.".format(ctx.message.mentions[0].mention))
+    else:
+      await self.bot.say("You ain't no mod, shoo!")
 
   def minion(self, ctx):
     for role in ctx.message.author.roles:
