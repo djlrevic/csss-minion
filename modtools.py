@@ -95,7 +95,7 @@ class Modtools:
       if role.id == '338575090847580160':
         MUTED_ROLE = role
     await self.bot.add_roles(ctx.message.mentions[0], MUTED_ROLE)
-    await self.bot.say("{} has been muted.".format(ctx.message.mentions[0].nick))
+    await self.bot.say("{} has been muted.".format(ctx.message.mentions[0].nick or ctx.message.mentions[0].name))
   else:
     await self.bot.say("You ain't no mod, shoo!")
 
