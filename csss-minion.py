@@ -221,7 +221,7 @@ async def update():
   while not bot.is_closed:
       for i, item in enumerate(expQueue):
           if time.time() - item[1] >= EXP_COOLDOWN_TIMER:
-              print("entry expired")
+              # print("entry expired")
               del expQueue[i]
       f.flush()
       line = f.readline()
@@ -237,7 +237,7 @@ def validate(message):
       # author on cooldown
       return False
   # author not on cooldown, add author id and current time to queue
-  print("entry added to queue")
+  # print("entry added to queue")
   expQueue.append([message.author.id, time.time()])
   return True
 
@@ -248,7 +248,7 @@ async def add(message):
   if entry == None:
     # user not in database
     exp_amount = random.randint(15, 25)
-    print("entry added to db")
+    # print("entry added to db")
     db_insert(database, ['name', 'user_id', 'exp', 'level', 'true_experience'], [message.author.name, message.author.id, exp_amount, currentLevel(exp_amount), exp_amount])
   else:
     list(entry)
@@ -262,7 +262,7 @@ async def add(message):
     #   # user's levelled down
       # db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
     # update user new experience
-    print("entry update exp")
+    # print("entry update exp")
 
     db_update(database, 'exp', entry[3]+changeInExp, 'user_id', message.author.id)
     db_update(database, 'true_experience', entry[3]+changeInExp, 'user_id', message.author.id)
@@ -326,7 +326,7 @@ async def rank(ctx):
 async def levels(ctx):
   cur.execute('SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter')
   res = list(cur.fetchall())
-  print(res)
+  # print(res)
   items = []
   for item in res:
     items.append(['#{}. {}'.format(str(item[6]), str(item[1])), 'Level: {} \nExperience: {}'.format(str(item[4]), str(int(item[3])))])
