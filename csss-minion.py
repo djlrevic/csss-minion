@@ -223,6 +223,11 @@ async def update():
           if time.time() - item[1] >= EXP_COOLDOWN_TIMER:
               print("entry expired")
               del expQueue[i]
+      f.flush()
+      line = f.readline()
+      while line:
+        await bot.send_message(bot.get_channel('321832332279676928'), line)
+        line = f.readline()
       await asyncio.sleep(1)
 
 # Check if author is currently on cooldown
