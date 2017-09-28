@@ -103,12 +103,18 @@ async def load(ctx, name):
       return
     await bot.say("{} cog loaded.".format(name))
 
+  else:
+    await bot.say("You ain't my master! Shoo!")
+
 
 @bot.command(pass_context = True)
 async def unload(ctx, name):
   if Henry(ctx):
     bot.unload_extension(name)
     await bot.say("{} cog unloaded".format(name))
+
+  else:
+    await bot.say("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
 async def reload(ctx, name):
@@ -121,17 +127,21 @@ async def reload(ctx, name):
       return
     await bot.say("`{} cog reloaded`".format(name))
 
+  else:
+    await bot.say("You ain't my master! Shoo!")
+
 @bot.command(pass_context = True)
 async def exc(ctx, *args):
   if Henry(ctx):
     query = " ".join(args)
     await bot.say("```"+subprocess.getoutput(query)+"```")
+  else:
+    await bot.say("You ain't my master! Shoo!")
 
 def Henry(ctx):
   if ctx.message.author.id == "173702138122338305":
     return True
   else:
-    await bot.say("You ain't my master! Shoo!")
     return False
 
 # pulling all members from the server. Disable unless admin using
