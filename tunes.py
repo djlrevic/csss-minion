@@ -60,13 +60,12 @@ class VoiceState:
 
     async def loop_cooldown(self):
         """This function will decrease the user's heat every 10mins"""
-        await asyncio.sleep(600) # wait 600 seconds / 10minutes
         while True:
             # decrement heat if greater value than 0
             for k,v in self.playerheat.items():
                 if(self.playerheat[k] > 0):
                     self.playerheat[k] = self.playerheat[k]-1
-            await asyncio.sleep(10) # wait 10 more seconds.
+            await asyncio.sleep(600) # wait 10 more seconds.
             
 
     def is_playing(self):
@@ -320,14 +319,27 @@ class Tunes:
         state = self.get_voice_state(ctx.message.server)
         em = discord.Embed(colour=0xfff, title="Dank Tune Song Queue")
         em.set_footer(text="♪ DJ Minion Spinning The Decks ♪", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
-        spot_in_line = 1
+        
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order
         msg = ""
+        spot_in_line = 1
+        counter = 1
         for text in state.queue:
-            msg += "**"+str(spot_in_line)+"**: "+str(text)+"\n"
+            if(spot_in_line >= 106):
+                break;
+            msg += "**"+str(spot_in_line)+"**: "+str(text)+"\n" # this breaks due to char limits
+            
+            if(counter > 5):
+                em.add_field(name="Batch of tunes",value=msg)
+                msg = "" #reset msg
+                counter = 1 # reset limit
+            #THIS ONLY BREAKS WHEN YOU HAVE 107 SONGS IN QUEUE
+            counter += 1    
             spot_in_line+=1
-        em.add_field(name="The best of the worst", value=msg)
+               
+        if len(msg) > 2:       
+            em.add_field(name="The best of the worst", value=msg)
         await self.bot.send_message(ctx.message.channel, embed=em)
 
 
@@ -357,7 +369,7 @@ class Tunes:
                 await self.embed_for_me('Skip vote passed, skipping song...',ctx)
                 state.skip()
             else:
-                await self.embed_for_me('Skip vote added, currently at [{}/3]'.format(total_votes),ctx)
+                await self.embed_for_me('Skip vote added, currently at [{}/{}]'.format(total_votes, math.floor(skipnum/2)),ctx)
         else:
             await self.embed_for_me('You have already voted to skip this song.',ctx)
 
