@@ -59,7 +59,7 @@ class Memes:
     @commands.command(pass_context=True)
     async def prettygood(self,ctx):
         em = discord.Embed(colour=0xfff)
-        em.set_image(url='https://img.memesuper.com/bd0f44643ba40759f4e9f89bbaf577e3_heyyyy-thats-pretty-good-meme-hey-thats-pretty-good_1130-500.jpeg')
+        em.set_image(url='https://i.imgflip.com/y7owh.jpg')
         await self.bot.send_message(ctx.message.channel, embed=em)
 
     @commands.command()
