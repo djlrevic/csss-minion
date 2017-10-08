@@ -315,7 +315,7 @@ async def rank(ctx):
   nextLevel = calcLevel(int(level))
 
   embed = discord.Embed(colour=discord.Colour(0x1d86c9))
-  embed.set_author(name=ctx.message.author.nick || ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+  embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
   embed.set_footer(text="CSSS-Minion")
   embed.add_field(name="Rank", value="{}/{}".format(rank, totalUsers), inline=True)
   embed.add_field(name="Level", value=level, inline=True)
