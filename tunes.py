@@ -222,11 +222,11 @@ class Tunes:
             return False
 
         state = self.get_voice_state(ctx.message.server)
-        beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+        beforeArgs = "-loglevel 0 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         opts = {
             'default_search': 'auto',
             'quiet': True,
-            'logtostderr': False,
+            'logtostderr': True,
             'no_warnings': True
         }
 
