@@ -209,13 +209,13 @@ async def cogs(ctx):
 
 # used to update the queue
 async def update():
-  await self.bot.wait_until_ready()
+  await bot.wait_until_ready()
   print("ready")
-  while not self.bot.is_closed:
+  while not bot.is_closed:
       f.flush()
       line = f.readline()
       while line:
-        await self.bot.send_message(self.bot.get_channel('321832332279676928'), line)
+        await bot.send_message(bot.get_channel('321832332279676928'), line)
         line = f.readline()
       await asyncio.sleep(1)
 
