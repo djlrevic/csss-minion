@@ -19,7 +19,7 @@ class Levels:
     # SQL SETUP------------------------------------------------------------------------------
     # creating a 2D empty array for exp queues
     self.expQueue = []
-    self.EXP_COOLDOWN_TIMER = 3 #seconds
+    self.EXP_COOLDOWN_TIMER = 60 #seconds
     self.bot.loop.create_task(self.update_exp())
 
   # used to update the queue
@@ -27,7 +27,7 @@ class Levels:
     while not self.bot.is_closed:
       for i, item in enumerate(self.expQueue):
         if time.time() - item[1] >= self.EXP_COOLDOWN_TIMER:
-          print("entry expired")
+          # print("entry expired")
           del self.expQueue[i]
       await asyncio.sleep(1)
 
@@ -38,7 +38,7 @@ class Levels:
         # author on cooldown
         return False
     # author not on cooldown, add author id and current time to queue
-    print("entry added to queue")
+    # print("entry added to queue")
     self.expQueue.append([message.author.id, time.time()])
     return True
 
@@ -50,27 +50,28 @@ class Levels:
   async def add(self, message):
     database = 'experience'
     entry = self.db_select(database, message.author.id)
+    exp_amount = random.randint(15, 25)
     if entry == None:
       # user not in database
-      exp_amount = random.randint(15, 25)
       # print("entry added to db")
+      print('{} added to db, gaining {} exp.'.format(message.author.name, exp_amount))
       self.db_insert(database, ['name', 'user_id', 'exp', 'level', 'true_experience'], [message.author.name, message.author.id, exp_amount, self.currentLevel(exp_amount), exp_amount])
     else:
       list(entry)
-      changeInExp = random.randint(15, 25)
-      if self.changeInLevel(changeInExp, entry[3], entry[4]) == 'levelup':
+      if self.changeInLevel(exp_amount, entry[3], entry[4]) == 'levelup':
         # user's levelled up
         self.db_update(database, 'level', self.currentLevel(entry[3]), 'user_id', message.author.id)
         await self.bot.send_message(message.channel, "{} has leveled up to {}".format(message.author.name, self.currentLevel(entry[3])))
 
-      # if changeInLevel(changeInExp, entry[3], entry[4]) == 'leveldown':
+      # if changeInLevel(exp_amount, entry[3], entry[4]) == 'leveldown':
       #   # user's levelled down
         # self.db_update(database, 'level', currentLevel(entry[3]), 'user_id', message.author.id)
       # update user new experience
       # print("entry update exp")
 
-      self.db_update(database, 'exp', entry[3]+changeInExp, 'user_id', message.author.id)
-      self.db_update(database, 'true_experience', entry[3]+changeInExp, 'user_id', message.author.id)
+      print('{} gained {} exp.'.format(message.author.name, exp_amount))
+      self.db_update(database, 'exp', entry[3]+exp_amount, 'user_id', message.author.id)
+      self.db_update(database, 'true_experience', entry[3]+exp_amount, 'user_id', message.author.id)
 
   def changeInLevel(self, change, experience, currLevel):
     curr_experience = experience + change
