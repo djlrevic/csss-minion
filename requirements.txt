@@ -1,7 +1,1 @@
-discord.py
-wolframalpha
-mcstatus
-psycopg2
-PyEnchant
-PyDictionary
-requests
+discord.py wolframalpha mcstatus psycopg2 PyEnchant PyDictionary requests

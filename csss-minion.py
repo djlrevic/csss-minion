@@ -75,16 +75,8 @@ async def on_ready():
     print('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
 
-def levels_loaded():
-  return "Levels" in list(bot.cogs.keys())
-
 @bot.event
 async def on_message(message):
-    # DATABASE OPERATIONS. DISABLE UNLESS ACTUALLY RUNNING AS SERVICE
-    # print(message.author.name+"#"+message.author.discriminator)
-    if levels_loaded():
-      if validate(message):
-          await add(message)
     await bot.process_commands(message)
 
 @bot.command(pass_context = True)
@@ -133,24 +125,6 @@ def Henry(ctx):
         return True
     else:
         return False
-
-# pulling all members from the server. Disable unless admin using
-# @bot.command(pass_context = True)
-# async def pull(ctx):
-#     members = ctx.message.server.members
-#     with codex.open('ids.txt', 'a', 'utf-8') as log:
-#             log.write('[')
-#     for i in members:
-#         # target.write('{"name" : "')
-#         # target.write(i.name)
-#         # target.write(', "user_id" : "')
-#         # target.write(i.id)
-#         # target.write('"}, ')
-#         name = bytes(i.name, 'utf-8').decode('utf-8', 'ignore')
-#         with codex.open('ids.txt', 'a', 'utf-8') as log:
-#             log.write('{"name" : "' + name + '", "user_id" : "' + i.id + '", "id" : "' + i.discriminator + '"}, ')
-#     with codex.open('ids.txt', 'a', 'utf-8') as log:
-#             log.write(']')
 
 async def embed_this_for_me(text, ctx):
     """Standardized embeddings across cogs"""
