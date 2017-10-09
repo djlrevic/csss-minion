@@ -14,21 +14,16 @@ class Levels():
   # SQL SETUP------------------------------------------------------------------------------
   # creating a 2D empty array for exp queues
   expQueue = []
+  EXP_COOLDOWN_TIMER = 60 #seconds
 
   # used to update the queue
-  async def update():
+  async def update_exp():
     await self.bot.wait_until_ready()
-    print("ready")
     while not self.bot.is_closed:
-        for i, item in enumerate(expQueue):
-            if time.time() - item[1] >= EXP_COOLDOWN_TIMER:
-                # print("entry expired")
-                del expQueue[i]
-        f.flush()
-        line = f.readline()
-        while line:
-          await self.bot.send_message(self.bot.get_channel('321832332279676928'), line)
-          line = f.readline()
+      for i, item in enumerate(expQueue):
+        if time.time() - item[1] >= EXP_COOLDOWN_TIMER:
+          # print("entry expired")
+          del expQueue[i]
         await asyncio.sleep(1)
 
   # Check if author is currently on cooldown
@@ -138,7 +133,6 @@ class Levels():
 
     await p.paginate()
 
-
   # database accessors ----------------------------------------------------------------------------
   def db_update(database, column, value, where, query):
     cur.execute("UPDATE {} SET {} = {} WHERE {} = {}".format(database, column, value, where, query))
@@ -153,5 +147,5 @@ class Levels():
     return cur.fetchone()
 
 def setup(self.bot):
-    self.bot.add_cog(Levels(self.bot))
-    self.bot.loop.create_task(update())
+  self.bot.add_cog(Levels(self.bot))
+  self.bot.loop.create_task(update_exp())

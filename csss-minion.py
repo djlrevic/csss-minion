@@ -26,7 +26,6 @@ sys.stdout = sys.stderr = fsock
 f = open('logs.txt', 'r')
 f.seek(0)
 configFile = "botMain.settings"
-database = "experience" #database name used for exp
 
 #check if config file exists, if not, input manually
 if not os.path.isfile(configFile):
@@ -63,7 +62,6 @@ bot.mashape_key = mashape_key
 bot.imgur_id = imgur_id
 bot.lang_url = config.get("Translate","url")
 bot.postgrespass = postgrespass
-EXP_COOLDOWN_TIMER = 60 #seconds
 
 def reloadConfig():
     pass
@@ -209,8 +207,21 @@ async def cogs(ctx):
     cogs.sort()
     await bot.embed_this_for_me("\n".join(cogs), ctx)
 
+# used to update the queue
+async def update():
+  await self.bot.wait_until_ready()
+  print("ready")
+  while not self.bot.is_closed:
+      f.flush()
+      line = f.readline()
+      while line:
+        await self.bot.send_message(self.bot.get_channel('321832332279676928'), line)
+        line = f.readline()
+      await asyncio.sleep(1)
+
 bot.load_extension("wordart") # bot can start and load wordart later.
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.fit_msg = fit_msg # attach fit_msg to bot object
 bot.Henry = Henry
+bot.loop.create_task(update())
 bot.run(token)
