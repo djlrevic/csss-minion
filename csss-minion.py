@@ -18,12 +18,17 @@ from io import StringIO
 import logging
 from pagination import Pages
 
-saveout = sys.stdout
-saveerr = sys.stderr
-fsock = open('logs.txt', 'w', 1)
-sys.stdout = sys.stderr = fsock
+logger = logging.getLogger('discord')
+logger.setLevel(logging.WARNING)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
-f = open('logs.txt', 'r')
+log_file = open('discord.log', 'a', 1)
+sys.stdout = log_file
+sys.stderr = log_file
+
+f = open('discord.log', 'r')
 f.seek(0)
 configFile = "botMain.settings"
 
@@ -52,7 +57,7 @@ else:
     local_postgres_pw = config.get("LocalPG", 'Password')
     imgur_id = config.get("Imgur", "client_id")
 
-startup_extensions = ["classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme", "modtools"]
+startup_extensions = ["levels", "classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme", "modtools"]
 
 bot = commands.Bot(command_prefix='.', description=description)
 bot.wolframid = wolframid
@@ -70,9 +75,9 @@ bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' 
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print('------')
+    logger.warning('Logged in as')
+    logger.warning(bot.user.name)
+    logger.warning('------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
 
 @bot.event
@@ -172,7 +177,7 @@ if __name__ == "__main__":
             bot.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
-            print('Failed to load extension {}\n{}'.format(extension, exc))
+            logger.warning('Failed to load extension {}\n{}'.format(extension, exc))
 
 @bot.command(pass_context=True)
 async def cogs(ctx):
@@ -184,7 +189,7 @@ async def cogs(ctx):
 # used to update the queue
 async def update():
   await bot.wait_until_ready()
-  print("ready")
+  logger.warning("ready")
   while not bot.is_closed:
       f.flush()
       line = f.readline()
