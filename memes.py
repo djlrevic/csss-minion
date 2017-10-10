@@ -1,11 +1,15 @@
 import discord
 import random
 from discord.ext import commands
+from os import path
 
 
 
 class Memes:
 
+
+    top = path.dirname(__file__)
+    sub = "wordart_dir"
     def __init__(self, bot):
         self.bot = bot
         
@@ -65,6 +69,12 @@ class Memes:
     @commands.command()
     async def beep(self):    
         await self.bot.say("boop")
+        
+        
+    @commands.command(pass_context=True)
+    async def joke(self,ctx):
+        img = path.join(self.top, self.sub, "thejoke_henry.png")
+        await self.bot.send_file(ctx.message.channel, img)
 
     @commands.command(pass_context=True)
     async def doraemon(self, ctx):
