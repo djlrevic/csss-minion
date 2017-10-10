@@ -55,7 +55,10 @@ class WordArt:
         cur = self.bot.conn_wc.cursor()
         
         query = "CREATE TABLE IF NOT EXISTS "+self.tablename+"(user_id bigint, msgs varchar(2000), date text, UNIQUE(user_id, date))" # create table if doesn't exist
-        cur.execute(query)
+        try:
+            cur.execute(query)
+        except Exception as e: # idk what could go wrong here, so catch all errors and print
+            print("Could not create wordart table, something really bad happened.", e)
         self.bot.conn_wc.commit()
         cur.close()
         print("Populating caches, prepare for major lagspike")
@@ -67,7 +70,10 @@ class WordArt:
         cur = self.bot.conn_wc.cursor()
         msg = await self.bot.say("Clearing the spam your mightyness")
        # cur.callproc('spam_reduction')
-        cur.execute(query_spam_reduction)
+        try:
+            cur.execute(query_spam_reduction)
+        except Exception as e:# idk what could go wrong here, so catch all errors and print
+            print("Could not execute spam reduction query. omg what happened?", e)
         self.bot.conn_wc.commit()
         cur.close()
         await self.bot.edit_message(msg, "Spam is cleared your mightyness")
@@ -88,8 +94,8 @@ class WordArt:
                 self.serverCache = self.backupArr
             else:
                 self.serverCache = arr
-        except:
-            print("server cache retrieval error")
+        except Exception as e:
+            print("server cache retrieval error: \n", e)
             self.serverCache = self.backupArr
         text = " ".join(self.serverCache)
         print("generating word cloud")
@@ -151,8 +157,7 @@ class WordArt:
                 arr.append(entries[i][0])
             return arr           
         except Exception as e:
-            print("Something broke. Printing error message: ")
-            print(e)
+            print("Something broke. Printing error message: ", e)
             return self.backupArr
         
     def createImage(self, arr, saveName):
@@ -168,8 +173,11 @@ class WordArt:
         cur = self.bot.conn_wc.cursor()
         query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s)"
         data = (message.author.id, message.content, message.timestamp)
-        cur.execute(query, data)
-        self.bot.conn_wc.commit()
+        try:
+            cur.execute(query, data)
+            self.bot.conn_wc.commit()
+        except psycopg2.IntegrityError as e:
+            print("on_message integrity error: ", e)
         cur.close()
 
     @commands.command(pass_context=True)
