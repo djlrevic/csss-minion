@@ -104,7 +104,7 @@ class WordArt:
     
     @commands.command(pass_context=True)
     async def top10(self, ctx):
-        test = " ".join(self.serverCache)
+        test = " ".join(self.serverCache).lower()
         small = []
         # yes I know that servercache is already an array,
         # yes I know that it is strange that I am joining into a string
@@ -129,7 +129,7 @@ class WordArt:
     @commands.command(pass_context=True)
     async def mytop10(self, ctx):
         words = self.wordsFromDB(ctx.message.author)
-        test= " ".join(words)
+        test= " ".join(words).lower()
         small = []
         for i in test.split():
             if(len(i) < 50):
