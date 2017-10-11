@@ -10,7 +10,7 @@ class Devtools:
 
   @commands.command(pass_context=True)
   async def inspect(self, ctx):
-    for role in ctx.message.server.roles:
+    for role in ctx.message.author.roles:
       if self.bot.Henry(ctx) or role.id == '321832268282855436': #bot devs
         theObject = None
         if len(ctx.message.mentions) > 0:
