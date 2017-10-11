@@ -22,26 +22,26 @@ class Info():
 
     #     await bot.say(embed=embed)
 
-    @commands.command(pass_context = True)
-    async def voteresult(self, ctx):
-        """Return the voting results from the previous CSSS election."""
-        if ctx.invoked_subcommand is None:
-            embed = discord.Embed(title="CSSS Exec Positions", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
+    # @commands.command(pass_context = True)
+    # async def voteresult(self, ctx):
+    #     """Return the voting results from the previous CSSS election."""
+    #     if ctx.invoked_subcommand is None:
+    #         embed = discord.Embed(title="CSSS Exec Positions", colour=discord.Colour(0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
 
-            embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
-            embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
-            embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+    #         embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+    #         embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
+    #         embed.set_footer(text="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
 
-            embed.add_field(name="President", value="David Miiller")
-            embed.add_field(name="Vice President", value="Jon Loewen")
-            embed.add_field(name="Treasurer", value="Dustin Cao")
-            embed.add_field(name="Director of Resources", value="Kiarash Mirsalehi")
-            embed.add_field(name="Director of Events", value="Brendan Chan")
-            embed.add_field(name="Director of Communications", value="Henry Zhao")
-            embed.add_field(name="Director of Archives", value="Josh Wu")
-            embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
+    #         embed.add_field(name="President", value="David Miiller")
+    #         embed.add_field(name="Vice President", value="Jon Loewen")
+    #         embed.add_field(name="Treasurer", value="Dustin Cao")
+    #         embed.add_field(name="Director of Resources", value="Kiarash Mirsalehi")
+    #         embed.add_field(name="Director of Events", value="Brendan Chan")
+    #         embed.add_field(name="Director of Communications", value="Henry Zhao")
+    #         embed.add_field(name="Director of Archives", value="Josh Wu")
+    #         embed.add_field(name="Source Code", value="https://github.com/henrymzhao/csss-minion/")
 
-            await self.bot.say(embed=embed)    
+    #         await self.bot.say(embed=embed)
 
 
     # the following several functions are inspired by formatterhelper and default_help command
@@ -109,9 +109,9 @@ class Info():
                 com = self.bot.commands[k]
                 sig = self.get_command_signature(ctx,com) # grabs command signature
                 items.append([sig,com.help]) # append command signature and pydoc to list
-            
-            
-            items.append(["Source Code", "https://github.com/henrymzhao/csss-minion/"]) # keep src as last entry            
+
+
+            items.append(["Source Code", "https://github.com/henrymzhao/csss-minion/"]) # keep src as last entry
             p = Pages(self.bot, message=ctx.message, entries = items, per_page=4)
             p.embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643),timestamp=datetime.datetime.utcfromtimestamp(1490339531))
             p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
@@ -146,7 +146,7 @@ class Info():
         """Display the number of players on the minecraft server"""
         if ctx.message.channel.name != "minecraft":
             await self.bot.say("Please move to #minecraft for this command.")
-        else: 
+        else:
             server = MinecraftServer.lookup(self.bot.mcip)
             try:
                 status = server.status()
@@ -166,10 +166,10 @@ class Info():
         """Display the minecraft server information"""
         if ctx.message.channel.name != "minecraft":
             await self.bot.say("Please move to #minecraft for this command.")
-        else:    
+        else:
             em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
-    Modpack: FTBBeyond 1.5.3
-    Minecraft: 1.10.2
+    Modpack:  FTB Infinity 2.7 (Not 3.0 !)
+    Minecraft: 1.7.10
     Cracked: YES
     See pinned message to download cracked client.""", colour=0x3D85C6)
             await self.bot.send_message(ctx.message.channel, embed=em)

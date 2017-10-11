@@ -38,11 +38,12 @@ class UrbanDict:
         query = "https://mashape-community-urban-dictionary.p.mashape.com/define?term="+word
         req = requests.get(query, headers=self.headers)
         ret = self.parseResponse(req)
-        msgs = self.bot.fit_msg(ret,1024)
-        try:
-            await self.bot.embed_this_for_me(msgs[0],ctx)
-        except:
-            await self.bot.say("The content is probably too long for discord to handle")
+#       msgs = self.bot.fit_msg(ret,1024)
+        await self.bot.say(ret) #embedding is too much needless effort here
+        #try: 
+        #    await self.bot.embed_this_for_me(msgs[0],ctx)
+        #except:
+        #    await self.bot.say("The content is probably too long for discord to handle")
         
 def setup(bot):
     bot.add_cog(UrbanDict(bot))

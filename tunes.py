@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import datetime
 import __main__
+import math
 
 # pip install PyNaCl
 # pip install youtube-dl
@@ -11,7 +12,7 @@ import __main__
 
 # this script was originally written to work across multiple servers, it has been changed to *barely* work on only one server.
 
-# TODO 
+# TODO
 # cooldown for heat
 
 
@@ -54,7 +55,18 @@ class VoiceState:
             self.songs = asyncio.PriorityQueue() # gotta keep priority -----------------
         else:
             self.songs = asyncio.Queue()
-            
+        main_loop = asyncio.get_event_loop()
+        main_loop.create_task(self.loop_cooldown())
+
+    async def loop_cooldown(self):
+        """This function will decrease the user's heat every 10mins"""
+        while True:
+            # decrement heat if greater value than 0
+            for k,v in self.playerheat.items():
+                if(self.playerheat[k] > 0):
+                    self.playerheat[k] = self.playerheat[k]-1
+            await asyncio.sleep(600) # wait 10 more seconds.
+
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -66,7 +78,7 @@ class VoiceState:
     async def embed_for_me(self, msg):
         em = discord.Embed(colour=0xfff, title=msg)
         await self.bot.send_message(self.current.channel, embed=em)
-        
+
 
     def getheat(self, author):
         if author in self.playerheat:
@@ -75,14 +87,14 @@ class VoiceState:
             self.playerheat[author] = 1
             return 1
 
-        
+
     def updateheat(self, message):
         newheat = 1 if message.channel.id == self.bot.request_channel else 5 # higher heat tax if wrong channel
         if message.author in self.playerheat:
             self.playerheat[message.author] += newheat
         else:
             self.playerheat[message.author] = newheat
-            
+
     @property
     def player(self):
         return self.current.player
@@ -124,6 +136,10 @@ class Tunes:
         self.msg_badchannel = ""
         self.msg_unauthorized = "If you don't like the music then !skip or leave the channel."
 
+
+
+
+
     def get_voice_state(self, server):
         state = self.voice_states.get(server.id)
         if state is None:
@@ -156,7 +172,7 @@ class Tunes:
         if str(ctx.message.author.voice_channel) is not null or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.embed_for_me('I can only play in Music voicechannel. This is '+str(ctx.message.author.voice_channel),ctx)
             return False
-            
+
         try:
             await self.create_voice_client(channel)
         except discord.ClientException:
@@ -165,21 +181,21 @@ class Tunes:
             await self.embed_for_me('This is not a voice channel...',ctx)
         else:
             await self.embed_for_me('Ready to play audio in '+channel.name,ctx)
-            
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         """Summons the bot to join your voice channel."""
-        
+
         summoned_channel = ctx.message.author.voice_channel
         if summoned_channel is None:
             await self.embed_for_me('You are not in a voice channel.',ctx)
             return False
-            
+
         if str(summoned_channel.id) != self.bot.music_channel:
             await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(summoned_channel),ctx)
             return False
-            
+
         state = self.get_voice_state(ctx.message.server)
         if state.voice is None:
             state.voice = await self.bot.join_voice_channel(summoned_channel)
@@ -200,16 +216,18 @@ class Tunes:
         if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
             await self.embed_for_me('I can only play in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
             return False
-            
-        if not self.bot.testing and str(ctx.message.channel.id) != "293120981067890691":
-            await self.embed_for_me('You can only request from #bottesting',ctx) 
+
+        if not self.bot.testing and str(ctx.message.channel.id) != self.bot.request_channel:
+            await self.embed_for_me('You can only request from #bottesting',ctx)
             return False
-        
+
         state = self.get_voice_state(ctx.message.server)
-        beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+        beforeArgs = "-loglevel 0 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         opts = {
             'default_search': 'auto',
-            'quiet': True
+            'quiet': True,
+            'logtostderr': True,
+            'no_warnings': True
         }
 
         if state.voice is None:
@@ -231,7 +249,7 @@ class Tunes:
             entry = VoiceEntry(ctx.message, player, datetime.datetime.now(), heat)
             await self.embed_for_me('Enqueued ' +str(entry)+'. Your heat is now '+str(heat), ctx)
             state.updateheat(ctx.message)
-            
+
             if self.bot.music_priorityqueue:
                 await state.songs.put((heat,entry))
                 state.queue.append(entry)
@@ -248,7 +266,7 @@ class Tunes:
         if state.is_playing():
             player = state.player
             #player.volume = value / 100  # :P
-            await self.embed_for_me('Set the volume to {:.0%}'.format(value/100), ctx)            
+            await self.embed_for_me('Set the volume to {:.0%}'.format(value/100), ctx)
 
 
     @commands.command(pass_context=True, no_pm=True)
@@ -296,19 +314,34 @@ class Tunes:
         except:
             pass
 
-            
+
     @commands.command(pass_context=True, no_pm=True)
     async def queue(self, ctx):
         """shows songs in the current queue"""
         state = self.get_voice_state(ctx.message.server)
         em = discord.Embed(colour=0xfff, title="Dank Tune Song Queue")
         em.set_footer(text="♪ DJ Minion Spinning The Decks ♪", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
-        spot_in_line = 1
+
         if self.bot.music_priorityqueue:
             state.queue.sort() #make sure it's in the right order
+        msg = ""
+        spot_in_line = 1
+        counter = 1
         for text in state.queue:
-            em.add_field(name=str(spot_in_line)+'st in queue', value=text)
+            if(spot_in_line >= 106):
+                break;
+            msg += "**"+str(spot_in_line)+"**: "+str(text)+"\n" # this breaks due to char limits
+
+            if(counter > 5):
+                em.add_field(name="Batch of tunes",value=msg)
+                msg = "" #reset msg
+                counter = 1 # reset limit
+            #THIS ONLY BREAKS WHEN YOU HAVE 107 SONGS IN QUEUE
+            counter += 1
             spot_in_line+=1
+
+        if len(msg) > 2:
+            em.add_field(name="The best of the worst", value=msg)
         await self.bot.send_message(ctx.message.channel, embed=em)
 
 
@@ -317,6 +350,9 @@ class Tunes:
         """Vote to skip a song. The song requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
+        if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
+            await self.embed_for_me('You can only skip in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
+            return False
 
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
@@ -325,18 +361,32 @@ class Tunes:
 
         voter = ctx.message.author
         if voter == state.current.requester:
-            await self.embed_for_me('Requester requested skipping song...',ctx)        
+            await self.embed_for_me('Requester requested skipping song...',ctx)
             state.skip()
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
-            if total_votes >= 3:
+            skipnum = len(self.bot.get_channel(self.bot.music_channel).voice_members)
+            if total_votes >= math.floor(skipnum/2):
                 await self.embed_for_me('Skip vote passed, skipping song...',ctx)
                 state.skip()
             else:
-                await self.embed_for_me('Skip vote added, currently at [{}/3]'.format(total_votes),ctx)
+                await self.embed_for_me('Skip vote added, currently at [{}/{}]'.format(total_votes, math.floor(skipnum/2)),ctx)
         else:
             await self.embed_for_me('You have already voted to skip this song.',ctx)
+
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def bump(self, ctx):
+        """vote to bump the indexed song to the front."""
+        # TODO
+        if (ctx.message.author.voice_channel is None) or str(ctx.message.author.voice_channel.id) != self.bot.music_channel:
+            await self.embed_for_me('You can only skip in Music voicechannel, this channel is '+str(ctx.message.author.voice_channel),ctx)
+            return False
+        state = self.get_voice_state(ctx.message.server)
+        if not state.is_playing():
+            await self.embed_for_me('Not playing any music right now...',ctx)
+            return
 
 
     @commands.command(pass_context=True, no_pm=True)
@@ -349,9 +399,9 @@ class Tunes:
         else:
             skip_count = len(state.skip_votes)
             await self.embed_for_me('Now playing {} [skips: {}/3]'.format(state.current, skip_count),ctx)
-        
-        
-        
+
+
+
 def setup(bot):
     bot.add_cog(Tunes(bot))
     if __main__.__file__ == "bot.py": # use test channels
@@ -362,9 +412,9 @@ def setup(bot):
     else: # use production channels
         bot.testing = False
         print("set to production channels")
-        bot.request_channel = "293120981067890691"
+        bot.request_channel = "354084037465473025"
         bot.music_channel = "228761314644852737"
-    bot.music_priorityqueue = True
+    bot.music_priorityqueue = False
     bot.music_authoritarian = False
     bot.admins_dict = {"173702138122338305":"henry",
      "173177975045488640":"nos"
