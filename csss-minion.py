@@ -90,19 +90,19 @@ async def load(ctx, name):
         try:
             bot.load_extension(name)
         except(AttributeError, ImportError) as e:
-            await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            await ctx.say("Cog load failed: {}, {}".format(type(e), str(e)))
             return
-        await bot.say("{} cog loaded.".format(name))
+        await ctx.say("{} cog loaded.".format(name))
     else:
-        await bot.say("You ain't my master! Shoo!")
+        await ctx.say("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
 async def unload(ctx, name):
     if Henry(ctx):
         bot.unload_extension(name)
-        await bot.say("{} cog unloaded".format(name))
+        await ctx.say("{} cog unloaded".format(name))
     else:
-        await bot.say("You ain't my master! Shoo!")
+        await ctx.say("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
 async def reload(ctx, name):
@@ -111,19 +111,19 @@ async def reload(ctx, name):
         try:
             bot.load_extension(name)
         except(AttributeError, ImportError) as e:
-            await bot.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            await ctx.say("Cog load failed: {}, {}".format(type(e), str(e)))
             return
-        await bot.say("`{} cog reloaded`".format(name))
+        await ctx.say("`{} cog reloaded`".format(name))
     else:
-        await bot.say("`You ain't my master! Shoo!``")
+        await ctx.say("`You ain't my master! Shoo!``")
 
 @bot.command(pass_context = True)
 async def exc(ctx, *args):
     if Henry(ctx):
         query = " ".join(args)
-        await bot.say("```"+subprocess.getoutput(query)+"```")
+        await ctx.say("```"+subprocess.getoutput(query)+"```")
     else:
-        await bot.say("You ain't my master! Shoo!")
+        await ctx.say("You ain't my master! Shoo!")
 
 def Henry(ctx):
     if ctx.message.author.id == "173702138122338305":
@@ -137,7 +137,7 @@ async def embed_this_for_me(text, ctx):
     em = discord.Embed(colour=0xfff)
     em.add_field(name="Results from "+callingframe.f_code.co_name, value=text)
     #em.set_footer(text="Written by Nos", icon_url="https://cdn.discordapp.com/avatars/173177975045488640/61d53ada7449ce4a3e1fdc13dc0ee21e.png")
-    await bot.send_message(ctx.message.channel, embed=em)
+    await ctx.send(ctx.message.channel, embed=em)
 
 def fit_msg(msg, maxlen:int=2000):
     """Split a long message to fit within discord's limits.
@@ -169,7 +169,7 @@ def fit_msg(msg, maxlen:int=2000):
 # testing if the bot is alive
 @bot.command()
 async def ping():
-    await bot.say("pong")
+    await ctx.say("pong")
 
 if __name__ == "__main__":
     for extension in startup_extensions:

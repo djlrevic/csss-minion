@@ -86,11 +86,11 @@ class Poem:
         msgs = self.bot.fit_msg(msg[0]+"\n"+msg[1])
         #print("There are "+str(len(msgs))+" parts to this msg")
         if msg[0] == "error":
-            await self.bot.say("Spelling error or not in database.")
+            await ctx.send("Spelling error or not in database.")
         else:
-            await self.bot.say("Sending "+msg[0]+" to "+str(ctx.message.author))
+            await ctx.send("Sending "+msg[0]+" to "+str(ctx.message.author))
             for msg in msgs:
-                await self.bot.send_message(ctx.message.author, msg)
+                await ctx.message.author.send(msg)
         
         
 def setup(bot):

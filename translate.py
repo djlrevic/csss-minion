@@ -16,9 +16,11 @@ class Translate:
     def sneakpastgooglesecurity(self, msg, tlang, slang='en'): # default to english
         fmt = self.bot.lang_url.format(slang,tlang,urllib.parse.quote_plus(msg))
         #fmt = self.url.format(slang,tlang,msg)
-        req = requests.get(fmt) # reponse is in ascii?
+        #print(fmt)
+        req = requests.get(fmt)
         if req.status_code == 200:
             ret = req.json()
+            #print(ret)
             newm = ''
             for tr in ret[0]:
                 newm += tr[0]
@@ -42,11 +44,11 @@ class Translate:
         
         """
         if len(args) < 2:
-            print("not enough arguments")
+            #print("not enough arguments")
             await self.bot.embed_this_for_me("Not enough arguments or bad language code.",ctx)
             return
         if args[1] not in self.codes:
-            print("not supported language code")
+            #print("not supported language code")
             await self.bot.embed_this_for_me("Please visit https://cloud.google.com/translate/docs/languages for a list of supported languages and codes",ctx)
             return
         if len(args) == 3:
@@ -54,12 +56,15 @@ class Translate:
         elif len(args) == 2:
             msg = self.sneakpastgooglesecurity(args[0],args[1])
         #await self.bot.embed_this_for_me(msg,ctx)
-        print("msg length: ",len(msg))
+        #print("msg length: ",len(msg))
+        #print(type(msg))
+        mstr = u"{}".format(msg)
+        #print(mstr)
         msgs = self.bot.fit_msg(msg,1024)
         em = discord.Embed(colour=0xfff,title="Results from translate")
         for m in msgs:
             em.add_field(name="text", value=m)
-        await self.bot.send_message(ctx.message.channel, embed=em)
+        await ctx.send(embed=em)
         
         
         

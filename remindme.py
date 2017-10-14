@@ -11,7 +11,8 @@ import sys
 
 #TODO
 #proper errors for unit types.
-#add cron jobs
+# easier remindme syntax
+#add cron jobs?
 #stop isvan
 
 
@@ -22,21 +23,20 @@ class Remindme:
         self.remindmelist = list()
         self.remindmedb = sqlite3.connect("remindmedb")
         c = self.remindmedb.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS remindme (user_id bigint, msg varchar(2000), datetime datetime, channel_id varchar(20))")
+        c.execute("CREATE TABLE IF NOT EXISTS remindme (user_id bigint, msg varchar(2000), datetime datetime, channel_id int)")
         self.remindmedb.commit()
         c.close()
         self.mass_populate()
         main_loop = asyncio.get_event_loop()
         main_loop.create_task(self.loop_remindme())
         if __main__.__file__ == "bot.py":
-            self.remindmechannel = "304837708650643459" #testing channel
+            self.remindmechannel = 304837708650643459 #testing channel
         else:
-            self.remindmechannel = "228761314644852736"  #production channel
+            self.remindmechannel = 228761314644852736  #production channel
 
     async def loop_remindme(self):    
         """This loop is subscribed to check the time.
         note, the while loop might be redundant.
-        
         """   
         dt = datetime.datetime
         await asyncio.sleep(5)
@@ -64,11 +64,9 @@ class Remindme:
         if False == time or None == time: # bad input
             await self.bot.say("I cannot remember this.\n.format: remindme (message) year month day [hour] [minute] [second]")
             return
-        #add to long term queue. probably using sqlite.
+            
         self.add_to_storage(ctx.message.author.id, msg, time, ctx.message.channel.id)
-        #add to short term queue. probably using list.
         self.add_to_queue(ctx.message.author.id, msg, time, ctx.message.channel.id)
-        #print(self.bot.get_user_info(173177975045488640))
         await self.bot.send_message(ctx.message.channel, "Remembering: "+msg+" until "+str(time) + " for "+ ctx.message.author.name)
    
     @commands.command(pass_context=True)
@@ -80,20 +78,20 @@ class Remindme:
         msg = " ".join(word[2:])
         if int(unit) > pow(2,32):
             print("unit too big for max size.")
-            await self.bot.say("Your unit might be too big")
+            await ctx.send("Your unit might be too big")
         time = await self.parse_time_relative(unit, unittype)
         if False == time:
-            await self.bot.say("I cannot remember this.")
+            await ctx.send("I cannot remember this.")
             return
         self.add_to_storage(ctx.message.author.id, msg, time, ctx.message.channel.id)
         self.add_to_queue(ctx.message.author.id, msg, time, ctx.message.channel.id)
-        await self.bot.send_message(ctx.message.channel, "Remembering: "+msg+" until "+str(time)[:19] + " for "+ ctx.message.author.name)
+        await ctx.send("Remembering: "+msg+" until "+str(time)[:19] + " for "+ ctx.message.author.name)
         
     
     @commands.command(pass_context=True)
     async def allreminders(self, ctx):
         """list all the active reminders."""
-        await self.bot.say(self.remindmelist)
+        await ctx.send(self.remindmelist)
         
         
     @commands.command(pass_context=True)
@@ -104,7 +102,7 @@ class Remindme:
         for item in self.remindmelist:
             if item[0] == userid:
                 userlist.append(item)
-        await self.bot.say(userlist)
+        await ctx.send(userlist)
 
  
     
@@ -113,9 +111,9 @@ class Remindme:
         user = await self.bot.get_user_info(userid) 
         #mgiht break here
         try:    
-            await self.bot.send_message(self.bot.get_channel(channel),user.mention+"\nReminder: "+msg)
+            await self.bot.get_channel(channel).send(user.mention+"\nReminder: "+msg)
         except:
-            await self.bot.send_message(self.bot.get_channel(self.remindmechannel),user.mention+"\nReminder: "+msg)
+            await self.bot.get_channel(self.remindmechannel).send(user.mention+"\nReminder: "+msg)
         
         
     def mass_populate(self):
