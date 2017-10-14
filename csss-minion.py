@@ -90,19 +90,19 @@ async def load(ctx, name):
         try:
             bot.load_extension(name)
         except(AttributeError, ImportError) as e:
-            await ctx.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            await ctx.send("Cog load failed: {}, {}".format(type(e), str(e)))
             return
-        await ctx.say("{} cog loaded.".format(name))
+        await ctx.send("{} cog loaded.".format(name))
     else:
-        await ctx.say("You ain't my master! Shoo!")
+        await ctx.send("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
 async def unload(ctx, name):
     if Henry(ctx):
         bot.unload_extension(name)
-        await ctx.say("{} cog unloaded".format(name))
+        await ctx.send("{} cog unloaded".format(name))
     else:
-        await ctx.say("You ain't my master! Shoo!")
+        await ctx.send("You ain't my master! Shoo!")
 
 @bot.command(pass_context = True)
 async def reload(ctx, name):
@@ -111,19 +111,19 @@ async def reload(ctx, name):
         try:
             bot.load_extension(name)
         except(AttributeError, ImportError) as e:
-            await ctx.say("Cog load failed: {}, {}".format(type(e), str(e)))
+            await ctx.send("Cog load failed: {}, {}".format(type(e), str(e)))
             return
-        await ctx.say("`{} cog reloaded`".format(name))
+        await ctx.send("`{} cog reloaded`".format(name))
     else:
-        await ctx.say("`You ain't my master! Shoo!``")
+        await ctx.send("`You ain't my master! Shoo!``")
 
 @bot.command(pass_context = True)
 async def exc(ctx, *args):
     if Henry(ctx):
         query = " ".join(args)
-        await ctx.say("```"+subprocess.getoutput(query)+"```")
+        await ctx.send("```"+subprocess.getoutput(query)+"```")
     else:
-        await ctx.say("You ain't my master! Shoo!")
+        await ctx.send("You ain't my master! Shoo!")
 
 def Henry(ctx):
     if ctx.message.author.id == "173702138122338305":
@@ -169,7 +169,7 @@ def fit_msg(msg, maxlen:int=2000):
 # testing if the bot is alive
 @bot.command()
 async def ping():
-    await ctx.say("pong")
+    await ctx.send("pong")
 
 if __name__ == "__main__":
     for extension in startup_extensions:
