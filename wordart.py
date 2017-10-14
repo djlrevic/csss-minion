@@ -68,7 +68,7 @@ class WordArt:
     @commands.command(pass_context=True)
     async def clearspam(self, ctx):
         cur = self.bot.conn_wc.cursor()
-        msg = await self.bot.say("Clearing the spam your mightyness")
+        msg = await ctx.send("Clearing the spam your mightyness")
        # cur.callproc('spam_reduction')
         try:
             cur.execute(query_spam_reduction)
@@ -76,7 +76,7 @@ class WordArt:
             print("Could not execute spam reduction query. omg what happened?", e)
         self.bot.conn_wc.commit()
         cur.close()
-        await self.bot.edit_message(msg, "Spam is cleared your mightyness")
+        await msg.edit("Spam is cleared your mightyness")
     
     
     
@@ -172,7 +172,7 @@ class WordArt:
     async def on_message(self, message):   
         cur = self.bot.conn_wc.cursor()
         query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s)"
-        data = (message.author.id, message.content, message.timestamp)
+        data = (message.author.id, message.content, message.created_at)
         try:
             cur.execute(query, data)
         except psycopg2.IntegrityError as e:
@@ -189,7 +189,7 @@ class WordArt:
         
         """
         fmt = "Making artwork {}, hold your horses!"
-        msg = await self.bot.say(fmt.format(ctx.message.author.mention))
+        msg = await ctx.send(fmt.format(ctx.message.author.mention))
         fin_img = path.join(self.d,self.e,"fin.png")
         
         # this whole block is lol
@@ -220,7 +220,7 @@ class WordArt:
         try:
             if ava == "":
                 print("there's no avatar for this user: "+str(ctx.message.author))
-                await self.bot.say("```I can't make avatar art without an avatar you silly goose. But it's ok, I have something special for you.```")
+                await ctx.send("```I can't make avatar art without an avatar you silly goose. But it's ok, I have something special for you.```")
                 img = cv2.imread(path.join(self.d,self.e,"default_avatar.jpg"),1)
             else:
                 img_data = requests.get(ava, stream=True).content #dl from dat url
@@ -236,10 +236,10 @@ class WordArt:
             wc = WordCloud(background_color=bg_colour, max_words=20000,stopwords=self.STOPWORDS, mask=avatar_mask)
             wc.generate(text)
             wc.to_file(fin_img) # save masked wordart to file
-            await self.bot.send_file(ctx.message.channel, fin_img, content=ctx.message.author.mention)
-            await self.bot.delete_message(msg)
+            await ctx.send(file=discord.File(fin_img), content=ctx.message.author.mention)
+            await msg.delete()
         except:
-            await self.bot.say("```Something has gone horribly wrong.```")
+            await ctx.send("```Something has gone horribly wrong.```")
         
 
 
@@ -248,28 +248,28 @@ class WordArt:
     async def refreshCache(self, ctx):
         """Refresh the server wordart cache. Admin only."""
         start = time.time()
-        if ctx.message.author.id == "173177975045488640" or ctx.message.author.id == "173702138122338305": #users authorized to refresh
-            msg = await self.bot.say("```Working...```")
+        if ctx.message.author.id == 173177975045488640 or ctx.message.author.id == 173702138122338305: #users authorized to refresh
+            msg = await ctx.send("```Working...```")
             self.populateCaches()
             fmt = "Refreshing cache took {0} seconds {1}."
-            await self.bot.delete_message(msg)
-            await self.bot.say(fmt.format(str(float(round((time.time()-start), 3)))
+            await msg.delete()
+            await ctx.send(fmt.format(str(float(round((time.time()-start), 3)))
 , ctx.message.author.mention)) # what in god's name
         else:
-            await self.bot.say("```Bad boy! Down!```")
+            await ctx.send("```Bad boy! Down!```")
 
 
     @commands.command(pass_context=True)
     async def servart(self,ctx):
         """Make a wordcloud out of the server's most common words."""
-        await self.bot.send_file(ctx.message.channel, self.serverImage, content=ctx.message.author.mention)
+        await ctx.send(file=discord.File(self.serverImage), content=ctx.message.author.mention)
 
     @commands.command(pass_context=True)
     async def wordart(self,ctx):
         """Make a wordcloud out of your most common words."""
         words = self.wordsFromDB(ctx.message.author)
         filename = self.createImage(words, "wow.png")
-        await self.bot.send_file(ctx.message.channel,filename,content=ctx.message.author.mention)
+        await ctx.send(file=discord.File(filename),content=ctx.message.author.mention)
         
 def setup(bot):
     bot.add_cog(WordArt(bot))
