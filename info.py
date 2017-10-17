@@ -168,7 +168,7 @@ class Info():
             await self.bot.say("Please move to #minecraft for this command.")
         else:
             em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
-    Modpack:  FTB Infinity 2.7 (Not 3.0 !)
+    Modpack:  Divine Journey (Curse)
     Minecraft: 1.7.10
     Cracked: YES
     See pinned message to download cracked client.""", colour=0x3D85C6)
