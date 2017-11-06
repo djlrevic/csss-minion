@@ -55,7 +55,7 @@ class Misc():
         #currently only returns days, because I'm too lazy to format the rest
         #and it doesn't feel particularly useful
         daysSinceJoining = timeDifference.days
-        print("that was " + str(daysSinceJoining) + "days ago" )
+        await self.bot.say("that was {} days ago".format(daysSinceJoining))
 
     @commands.command()
     async def wolf(self, *args):
