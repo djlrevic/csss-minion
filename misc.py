@@ -2,6 +2,7 @@
 import discord
 from discord.ext import commands
 import wolframalpha
+import datetime
 
 class Misc():
     def __init__(self, bot, wolframid):
@@ -48,7 +49,6 @@ class Misc():
     @commands.command(pass_context=True)
     async def howoldami(self, ctx):
         """Display when you joined the server"""
-        await self.bot.say("You joined this server on {}".format(ctx.message.author.joined_at))
         #calculate the difference between then and the current time
         currentTime = datetime.datetime.now()
         timeDifference = currentTime - ctx.message.author.joined_at
