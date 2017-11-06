@@ -49,6 +49,13 @@ class Misc():
     async def howoldami(self, ctx):
         """Display when you joined the server"""
         await self.bot.say("You joined this server on {}".format(ctx.message.author.joined_at))
+        #calculate the difference between then and the current time
+        currentTime = datetime.datetime.now()
+        timeDifference = currentTime - ctx.message.author.joined_at
+        #currently only returns days, because I'm too lazy to format the rest
+        #and it doesn't feel particularly useful
+        daysSinceJoining = timeDifference.days
+        print("that was " + str(daysSinceJoining) + "days ago" )
 
     @commands.command()
     async def wolf(self, *args):
