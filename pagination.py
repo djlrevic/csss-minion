@@ -46,21 +46,19 @@ class Pages:
         p = []
         for t in entries:
             p.append(t)
-        if len(p) < 3:
-            p.append(True)
 
         self.embed.set_footer(text='Page %s/%s (%s entries)' % (page, self.maximum_pages, len(self.entries)))
 
         if not self.paginating:
             self.embed.clear_fields()
             for i in p:
-                self.embed.add_field(name = i[0], value = i[1], inline = i[2])
+                self.embed.add_field(name = i[0], value = i[1])
             return await self.bot.send_message(self.message.channel, embed=self.embed)
 
         if not first:
             self.embed.clear_fields()
             for i in p:
-                self.embed.add_field(name = i[0], value = i[1], inline = i[2])
+                self.embed.add_field(name = i[0], value = i[1])
             await self.bot.edit_message(self.message, embed=self.embed)
             return
 
@@ -75,7 +73,7 @@ class Pages:
 
         self.embed.clear_fields()
         for i in p:
-            self.embed.add_field(name = i[0], value = i[1], inline = i[2])
+            self.embed.add_field(name = i[0], value = i[1])
         self.message = await self.bot.send_message(self.message.channel, embed=self.embed)
         for (reaction, _) in self.reaction_emojis:
             if self.maximum_pages == 2 and reaction in ('\u23ed', '\u23ee'):

@@ -71,7 +71,7 @@ class Levels:
 
       print('{} gained {} exp.'.format(message.author.name, exp_amount))
       self.db_update(database, 'exp', entry[3]+exp_amount, 'user_id', message.author.id)
-      self.db_update(database, 'true_experience', entry[3]+exp_amount, 'user_id', message.author.id)
+      self.db_update(database, 'true_experience', entry[5]+exp_amount, 'user_id', message.author.id)
 
   def changeInLevel(self, change, experience, currLevel):
     curr_experience = experience + change
@@ -103,6 +103,14 @@ class Levels:
   # x = level
   def calcLevel(self, x):
     return 5*math.pow(x, 2) + 50*x + 100
+
+  @commands.command(pass_context = True)
+  async def gexp(self, ctx, user, amount):
+    if self.bot.Henry(ctx):
+      self.cur.execute('SELECT exp FROM experience WHERE user_id = {}'.format(ctx.message.mentions[0].id))
+      res = self.cur.fetchone()
+      self.db_update('experience', 'exp', int(res[0])+int(amount), 'user_id', ctx.message.mentions[0].id)
+      await self.bot.say('Gave {} {} exp. {} -> {}'.format(ctx.message.mentions[0].name, amount, int(res[0]), int(res[0])+int(amount)))
 
   @commands.command(pass_context = True)
   async def rank(self, ctx):
