@@ -151,6 +151,16 @@ class Levels:
 
     await p.paginate()
 
+  @commands.command(pass_context = True)
+  async def stats(self,ctx):
+    msg = "One day diff chart : http://172.93.48.238/oneDayDiff.html"
+    msg += "\n One Week diff chart : http://172.93.48.238/oneWeekDiff.html"
+    msg += "\n One Month diff chart : http://172.93.48.238/oneMonthDiff.html"
+    msg += "\n *Note One week and month wont show till that much time has passed*"
+
+    await self.bot.say(msg)
+    pass
+
   # database accessors ----------------------------------------------------------------------------
   def db_update(self, database, column, value, where, query):
     self.cur.execute("UPDATE {} SET {} = {} WHERE {} = {}".format(database, column, value, where, query))
