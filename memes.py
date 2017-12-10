@@ -56,7 +56,7 @@ class Memes:
        
     @commands.command(pass_context=True)
     async def henry(self, ctx):
-        im = path.join(self.top, self.sub, "dear_leader_henry.jpg")
+        img = path.join(self.top, self.sub, "dear_leader_henry.jpg")
         await self.bot.send_file(ctx.message.channel, img)
     
         
