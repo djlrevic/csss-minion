@@ -11,8 +11,12 @@ def saveToFile(obj):
         pickle.dump(obj,f)
 
 def readFromFile():
-    with open("stats.pck","rb") as f:
-        return pickle.load(f)
+    try:
+        with open("stats.pck","rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        blankArr = []
+        return blankArr
 
 def newArrsDict(newDict,oldDict):
     xVals = []
