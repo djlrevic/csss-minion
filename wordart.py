@@ -175,7 +175,9 @@ class WordArt:
         data = (message.author.id, message.content, message.timestamp)
         try:
             cur.execute(query, data)
-        except psycopg2.IntegrityError as e:
+        except Exception as e: # simply to test as the exception is not properly caught.
+        #except psycopg2.IntegrityError as e:
+            print("error type", type(e))
             print("on_message integrity error: ", e)
             print("Rolling back the transaction...")
             self.bot.conn_wc.rollback()
