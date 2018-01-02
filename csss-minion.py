@@ -19,7 +19,7 @@ import logging
 from pagination import Pages
 
 logger = logging.getLogger('discord')
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
@@ -34,28 +34,21 @@ configFile = "botMain.settings"
 
 #check if config file exists, if not, input manually
 if not os.path.isfile(configFile):
-    DISCORD_API_ID = getpass.getpass('Discord API: ')
-    token = getpass.getpass('Token: ')
-    wolframid = getpass.getpass('Wolframalpha: ')
-    ip = "172.93.48.238:25565"
-    description = "Bot of the CSSS"
-    postgrespass = getpass.getpass('Database Password: ')
-    mashape_key = getpass.getpass('Mashape Key: ')
-    local_postgres_pw = getpass.getpass('Database Password: ')
-    imgur_id = getpass.getpass('Imgur client id: ')
-else:
-    #Load the config file
-    config = configparser.ConfigParser()
-    config.read(configFile)
-    description = config.get("Discord", "Description")
-    wolframid = config.get("Wolfram", "TokenId")
-    DISCORD_API_ID = config.get("Discord", "API_ID")
-    token = config.get("Discord", "Token")
-    ip = "172.93.48.238:25565"
-    postgrespass = config.get("Postgres", "Password")
-    mashape_key = config.get("Mashape", "Token")
-    local_postgres_pw = config.get("LocalPG", 'Password')
-    imgur_id = config.get("Imgur", "client_id")
+    logger.warning("ConfigFile not found. Exiting.")
+    sys.exit(1);
+
+#Load the config file
+config = configparser.ConfigParser()
+config.read(configFile)
+description = config.get("Discord", "Description")
+DISCORD_API_ID = config.get("Discord", "API_ID")
+token = config.get("Discord", "Token")
+ip = "172.93.48.238:25565"
+wolframid = config.get("Wolfram", "TokenId")
+postgrespass = config.get("Postgres", "Password")
+local_postgres_pw = config.get("LocalPG", 'Password')
+mashape_key = config.get("Mashape", "Token")
+imgur_id = config.get("Imgur", "client_id")
 
 startup_extensions = ["levels", "classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme", "modtools"]
 
@@ -71,13 +64,9 @@ bot.postgrespass = postgrespass
 def reloadConfig():
     pass
 
-bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' password='"+local_postgres_pw+"'") # second connection for wordcloud cog
-
 @bot.event
 async def on_ready():
-    logger.warning('Logged in as')
-    logger.warning(bot.user.name)
-    logger.warning('------')
+    logger.info('Logged in as ' + bot.user.name + ' ------')
     await bot.change_presence(game=discord.Game(name='Yes my master'))
 
 @bot.event
@@ -129,7 +118,7 @@ def Henry(ctx):
     if ctx.message.author.id == "173702138122338305":
         return True
     else:
-        return False
+        return False or sys.argv[1] == "test"
 
 async def embed_this_for_me(text, ctx):
     """Standardized embeddings across cogs"""
@@ -172,19 +161,25 @@ async def ping():
     await bot.say("pong")
 
 if __name__ == "__main__":
-    for extension in startup_extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            exc = '{}: {}'.format(type(e).__name__, e)
-            logger.warning('Failed to load extension {}\n{}'.format(extension, exc))
+    if sys.argv[1] != "test":
+        for extension in startup_extensions:
+            try:
+                bot.load_extension(extension)
+            except Exception as e:
+                exc = '{}: {}'.format(type(e).__name__, e)
+                logger.warning('Failed to load extension {}\n{}'.format(extension, exc))
+    else:
+        logger.info("Skipping all cogs")
 
 @bot.command(pass_context=True)
 async def cogs(ctx):
     """Lists the currently loaded cogs."""
     cogs = list(bot.cogs.keys())
-    cogs.sort()
-    await bot.embed_this_for_me("\n".join(cogs), ctx)
+    if len(cogs) == 0:
+        await bot.embed_this_for_me("No cogs loaded", ctx);
+    else:
+        cogs.sort()
+        await bot.embed_this_for_me("\n".join(cogs), ctx)
 
 # used to update the queue
 async def update():
@@ -198,7 +193,8 @@ async def update():
         line = f.readline()
       await asyncio.sleep(1)
 
-bot.load_extension("wordart") # bot can start and load wordart later.
+if sys.argv[1] != "test":
+    bot.load_extension("wordart") # bot can start and load wordart later.
 bot.embed_this_for_me = embed_this_for_me # attach to bot object so cogs don't need to import main
 bot.fit_msg = fit_msg # attach fit_msg to bot object
 bot.Henry = Henry
