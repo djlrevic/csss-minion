@@ -11,8 +11,12 @@ def saveToFile(obj):
         pickle.dump(obj,f)
 
 def readFromFile():
-    with open("stats.pck","rb") as f:
-        return pickle.load(f)
+    try:
+        with open("stats.pck","rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        blankArr = []
+        return blankArr
 
 def newArrsDict(newDict,oldDict):
     xVals = []
@@ -20,7 +24,7 @@ def newArrsDict(newDict,oldDict):
 
     for key in newDict:
 
-        if(newDict[key] == oldDict[key]):
+        if(newDict[key] == oldDict.get(key,0)):
             continue
 
         xVals.append(key)
@@ -72,7 +76,7 @@ if(len(saveObj) > 0):
         "data": [Bar(x=xVals, y=yVals)],
         "layout": Layout(title="1 Day Diff from : " + str((date.today() - timedelta(1))) + "  to  " + str(date.today()))
 
-    }, filename="oneDayDiff.html")
+    }, filename="oneDayDiff.html",auto_open=False)
 
 if(len(saveObj) > 7):
     arrVals = newArrsDict(newVals, saveObj[-7])
@@ -82,7 +86,7 @@ if(len(saveObj) > 7):
         "data": [Bar(x=xVals, y=yVals)],
         "layout": Layout(title="1 Day Diff from : " + str((date.today() - timedelta(7))) + "  to  " + str(date.today()))
 
-    }, filename="oneWeekDiff.html")
+    }, filename="oneWeekDiff.html",auto_open=False)
 
 if(len(saveObj) > 30):
     arrVals = newArrsDict(newVals, saveObj[-30])
@@ -92,7 +96,7 @@ if(len(saveObj) > 30):
         "data": [Bar(x=xVals, y=yVals)],
         "layout": Layout(title="1 Day Diff from : " + str((date.today() - timedelta(30))) + "  to  " + str(date.today()))
 
-    }, filename="oneMonthDiff.html")
+    }, filename="oneMonthDiff.html",auto_open=False)
 
 saveObj.append(newVals);
 
