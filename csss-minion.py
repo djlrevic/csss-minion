@@ -34,21 +34,21 @@ configFile = "botMain.settings"
 
 #check if config file exists, if not, input manually
 if not os.path.isfile(configFile):
-    logger.warning("ConfigFile not found. Exiting.")
-    sys.exit(1);
-
-#Load the config file
-config = configparser.ConfigParser()
-config.read(configFile)
-description = config.get("Discord", "Description")
-DISCORD_API_ID = config.get("Discord", "API_ID")
-token = config.get("Discord", "Token")
-ip = "172.93.48.238:25565"
-wolframid = config.get("Wolfram", "TokenId")
-postgrespass = config.get("Postgres", "Password")
-local_postgres_pw = config.get("LocalPG", 'Password')
-mashape_key = config.get("Mashape", "Token")
-imgur_id = config.get("Imgur", "client_id")
+    logger.warning("ConfigFile not found.")
+    token = getpass.getpass("Bot Token: ")
+else:
+    #Load the config file
+    config = configparser.ConfigParser()
+    config.read(configFile)
+    description = config.get("Discord", "Description")
+    DISCORD_API_ID = config.get("Discord", "API_ID")
+    token = config.get("Discord", "Token")
+    ip = "172.93.48.238:25565"
+    wolframid = config.get("Wolfram", "TokenId")
+    postgrespass = config.get("Postgres", "Password")
+    local_postgres_pw = config.get("LocalPG", 'Password')
+    mashape_key = config.get("Mashape", "Token")
+    imgur_id = config.get("Imgur", "client_id")
 
 startup_extensions = ["levels", "classes", "misc", "info", "spellcheck", "poem", "dictionary", "wiki", "roullette", "urbandict", "youtubesearch", "duck","tunes", "imgur", "memes","sfusearch", "outlines", "roads", "announce","translate", "remindme", "modtools"]
 
@@ -115,10 +115,7 @@ async def exc(ctx, *args):
         await bot.say("You ain't my master! Shoo!")
 
 def Henry(ctx):
-    if ctx.message.author.id == "173702138122338305":
-        return True
-    else:
-        return False or sys.argv[1] == "test"
+    return ctx.message.author.id == "173702138122338305" or sys.argv[1] == "test"
 
 async def embed_this_for_me(text, ctx):
     """Standardized embeddings across cogs"""
