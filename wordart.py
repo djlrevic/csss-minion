@@ -171,7 +171,7 @@ class WordArt:
         # idk how it subscribes to the event... but it works!
     async def on_message(self, message):   
         cur = self.bot.conn_wc.cursor()
-        query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s)"
+        query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s) ON CONFLICT DO NOTHING"
         data = (message.author.id, message.content, message.timestamp)
         try:
             cur.execute(query, data)
@@ -179,7 +179,7 @@ class WordArt:
         #except psycopg2.IntegrityError as e:
             print("error type", type(e))
             print("on_message integrity error: ", e)
-            print("Rolling back the transaction...")
+            print("This error should never pop up anymore. Rolling back the transaction...")
             self.bot.conn_wc.rollback()
         self.bot.conn_wc.commit()
         cur.close()
