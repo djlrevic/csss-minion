@@ -1,0 +1,22 @@
+[Discord]
+Description: unimportant
+API_ID: also unimportant
+Token:
+
+[Wolfram]
+TokenId:
+
+[Postgres]
+Password:
+
+[LocalPG]
+Password:
+
+[Imgur]
+client_id:
+
+[Mashape]
+Token:
+
+[Translate]
+url:

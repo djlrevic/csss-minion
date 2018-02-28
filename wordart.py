@@ -14,7 +14,7 @@ import time
 import asyncio
 import decimal
 from collections import Counter
-#opencv-python is a dependency 
+#opencv-python is a dependency
 
 #note to self... this will need refactoring one day. That day is not today.
 
@@ -47,13 +47,14 @@ class WordArt:
     e = "wordart_dir"
     serverCache = None
     serverImage = path.join(d,e, "server.png")
-    
-       
+
+
     def __init__(self, bot):
         start = time.time()
         self.bot = bot
+        self.bot.conn_wc = psycopg2.connect("port='5432' user='csss_minion' host='localhost' password='"+bot.local_postgres_pw+"'") # second connection for wordcloud cog
         cur = self.bot.conn_wc.cursor()
-        
+
         query = "CREATE TABLE IF NOT EXISTS "+self.tablename+"(user_id bigint, msgs varchar(2000), date text, UNIQUE(user_id, date))" # create table if doesn't exist
         try:
             cur.execute(query)
@@ -64,7 +65,7 @@ class WordArt:
         print("Populating caches, prepare for major lagspike")
         self.populateCaches()
         print("wordart took "+str(time.time()-start)+" seconds to initalize.")
-    
+
     @commands.command(pass_context=True)
     async def clearspam(self, ctx):
         cur = self.bot.conn_wc.cursor()
@@ -77,9 +78,9 @@ class WordArt:
         self.bot.conn_wc.commit()
         cur.close()
         await self.bot.edit_message(msg, "Spam is cleared your mightyness")
-    
-    
-    
+
+
+
     # populates a word and image cache for the server's wordcloud
     # calls are limited to __init__, nos, and henry
     def populateCaches(self):
@@ -101,7 +102,7 @@ class WordArt:
         print("generating word cloud")
         wc = WordCloud(width=1024, height=1024, max_words=200000, stopwords=self.STOPWORDS).generate(text) # take it to the limit
         wc.to_file(self.serverImage)
-    
+
     @commands.command(pass_context=True)
     async def top10(self, ctx):
         test = " ".join(self.serverCache).lower()
@@ -115,17 +116,17 @@ class WordArt:
         for i in test.split():
             if(len(i) < 50):
                 small.append(i)
-        
+
         r = list(filter(lambda x: x not in self.STOPWORDS, small))
         r = Counter(r).most_common()
         msg = ""
         for rank in r[:10]:
-            msg += str(rank[1])            
+            msg += str(rank[1])
             msg += "\t\t"
             msg += rank[0]
             msg += "\n"
         await self.bot.embed_this_for_me(msg, ctx)
-    
+
     @commands.command(pass_context=True)
     async def mytop10(self, ctx):
         words = self.wordsFromDB(ctx.message.author)
@@ -138,13 +139,13 @@ class WordArt:
         r = Counter(r).most_common()
         msg = ""
         for rank in r[:10]:
-            msg += str(rank[1])            
+            msg += str(rank[1])
             msg += "\t\t"
             msg += rank[0]
             msg += "\n"
-        await self.bot.embed_this_for_me(msg, ctx)    
-    
-       
+        await self.bot.embed_this_for_me(msg, ctx)
+
+
        # open DB and retrieve messages from a userID
     def wordsFromDB(self, author):
         try:
@@ -155,21 +156,21 @@ class WordArt:
             arr = []
             for i in range(0, len(entries)):
                 arr.append(entries[i][0])
-            return arr           
+            return arr
         except Exception as e:
             print("Something broke. Printing error message: ", e)
             return self.backupArr
-        
+
     def createImage(self, arr, saveName):
         text = " ".join(arr)
         savedir = path.join(self.d,self.e, saveName) # local image gets overwritten each time. will this break if too many requests?
         wc = WordCloud(max_words=20000, stopwords=self.STOPWORDS).generate(text)
         wc.to_file(savedir)
         return savedir
-        
-        
+
+
         # idk how it subscribes to the event... but it works!
-    async def on_message(self, message):   
+    async def on_message(self, message):
         cur = self.bot.conn_wc.cursor()
         query = "INSERT INTO "+self.tablename+" VALUES (%s,%s,%s) ON CONFLICT DO NOTHING"
         data = (message.author.id, message.content, message.timestamp)
@@ -188,12 +189,12 @@ class WordArt:
     async def avatart(self, ctx, *args):
         """Make a wordcloud in the shape of your avatar.
         usage: !avatart <invert> <bgcolor>
-        
+
         """
         fmt = "Making artwork {}, hold your horses!"
         msg = await self.bot.say(fmt.format(ctx.message.author.mention))
         fin_img = path.join(self.d,self.e,"fin.png")
-        
+
         # this whole block is lol
         if len(args) >= 2:
             if args[0] == "yes" or args[0] == "true" or args[0] == "invert":
@@ -217,7 +218,7 @@ class WordArt:
                 thresh = cv2.THRESH_BINARY
         else:
             thresh = cv2.THRESH_BINARY
-            bg_colour = "white"     
+            bg_colour = "white"
         ava = ctx.message.author.avatar_url # grab avatar URL
         try:
             if ava == "":
@@ -226,12 +227,12 @@ class WordArt:
                 img = cv2.imread(path.join(self.d,self.e,"default_avatar.jpg"),1)
             else:
                 img_data = requests.get(ava, stream=True).content #dl from dat url
-                img = cv2.imdecode(np.frombuffer(img_data, np.uint8),1) # convert from string butter to uint8    
-        
+                img = cv2.imdecode(np.frombuffer(img_data, np.uint8),1) # convert from string butter to uint8
+
             img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) # grayscale that motha
             ret,img_bw = cv2.threshold(img_gray,127,255, thresh) #threshold values
             scaled = cv2.resize(img_bw, (1024,1024), interpolation = cv2.INTER_LINEAR)
-        
+
             word = self.wordsFromDB(ctx.message.author) # retrieve words from DB
             text = " ".join(word)
             avatar_mask = np.array(scaled) # create mask
@@ -242,7 +243,7 @@ class WordArt:
             await self.bot.delete_message(msg)
         except:
             await self.bot.say("```Something has gone horribly wrong.```")
-        
+
 
 
     # only refresh cache if an authorized ID
@@ -272,6 +273,6 @@ class WordArt:
         words = self.wordsFromDB(ctx.message.author)
         filename = self.createImage(words, "wow.png")
         await self.bot.send_file(ctx.message.channel,filename,content=ctx.message.author.mention)
-        
+
 def setup(bot):
     bot.add_cog(WordArt(bot))
