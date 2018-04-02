@@ -1,11 +1,20 @@
 # csss-minion
 
-The csss-minion bot is programmed by Henry Zhou (henrymzhou) using Python 3 and discord.py for SFU's Computing Science Student Society. The bot accepts user input from Discord chat channels and runs a script to execute the command. Commands available include WolframAlpha math functions, grouping users by courses, and admin commands. Valid inputs are processed by the bot and the specific command is executed. The bot then displays the command output to the user. When an invalid input is detected, the bot sends feedback to the user indicating the command does not exist.
+# Information: #
 
-TODO: Explain COGS
+The csss-minion bot is maintained by Henry Zhou (henrymzhou) using Python 3 and discord.py for SFU's Computing Science Student Society. The bot accepts user input from Discord chat channels and runs a script to execute the command. Commands available include WolframAlpha math functions, Google Translate functionality, and administrative commands. Valid inputs are processed by the bot and the specific command is executed. The bot then displays the command output to the user. When an invalid input is detected, the bot sends feedback to the user indicating the command does not exist.
 
+This bot supports ranks by giving users EXP every time they participate in chat. There are also custom ranks that users can place themselves in to add themselves to classes, allowing a user to find other students in their classes. 
 
-#Bot Setup:#
+The bot also supports audio playback of music, which can be added from any YouTube video. 
+
+A user can add a "cog", which is a additional file that has custom implementation to expand the use of the bot. The bot has built-in load and unloading of cogs available through its commands.
+
+A complete list of commands in listed below, and can also be found using the `.help` command.
+
+This bot is covered under the GPL-2.0 License.
+
+# Bot Setup: #
 
 Duplicate `botMain.settings.sample` as `botMain.settings` and add your own discord bot token. Afterwards, run the bot using `python3 csss-minion.py test`. The `test` argument skips
 loading all cogs and allows anyone to use commands usually restricted to Henry.
@@ -18,9 +27,9 @@ Source Code
 https://github.com/henrymzhao/csss-minion/
 
 
-#Commands:#
+# Commands: #
 
-##Administrative Commands:##
+## Administrative Commands: ##
 
 These commands are available to moderation and administrative users. Often these are back end commands that allow for the deletion of messages, the locking and unlocking of channels, and the loading and unloading of cogs for the bot.
 
@@ -409,6 +418,8 @@ Usage: .youtube "Never Gonna Give You Up"
 
 ## Music Commands: ##
 
+These commands are to control the bot's behaviour when playing music. This includes adding songs to the queue, pausing and resuming music, and moving which channel the bot is in.
+
 **.bump <index>**
 
 Vote to bump the indexed song to the front.
@@ -488,6 +499,8 @@ Sets the volume of the currently playing song.
 Usage: .volume 50
 
 ## Rank Commands: ##
+
+These commands are to control the custom user ranks. These commands include giving EXP to users, adding and removing users from ranks, and the creation of a custom ranks.
 
 **.gexp <user> <amount>**
 
