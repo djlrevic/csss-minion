@@ -2,12 +2,25 @@
 
 The csss-minion bot is programmed by Henry Zhou (henrymzhou) using Python 3 and discord.py for SFU's Computing Science Student Society. The bot accepts user input from Discord chat channels and runs a script to execute the command. Commands available include WolframAlpha math functions, grouping users by courses, and admin commands. Valid inputs are processed by the bot and the specific command is executed. The bot then displays the command output to the user. When an invalid input is detected, the bot sends feedback to the user indicating the command does not exist.
 
-TODO: Explain COGS, explain help
+TODO: Explain COGS
 
 
-# Commands: #
+#Bot Setup:#
 
-## Administrative Commands: ##
+Duplicate `botMain.settings.sample` as `botMain.settings` and add your own discord bot token. Afterwards, run the bot using `python3 csss-minion.py test`. The `test` argument skips
+loading all cogs and allows anyone to use commands usually restricted to Henry.
+
+Loading any cog is possible with `.load <cog>`, and listing available cogs can be done with `.cogs`.
+
+The bot's `.help` command will list all the currently implemented commands, listed in greater detail below.
+
+Source Code
+https://github.com/henrymzhao/csss-minion/
+
+
+#Commands:#
+
+##Administrative Commands:##
 
 These commands are available to moderation and administrative users. Often these are back end commands that allow for the deletion of messages, the locking and unlocking of channels, and the loading and unloading of cogs for the bot.
 
@@ -531,16 +544,3 @@ Usage: .stats
 Lists people in the discord role/class provided.
 
 Usage: whois <cmpt376>
-
-There are currently 5 commands available, and more commands will be added in future updates.
-
-# How to set up for testing.
-
-Duplicate `botMain.settings.sample` as `botMain.settings`, then add your own discord bot token. Then run the bot using `python3 csss-minion.py test`. The `test` argument skips
-loading all cogs and allows anyone to use commands usually restricted to Henry.
-
-You can load any cog you like with `.load <cog>` and list available cogs with `.cogs`.
-
-
-Source Code
-https://github.com/henrymzhao/csss-minion/
