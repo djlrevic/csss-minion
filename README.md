@@ -2,50 +2,102 @@
 
 The csss-minion bot is programmed by Henry Zhou (henrymzhou) using Python 3 and discord.py for SFU's Computing Science Student Society. The bot accepts user input from Discord chat channels and runs a script to execute the command. Commands available include WolframAlpha math functions, grouping users by courses, and admin commands. Valid inputs are processed by the bot and the specific command is executed. The bot then displays the command output to the user. When an invalid input is detected, the bot sends feedback to the user indicating the command does not exist.
 
+TODO: Explain COGS
+
 
 # Commands: #
 
-## Admin Commands: ##
+## Administrative Commands: ##
 
-.announce <title> <desc> 
-Make an announcement
-Usage: announce <title> <body>
-Restricted command
+These commands are available to moderation and administrative users. Often these are back end commands that allow for the deletion of messages, the locking and unlocking of channels, and the loading and unloading of cogs for the bot.
 
-.clear <amount> (ADMIN)
-Clear set amount of messages
+###.announce <title> <desc>###
 
-.clearspam (ADMIN) Clears the spam
+Makes an announcement.
 
-.cogs (ADMIN)
+Usage: .announce <title> <body>
+
+###.clear <amount>###
+
+Clears set amount of messages above current messages.
+
+Usage: .clear 50
+
+###.clearspam###
+
+Clears the spam.
+
+Usage: .clearspam
+
+###.cogs ###
+
 Lists the currently loaded cogs.
 
-.exc [args...] (ADMIN) Execute a bash command
+Usage: .cogs
 
-.load <name> (ADMIN) Loads a cog.
+###.exc [args...]###
 
-.modsay [msg...] (ADMIN)
-Give a stern message.
-Heavily inspired by brenfan's .em code <3
+Execute a bash command
 
-.propagateMute Adds the Muted role to every channel, maintaining universal control and ruleset for muted role
+Usage: .exc ls -a
 
-.refreshCache 
+###.load <name> ###
+
+Loads a cog.
+
+Usage: .load Announce
+
+###.lock ###
+
+Locks current channel.
+
+Usage: .lock
+
+###.modsay [msg...]###
+
+Give a stern message (Heavily inspired by brenfan's .em code <3).
+
+Usage: .modsay "This is a stern message."
+
+###.propagateMute ###
+
+Adds the Muted role to every channel, maintaining universal control and ruleset for muted role
+
+Usage: .propagateMute
+
+###.refreshCache ###
+
 Refresh the server wordart cache. 
 
-.reload <name>  (ADMIN) Reloads the cogs.
+Usage: .refreshCache
+
+###.reload <name>###
+
+Reloads the cogs.
+
+Usage: .reload Announce
  
-.restrict (ADMIN) (not yet implemented) restricts a user from posting in a channel
+###.restrict <user> (not yet implemented)###
 
-.unload <name> (ADMIN) Unloads a cog.
+Restricts a user from posting in a channel
 
-.unlock (ADMIN)
+Usage: .restrict <John Doe>
+
+###.unload <name>###
+
+Unloads a cog.
+
+Usage: .unload Announce
+
+###.unlock###
+
 Unlocks the current channel.
 
-.unrestrict [msg...] Undo any restrictions on a user for all channels. Usage: !unrestrict [users..] (ADMIN) (not yet implemented)
+###.unrestrict [msg...] (not yet implemented)###
 
+Undo any restrictions on a user for all channels. 
 
-
+Usage: !unrestrict [users..]
 
 ## Miscellaneous Commands: ##
 
@@ -59,7 +111,7 @@ Return the antonym of a word
 Make a wordcloud in the shape of your avatar.
 usage: .avatart <invert> <bgcolor>
 
-.beep (MISC) Same ass ping/pong
+.beep (MISC) Same as ping/pong
 
 .ding (MISC) Same as ping/pong
 
