@@ -506,15 +506,31 @@ Usage: .volume 50
 
 ## Rank Commands: ##
 
-.gexp <user> <amount> (EXP) gives exp to user
+**.gexp <user> <amount>**
 
-.levels (EXP) Shows the list of users by rank
+Gives input amount of EXP to given user.
 
-.rank (EXP) Displays your current rank on the server
+Usage: .gexp Henry 100
 
-.stats (EXP) (BROKEN) Shows EXP changes in the past amount of time. 
+**.levels**
 
+Shows the list of users sorted by rank
 
+Usage: .levels
+
+**.rank**
+
+Displays your current rank on the server
+
+Usage: .rank
+
+**.stats**
+
+Shows EXP changes in the past amount of time. 
+
+Usage: .stats
+
+*Currently broken*
 
 There are currently 5 commands available, and more commands will be added in future updates.
 
