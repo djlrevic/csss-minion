@@ -426,44 +426,83 @@ Usage: .youtube "Never Gonna Give You Up"
 
 ## Music Commands: ##
 
-.bump (MUSIC)
-vote to bump the indexed song to the front.
+**.bump <index>**
 
-.join <channel> (MUSIC) (SIMILAR TO SUMMON)
-Joins a voice channel.
+Vote to bump the indexed song to the front.
 
-.pause (MUSIC)
+Usage: .bump 2
+
+**.join <channel>**
+
+Makes the bot join a voice channel to play music.
+
+Usage: .join General
+
+**.pause**
+
 Pauses the currently played song.
 
-.play <song> (MUSIC)
-Plays a song.
-If there is a song currently in the queue, then it is
+Usage: .pause
+
+**.play <song>**
+
+Plays a song. If there is a song currently in the queue, then it is
 queued until the next song is done playing.
 This command automatically searches as well from YouTube.
-The list of supported sites can be found here:
-https://rg3.github.io/youtube-dl/supportedsites.html
 
-.playmsg <msg> (MUSIC)
-Change minion's playing message
-Usage: playing <msg>
+Usage: .play "The Sun Roars Into View"
 
-.playing Shows info about the currently played song. MUSIC
+*The list of supported sites can be found here:
+https://rg3.github.io/youtube-dl/supportedsites.html*
 
-.queue (MUSIC)
-shows songs in the current queue
+**.playmsg <msg>**
 
-.resume (MUSIC)
-Resumes the currently played song.
+Changes the bot's playing message
 
-.skip (MUSIC)
-Vote to skip a song. The song requester can automatically skip.
+Usage: .playing <msg>
+
+**.playing**
+
+Shows information about the currently played song.
+
+Usage: .playing
+
+**.queue**
+
+Shows songs in the current queue.
+
+Usage: .queue
+
+**.resume**
+
+Resumes the currently playing song.
+
+Usage: .resume
+
+**.skip**
+
+Vote to skip the current song. The song requester can automatically skip.
 3 skip votes are needed for the song to be skipped.
 
-.stop Stops playing audio and leaves the voice channel. This also clears the queue. MUSIC
+Usage: .skip
 
-.summon Summons the bot to join your voice channel. (PLAYS MUSIC IF) MUSIC
+**.stop**
 
-.volume <value> Sets the volume of the currently playing song. MUSIC
+Stops playing audio and leaves the voice channel. This also clears the queue.
+
+Usage: .stop
+
+**.summon**
+
+Make the bot join your current voice channel. Plays music if there is music in the queue.
+
+Usage: .summon
+
+**.volume <value>**
+
+Sets the volume of the currently playing song.
+
+Usage: .volume 50
 
 ## Rank Commands: ##
 
