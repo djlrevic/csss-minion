@@ -2,7 +2,7 @@
 
 The csss-minion bot is programmed by Henry Zhou (henrymzhou) using Python 3 and discord.py for SFU's Computing Science Student Society. The bot accepts user input from Discord chat channels and runs a script to execute the command. Commands available include WolframAlpha math functions, grouping users by courses, and admin commands. Valid inputs are processed by the bot and the specific command is executed. The bot then displays the command output to the user. When an invalid input is detected, the bot sends feedback to the user indicating the command does not exist.
 
-TODO: Explain COGS
+TODO: Explain COGS, explain help
 
 
 # Commands: #
@@ -11,89 +11,95 @@ TODO: Explain COGS
 
 These commands are available to moderation and administrative users. Often these are back end commands that allow for the deletion of messages, the locking and unlocking of channels, and the loading and unloading of cogs for the bot.
 
-###.announce <title> <desc>###
+**.announce <title> <desc>**
 
 Makes an announcement.
 
 Usage: .announce <title> <body>
 
-###.clear <amount>###
+**.clear <amount>**
 
 Clears set amount of messages above current messages.
 
 Usage: .clear 50
 
-###.clearspam###
+**.clearspam**
 
 Clears the spam.
 
 Usage: .clearspam
 
-###.cogs ###
+**.cogs **
 
 Lists the currently loaded cogs.
 
 Usage: .cogs
 
-###.exc [args...]###
+**.em [desc...]**
+
+Make an embedded message.
+
+Usage: .em <message>
+
+**.exc [args...]**
 
 Execute a bash command
 
 Usage: .exc ls -a
 
-###.load <name> ###
+**.load <name> **
 
 Loads a cog.
 
 Usage: .load Announce
 
-###.lock ###
+**.lock **
 
 Locks current channel.
 
 Usage: .lock
 
-###.modsay [msg...]###
+**.modsay [msg...]**
 
 Give a stern message (Heavily inspired by brenfan's .em code <3).
 
 Usage: .modsay "This is a stern message."
 
-###.propagateMute ###
+**.propagateMute **
 
 Adds the Muted role to every channel, maintaining universal control and ruleset for muted role
 
 Usage: .propagateMute
 
-###.refreshCache ###
+**.refreshCache **
 
 Refresh the server wordart cache. 
 
 Usage: .refreshCache
 
-###.reload <name>###
+**.reload <name>**
 
 Reloads the cogs.
 
 Usage: .reload Announce
  
-###.restrict <user> (not yet implemented)###
+**.restrict <user> (not yet implemented)**
 
 Restricts a user from posting in a channel
 
 Usage: .restrict <John Doe>
 
-###.unload <name>###
+**.unload <name>**
 
 Unloads a cog.
 
 Usage: .unload Announce
 
-###.unlock###
+**.unlock**
 
 Unlocks the current channel.
 
-###.unrestrict [msg...] (not yet implemented)###
+**.unrestrict [msg...] (not yet implemented)**
 
 Undo any restrictions on a user for all channels. 
 
@@ -101,65 +107,137 @@ Usage: !unrestrict [users..]
 
 ## Miscellaneous Commands: ##
 
-.allreminders (MISC) 
-list all the active reminders. Does not list reminders from remindmein.
+These are miscellaneous commands that add more character to the bot. These commands range from queries to DuckDuckGo and WolframAlpha, to posting cute cat pictures and wordart clouds.
 
-.antonym <word> (MISC) 
-Return the antonym of a word
+**.allreminders**
 
-.avatart [args...] (MISC)
-Make a wordcloud in the shape of your avatar.
-usage: .avatart <invert> <bgcolor>
+Lists all the active reminders. Does not list reminders from remindmein.
 
-.beep (MISC) Same as ping/pong
+Usage: .allreminders
 
-.ding (MISC) Same as ping/pong
+**.antonym <word> **
 
-.doraemon (Shows cat picture) MISC
+Returns a few antonyms of a given word.
 
-.eggplant (MISC) Prints "My eggplant brings all the boys to the yard"
-And they're like, it's better than yours
+Usage: .antonym clever
 
-.eggwrite [msg...] (MISC) (Only working with letters)
-Use the bot to write with eggplant emojis!
+**.avatart [args...]**
 
-.em [desc...] (MISC)
-Make an embedded message
-Usage: em <body>
-Restricted command
+Makes a wordcloud in the shape of your avatar.
 
-.gameR None (NOTHING?) Starts the roulette game
+Usage: .avatart <invert> <bgcolor>
 
-.goodluck (MISC) Shows a photo of a thumbs up eggplant
-Wish someone good luck
+**.beep**
 
-### .help ###
+Returns the message "boop". Useful when seeing if the bot is alive. Similar to .ding and .ping.
+
+Usage: .beep
+
+**.ding**
+
+Returns the message "dong". Useful when seeing if the bot is alive. Similar to .beep and .ping.
+
+Usage: .ding
+
+**.doraemon**
+
+Shows a cute cat picture.
+
+Usage: .doraemon
+
+**.eggplant**
+
+Prints "My eggplant brings all the boys to the yard."
+
+Usage: .eggplant
+
+*And they're like, it's better than yours*
+
+**.eggwrite [msg...] **
+
+Use the bot to write with eggplant emojis.
+
+Usage: .eggwrite "This is a message."
+
+*Only works with letters*
+
+**.gameR **
+
+Starts the roulette game.
+
+Usage: .gameR
+
+**.goodluck **
+
+Shows a photo of an eggplant in the shape of a thumbs up, wishing someone good luck
+
+Usage: .goodluck
+
+** .help **
+
 The help command will display the information menu in the chat. This menu contains brief descriptions of all possible commands, and provides a link to the source code.
 
-### .help mc ###
+Usage: .help
 
-This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to minecraft. Outside of the correct channel, it will display a message alerting the user to move to that channel.
+** .help mc **
 
-.henry (MISC) Posts a photo of people bowing to henry.
+This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to MineCraft. Outside of the correct channel, it will display a message alerting the user to move to that channel.
 
-.howoldami (MISC) Display when you joined the server
+Usage: .help mc
 
-### .iam \<course\> ###
+**.henry **
+
+Posts a photo of people bowing to Henry, the bot creator.
+
+Usage: .henry
+
+**.howoldami **
+
+Displays when you joined the server in days.
+
+Usage: .howoldami
+
+** .iam \<course\> **
+
 You can use this command to give yourself any roles that already exist, and consists of entirely lowercase letters or numbers. The \<class\> format follows the same rules as the .newclass command shown above. If the role you attempted to join does not exist, it will be created and you will be given it.
 
-.iamn <course> (MISC)
-Remove yourself from a discord class/role
-Usage: iamn <someclass>
+Usage: .iam "cmpt376"
 
-.imgur [word...] Search for a picture on imgur MISC
+**.iamn <course> **
 
-.impeach Impeach our dear leader (Shows photo of Henry) MISC
+Remove yourself from a discord class/role assigned by the **.iam** command
 
-.info (MISC) Displays the old minecraft server information
+Usage: .iamn <cmpt376>
 
-.joke (MISC) Displays a photo of a joke flying over henry's head
+**.imgur [word...] **
 
-.kms Don't (NOTHING?) (Nothing)
+Search for a picture on imgur MISC
+
+Usage: .imgur cat
+
+**.impeach **
+
+Posts a photo of Henry coming out of a giant peach.
+
+Usage: .impeach
+
+**.info**
+
+Displays the old MineCraft server information
+
+Usage: .info
+
+**.joke**
+
+Displays a photo of a joke flying over Henry's head
+
+Usage: .joke
+
+**.kms **
+
+Currently broken.
+
+Usage: .kms
 
 .meaning <word> (MISC)
 Return the meaning of a word
@@ -169,7 +247,7 @@ list only user's reminders
 
 .mytop10 (MISC) Displays your top 10 words on the server.
 
-### .newclass \<class\> ###
+** .newclass \<class\> **
 This command will create a new class role, and give you that role. The name of the role will either be the first word typed after the .newclass command, or will be the entire string between the first quotation marks. An example is shown below. It is also worth noting that all roles created using this command will be converted to lowercase for security reasons.
 
 .newclass <course> (MISC)
@@ -262,6 +340,9 @@ Make a wordcloud out of your most common words
 
 .youtube [query...] (MUSIC)
 Search for a youtube video
+
+
+
 
 ## Music Commands: ##
 
