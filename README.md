@@ -29,7 +29,7 @@ Clears the spam.
 
 Usage: .clearspam
 
-**.cogs **
+**.cogs**
 
 Lists the currently loaded cogs.
 
@@ -47,13 +47,13 @@ Execute a bash command
 
 Usage: .exc ls -a
 
-**.load <name> **
+**.load <name>**
 
 Loads a cog.
 
 Usage: .load Announce
 
-**.lock **
+**.lock**
 
 Locks current channel.
 
@@ -65,13 +65,13 @@ Give a stern message (Heavily inspired by brenfan's .em code <3).
 
 Usage: .modsay "This is a stern message."
 
-**.propagateMute **
+**.propagateMute**
 
 Adds the Muted role to every channel, maintaining universal control and ruleset for muted role
 
 Usage: .propagateMute
 
-**.refreshCache **
+**.refreshCache**
 
 Refresh the server wordart cache. 
 
@@ -115,7 +115,7 @@ Lists all the active reminders. Does not list reminders from remindmein.
 
 Usage: .allreminders
 
-**.antonym <word> **
+**.antonym <word>**
 
 Returns a few antonyms of a given word.
 
@@ -153,7 +153,7 @@ Usage: .eggplant
 
 *And they're like, it's better than yours*
 
-**.eggwrite [msg...] **
+**.eggwrite [msg...]**
 
 Use the bot to write with eggplant emojis.
 
@@ -161,61 +161,61 @@ Usage: .eggwrite "This is a message."
 
 *Only works with letters*
 
-**.gameR **
+**.gameR**
 
 Starts the roulette game.
 
 Usage: .gameR
 
-**.goodluck **
+**.goodluck**
 
 Shows a photo of an eggplant in the shape of a thumbs up, wishing someone good luck
 
 Usage: .goodluck
 
-** .help **
+**.help**
 
 The help command will display the information menu in the chat. This menu contains brief descriptions of all possible commands, and provides a link to the source code.
 
 Usage: .help
 
-** .help mc **
+**.help mc**
 
 This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to MineCraft. Outside of the correct channel, it will display a message alerting the user to move to that channel.
 
 Usage: .help mc
 
-**.henry **
+**.henry**
 
 Posts a photo of people bowing to Henry, the bot creator.
 
 Usage: .henry
 
-**.howoldami **
+**.howoldami**
 
 Displays when you joined the server in days.
 
 Usage: .howoldami
 
-** .iam \<course\> **
+**.iam \<course\>**
 
 You can use this command to give yourself any roles that already exist, and consists of entirely lowercase letters or numbers. The \<class\> format follows the same rules as the .newclass command shown above. If the role you attempted to join does not exist, it will be created and you will be given it.
 
 Usage: .iam "cmpt376"
 
-**.iamn <course> **
+**.iamn <course>**
 
 Remove yourself from a discord class/role assigned by the **.iam** command
 
 Usage: .iamn <cmpt376>
 
-**.imgur [word...] **
+**.imgur [word...]**
 
 Search for a picture on imgur MISC
 
 Usage: .imgur cat
 
-**.impeach **
+**.impeach**
 
 Posts a photo of Henry coming out of a giant peach.
 
@@ -233,116 +233,196 @@ Displays a photo of a joke flying over Henry's head
 
 Usage: .joke
 
-**.kms **
+**.kms**
 
 Currently broken.
 
 Usage: .kms
 
-.meaning <word> (MISC)
-Return the meaning of a word
+**.meaning <word>**
 
-.myreminders (MISC)
-list only user's reminders
+Returns the definition of the given word.
 
-.mytop10 (MISC) Displays your top 10 words on the server.
+Usage: .meaning life
 
-** .newclass \<class\> **
+**.myreminders**
+
+Lists only user's own reminders
+
+Usage: .myreminders
+
+**.mytop10**
+
+Displays your top 10 words on the server.
+
+Usage: .mytop10
+
+**.newclass \<class\>**
+
 This command will create a new class role, and give you that role. The name of the role will either be the first word typed after the .newclass command, or will be the entire string between the first quotation marks. An example is shown below. It is also worth noting that all roles created using this command will be converted to lowercase for security reasons.
 
-.newclass <course> (MISC)
-Create a new discord class/role
-Usage: newclass <someclass>
-Creating a class/role places you in that class/role
+Usage: 
+
+.newclass cmpt376 = a new role with the name "cmpt376"
 
 .newclass one two three = a new role with the name "one."
+
 .newclass "one two three" = a new role with the name "one two three."
 
-.outline [args...] (MISC)
+**.outline [args...]**
+
 Display an SFU course's outline
+
 Usage: outline <department> <number> (section) (year) (semester)
 
-.ping (MISC) Replys with pong
+**.ping**
 
-.playmsg <msg> (MUSIC)
-Change minion's playing message
-Usage: playing <msg>
+Returns the message "pong". Useful when seeing if the bot is alive. Similar to .beep and .ding.
 
-.poem [args...] Searches for a poem usage: !poem <title> <author> <length> (PMs you the poem) MISC
+Usage: .ping
 
-.poll [args...] (MISC)
-Create an instant poll
-Usage: poll <subject> [choices]...
-Defaults to yes/no if no choices supplied.
+**.poem [args...]**
 
-.prettygood (MISC) Photo of a man saying "Heyyyy, that's pretty good"
+Searches for a poem and private messages it to the user.
 
-.remindme [word...] (MISC)
-remind the user to do some thing at some time.
-usage: !remindme "hang the cat to dry" 2017 8 5
-format: year month day [hour] [minute] [second]
+Usage: !poem <title> <author> <length>
 
-.remindmein [word...] (MISC)
-usage: remindmein 2 days 'do that thing'
+**.poll [args...]**
 
-.roads [args...] (MISC)
-Display road conditions for SFU
-Usage: roads <city>
+Create an instant poll. Defaults to yes/no if no choices supplied.
 
-.search [query...] (MISC)
-Search the internet using DuckDuckGo!
+Usage: .poll <subject> [option 1]...[option N]
 
-.servart (MISC)
+**.prettygood**
+
+Photo of a man saying "Heyyyy, that's pretty good"
+
+Usage: .prettygood
+
+**.remindme [words] [time]**
+
+Reminds the user to do some thing at the given time. Format: YYYY MM DD [HH] [mm] [ss]
+
+Usage: .remindme "hang the cat to dry" 2017 8 5
+
+**.remindmein [time] [words]**
+
+Reminds the user to do some thing at the given time.
+
+Usage: .remindmein 2 days "do that thing"
+
+**.roads [campus]**
+
+Display road conditions for SFU. Campus must be an SFU campus.
+
+Usage: .roads <campus>
+
+**.search [query...]**
+
+Search the Internet using DuckDuckGo.
+
+Usage: .search "cute cats"
+
+**.servart**
+
 Make a wordcloud out of the server's most common words.
 
-.sfu [words...] (MISC)
-Lookup an SFU class
-usage: !sfu <cmpt120> or !sfu <cmpt> <120>
+Usage: .servart
 
-.status (MISC) (DEAD COMMAND)
-Display the number of players on the minecraft server
+**.sfu [words...]**
 
-.stealthegg (MISC) (Puts an eggplant in chat)
+Lookup an SFU class' information. Includes class calendar page.
 
-.spell <word> Check your spelling MISC
+Usage: .sfu <cmpt120> or .sfu <cmpt> <120>
 
-.synonym <word> (MISC)
-Return the synonym of a word
+**.status**
 
-.top10 (MISC) Displays the top 10 words on the server.
+Display the number of players on the MineCraft server
 
-.translate [args...] (MISC)
-Translate a string into a specified language!
-usage: !translate <target> (source)
-example translate into spanish: <!translate "I like cheese" es>
-To specify source language, include a third arg:
+Usage: .status
+
+*Dead Command*
+
+**.stealthegg**
+
+Puts an eggplant emoji in chat.
+
+Usage: .stealthegg
+
+**.spell <word>**
+
+Check your spelling of the given word.
+
+Usage: .spell wierd
+
+**.synonym <word>**
+
+Returns the synonym of a word
+
+Usage: .synonym clever
+
+**.top10**
+
+Displays the top 10 words on the server.
+
+Usage: .top10
+
+**.translate "message" <target> (source)**
+
+Translate a string into a specified language. To specify source language, include a third arg.
+
+Usage: 
+
+.translate "message" <target> (source)
+
+Example of a translation into Spanish: <!translate "I like cheese" es>
+
 !translate "Je suis formé à la guerre de Nerf et j'ai le plus d'étoiles d'or dans toute la classe maternelle." en fr
-Supported languages and language codes listed on this webpage
-https://cloud.google.com/translate/docs/languages
 
-.triggered When someone has a mildly different opinion. (Shows angry face GIF) MISC
+*Supported languages and language codes listed on this webpage
+https://cloud.google.com/translate/docs/languages*
 
-.urban [msg...] (MISC) Queries urban dictionary for the entry you provide
-Lookup some jargon from the urban dictionary.
+**.triggered**
 
-.whois <course> (MISC)
-List people in a discord class/role
-Usage: whois <someclass>
+Posts a GIF of an angry face in chat.
 
-.wiki [msg...] Look up a subject on wikipedia (MISC)
+Usage: .triggered
 
-.wolf [args...] (MISC)
-Get wolfram alpha to help with your homework
-Usage: wolf <query>
+**.urban [msg...]**
 
-.wordart (MISC)
-Make a wordcloud out of your most common words
+Queries urban dictionary for the entry you provide.
 
-.youtube [query...] (MUSIC)
+Usage: .urban hip
+
+**.whois <course>**
+
+Lists people in the discord role/class provided.
+
+Usage: whois <cmpt376>
+
+**.wiki [msg...]**
+
+Looks up the given input on Wikipedia.
+
+Usage: .wiki "wolf"
+
+**.wolf [args...]**
+
+Queries WolframAlpha with given input
+
+Usage: .wolf "How many cups are there in a quart?"
+
+**.wordart**
+
+Makes a wordcloud out of your most common words on the server.
+
+Usage: .wordart
+
+**.youtube [query...]**
+
 Search for a youtube video
 
-
-
+Usage: .youtube "Never Gonna Give You Up"
 
 ## Music Commands: ##
 
@@ -362,6 +442,10 @@ queued until the next song is done playing.
 This command automatically searches as well from YouTube.
 The list of supported sites can be found here:
 https://rg3.github.io/youtube-dl/supportedsites.html
+
+.playmsg <msg> (MUSIC)
+Change minion's playing message
+Usage: playing <msg>
 
 .playing Shows info about the currently played song. MUSIC
 
