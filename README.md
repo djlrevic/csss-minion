@@ -197,18 +197,6 @@ Displays when you joined the server in days.
 
 Usage: .howoldami
 
-**.iam \<course\>**
-
-You can use this command to give yourself any roles that already exist, and consists of entirely lowercase letters or numbers. The \<class\> format follows the same rules as the .newclass command shown above. If the role you attempted to join does not exist, it will be created and you will be given it.
-
-Usage: .iam "cmpt376"
-
-**.iamn <course>**
-
-Remove yourself from a discord class/role assigned by the **.iam** command
-
-Usage: .iamn <cmpt376>
-
 **.imgur [word...]**
 
 Search for a picture on imgur MISC
@@ -256,18 +244,6 @@ Usage: .myreminders
 Displays your top 10 words on the server.
 
 Usage: .mytop10
-
-**.newclass \<class\>**
-
-This command will create a new class role, and give you that role. The name of the role will either be the first word typed after the .newclass command, or will be the entire string between the first quotation marks. An example is shown below. It is also worth noting that all roles created using this command will be converted to lowercase for security reasons.
-
-Usage: 
-
-.newclass cmpt376 = a new role with the name "cmpt376"
-
-.newclass one two three = a new role with the name "one."
-
-.newclass "one two three" = a new role with the name "one two three."
 
 **.outline [args...]**
 
@@ -394,12 +370,6 @@ Queries urban dictionary for the entry you provide.
 
 Usage: .urban hip
 
-**.whois <course>**
-
-Lists people in the discord role/class provided.
-
-Usage: whois <cmpt376>
-
 **.wiki [msg...]**
 
 Looks up the given input on Wikipedia.
@@ -512,11 +482,35 @@ Gives input amount of EXP to given user.
 
 Usage: .gexp Henry 100
 
+**.iam \<course\>**
+
+You can use this command to give yourself any roles that already exist, and consists of entirely lowercase letters or numbers. The \<class\> format follows the same rules as the .newclass command shown above. If the role you attempted to join does not exist, it will be created and you will be given it.
+
+Usage: .iam "cmpt376"
+
+**.iamn <course>**
+
+Remove yourself from a discord class/role assigned by the **.iam** command
+
+Usage: .iamn <cmpt376>
+
 **.levels**
 
 Shows the list of users sorted by rank
 
 Usage: .levels
+
+**.newclass \<class\>**
+
+This command will create a new class role, and give you that role. The name of the role will either be the first word typed after the .newclass command, or will be the entire string between the first quotation marks. An example is shown below. It is also worth noting that all roles created using this command will be converted to lowercase for security reasons.
+
+Usage: 
+
+.newclass cmpt376 = a new role with the name "cmpt376"
+
+.newclass one two three = a new role with the name "one."
+
+.newclass "one two three" = a new role with the name "one two three."
 
 **.rank**
 
@@ -531,6 +525,12 @@ Shows EXP changes in the past amount of time.
 Usage: .stats
 
 *Currently broken*
+
+**.whois <course>**
+
+Lists people in the discord role/class provided.
+
+Usage: whois <cmpt376>
 
 There are currently 5 commands available, and more commands will be added in future updates.
 
