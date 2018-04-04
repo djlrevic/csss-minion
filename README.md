@@ -8,7 +8,7 @@ This bot supports ranks by giving users EXP every time they participate in chat.
 
 The bot also supports audio playback of music, which can be added from any YouTube video. 
 
-A user can add a "cog", which is a additional file that has custom implementation to expand the use of the bot. The bot has built-in load and unloading of cogs available through its commands.
+A user can add a "cog", which is an additional file that has custom implementation to expand the use of the bot. The bot has built-in load and unloading of cogs available through its commands.
 
 [A complete list of commands](COMMANDS.md)
 ; A list can also be found using the `.help` command.
