@@ -116,7 +116,7 @@ Usage: .antonym clever
 
 **.avatart [args...]**
 
-Makes a wordcloud in the shape of your avatar.
+Makes a word-cloud in the shape of your avatar.
 
 Usage: .avatart <invert> <bgcolor>
 
@@ -174,7 +174,7 @@ Usage: .help
 
 **.help mc**
 
-This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to MineCraft. Outside of the correct channel, it will display a message alerting the user to move to that channel.
+This can only be used within the #minecraft channel. When the command is used in correct channel, it will display commands specific to Minecraft. Outside of the correct channel, it will display a message alerting the user to move to that channel.
 
 Usage: .help mc
 
@@ -204,7 +204,7 @@ Usage: .impeach
 
 **.info**
 
-Displays the old MineCraft server information
+Displays the old Minecraft server information
 
 Usage: .info
 
@@ -294,7 +294,7 @@ Usage: .search "cute cats"
 
 **.servart**
 
-Make a wordcloud out of the server's most common words.
+Make a word-cloud out of the server's most common words.
 
 Usage: .servart
 
@@ -306,7 +306,7 @@ Usage: .sfu <cmpt120> or .sfu <cmpt> <120>
 
 **.status**
 
-Display the number of players on the MineCraft server
+Display the number of players on the Minecraft server
 
 Usage: .status
 
@@ -377,13 +377,13 @@ Usage: .wolf "How many cups are there in a quart?"
 
 **.wordart**
 
-Makes a wordcloud out of your most common words on the server.
+Makes a word-cloud out of your most common words on the server.
 
 Usage: .wordart
 
 **.youtube [query...]**
 
-Search for a youtube video
+Search for a Youtube video
 
 Usage: .youtube "Never Gonna Give You Up"
 
