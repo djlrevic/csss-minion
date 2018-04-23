@@ -11,7 +11,7 @@ class Devtools:
   @commands.command(pass_context=True)
   async def inspect(self, ctx):
     for role in ctx.message.author.roles:
-      if self.bot.Henry(ctx) or role.id == '321832268282855436': #bot devs
+      if self.bot.Henry(ctx) or role.id == 321832268282855436: #bot devs
         theObject = None
         if len(ctx.message.mentions) > 0:
           theObject = ctx.message.mentions[0]
@@ -20,7 +20,7 @@ class Devtools:
         elif len(ctx.message.role_mentions) > 0:
           theObject = ctx.message.role_mentions[0]
         else:
-          self.bot.say("I didn't understand what you are inspecting.")
+          await ctx.send("I didn't understand what you are inspecting.")
 
         if theObject is not None:
           items = []
@@ -29,7 +29,7 @@ class Devtools:
             attr = getattr(theObject, name)
             if 'object' not in str(attr) and 'method' not in str(attr):
               items.append([str(name), str(attr), False])
-          p = Pages(self.bot, message=ctx.message, entries = items, per_page=10)
+          p = Pages(self.bot, ctx=ctx, message=ctx.message, entries = items, per_page=10)
           p.embed = discord.Embed(title="Inspection Results", colour=discord.Colour(0xdc4643))
           p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
           p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
@@ -37,7 +37,7 @@ class Devtools:
 
           await p.paginate()
       else:
-        self.bot.say("You not a dev, shoo!")
+        await ctx.send("You not a dev, shoo!")
 
 def setup(bot):
   bot.add_cog(Devtools(bot))

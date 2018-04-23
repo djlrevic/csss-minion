@@ -8,6 +8,7 @@ from pagination import Pages
 class Info():
     def __init__(self, bot):
         self.bot = bot
+        self.bot.remove_command('help')  # so we can add our own!
 
     # Voting done, command disabled
     # @commands.command()
@@ -106,13 +107,16 @@ class Info():
             items = []
             print(type(self.bot.commands))
             for k in self.bot.commands: # grab all commands registered with the bot
-                com = self.bot.commands[k]
+                print(k)
+                print(type(k))
+                com = k
+                #com = self.bot.commands[k]
                 sig = self.get_command_signature(ctx,com) # grabs command signature
                 items.append([sig,com.help]) # append command signature and pydoc to list
 
 
             items.append(["Source Code", "https://github.com/henrymzhao/csss-minion/"]) # keep src as last entry
-            p = Pages(self.bot, message=ctx.message, entries = items, per_page=4)
+            p = Pages(self.bot, ctx=ctx, message=ctx.message, entries = items, per_page=4)
             p.embed = discord.Embed(title="CSSS-Minion Commands", colour=discord.Colour(0xdc4643),timestamp=datetime.datetime.utcfromtimestamp(1490339531))
             p.embed.set_thumbnail(url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
             p.embed.set_author(name="CSSS-Minion", icon_url="https://cdn.discordapp.com/app-icons/293110345076047893/15e2a6722723827ff9bd53ca787df959.jpg")
@@ -126,7 +130,7 @@ class Info():
     async def mc(self, ctx):
         """Display the help menu for the minecraft server"""
         if ctx.message.channel.name != "minecraft":
-            await self.bot.say("Please move to #minecraft for this command.")
+            await ctx.send("Please move to #minecraft for this command.")
         else:
             embed = discord.Embed(title="CSSS-Minion Minecraft Commands", colour=discord.Colour(
                 0xdc4643), timestamp=datetime.datetime.utcfromtimestamp(1490339531))
@@ -139,19 +143,19 @@ class Info():
             embed.add_field(name=".help mc", value="Displays this help menu.\n")
             embed.add_field(name=".status", value="Displays the current server status.\n")
             embed.add_field(name=".info", value="Information about how to connect to server.\n")
-            await self.bot.say(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.command(pass_context = True)
     async def status(self, ctx):
         """Display the number of players on the minecraft server"""
         if ctx.message.channel.name != "minecraft":
-            await self.bot.say("Please move to #minecraft for this command.")
+            await ctx.send("Please move to #minecraft for this command.")
         else:
             server = MinecraftServer.lookup(self.bot.mcip)
             try:
                 status = server.status()
             except IOError as e:
-                await self.bot.say("It's dead Jim.")
+                await ctx.send("It's dead Jim.")
             # try:
             #     query = server.query()
             # except Sock as e:
@@ -159,20 +163,20 @@ class Info():
             em = discord.Embed(title='CSSS FTB Server Status', description=
             """The server has {0} players and replied in {1} ms.\n""".format(status.players.online, status.latency), colour=0x3D85C6 )
             # + "\n{} are currently online.".format(", ".join(query.players.names)), colour=0x3D85C6)
-            await self.bot.send_message(ctx.message.channel, embed=em)
+            await ctx.send(embed=em)
 
     @commands.command(pass_context = True)
     async def info(self, ctx):
         """Display the minecraft server information"""
         if ctx.message.channel.name != "minecraft":
-            await self.bot.say("Please move to #minecraft for this command.")
+            await ctx.send("Please move to #minecraft for this command.")
         else:
             em = discord.Embed(title='CSSS FTB Server Information', description="""IP: 172.93.48.238
     Modpack:  FTB Infinity 2.7 (Not 3.0 !)
     Minecraft: 1.7.10
     Cracked: YES
     See pinned message to download cracked client.""", colour=0x3D85C6)
-            await self.bot.send_message(ctx.message.channel, embed=em)
+            await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(Info(bot))

@@ -15,18 +15,19 @@ class Announce:
         Restricted command
         """
         author = ctx.message.author
-        if author.permissions_in(ctx.message.channel).manage_channels or author.server_permissions.manage_channels:
+        if author.permissions_in(ctx.message.channel).manage_channels or author.guild_permissions.manage_channels:
 
             try:
                 color = author.colour
             except Exception:
                 color = discord.Colour(r.randrange(0xffffff))
-            embed = discord.Embed(title = title, description = desc, color = color, timestamp = datetime.datetime.utcnow())
+            embed = discord.Embed(title = title, description=desc, color = color, timestamp = datetime.datetime.utcnow())
             embed.set_thumbnail(url=author.avatar_url)
             embed.set_author(name=author.display_name, icon_url = author.avatar_url)
-            await self.bot.say(embed = embed)
+            await ctx.send(embed=embed)
         try:
-            await self.bot.delete_message(ctx.message)
+            await ctx.message.delete()
+            #await self.bot.delete_message(ctx.message)
         except Exception:
             #thats ok
             print("Not allowed to delete message")
@@ -39,7 +40,7 @@ class Announce:
         Restricted command
         """
         author = ctx.message.author
-        if author.permissions_in(ctx.message.channel).manage_channels or author.server_permissions.manage_channels:
+        if author.permissions_in(ctx.message.channel).manage_channels or author.guild_permissions.manage_channels:
 
             try:
                 color = author.colour
@@ -52,9 +53,10 @@ class Announce:
             embed = discord.Embed(description = string, color = color)
             #embed.set_thumbnail(url=author.avatar_url)
             embed.set_author(name=author.display_name, icon_url = author.avatar_url)
-            await self.bot.say(embed = embed)
+            await ctx.send(embed=embed)
         try:
-            await self.bot.delete_message(ctx.message)
+            await ctx.message.delete()
+            #await self.bot.delete_message(ctx.message)
         except Exception:
             #thats ok
             print("Not allowed to delete message")

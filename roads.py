@@ -8,8 +8,8 @@ class Roads:
         self.bot = bot
 
 
-    @commands.command()
-    async def roads(self, *args):
+    @commands.command(pass_context=True)
+    async def roads(self, ctx, *args):
         """Display road conditions for SFU
         Usage: roads <city>
         """
@@ -19,7 +19,7 @@ class Roads:
             text = road.conditions()
 
         text += road.announcements()
-        await self.bot.say("```" + text+ "```")
+        await ctx.send("```" + text+ "```")
 
 
 

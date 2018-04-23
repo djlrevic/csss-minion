@@ -17,11 +17,11 @@ class Classes():
 
         course = course.lower()
         dupe = False
-        for j in range(0, len(ctx.message.server.roles)):
-            if ctx.message.server.roles[j].name == course:
+        for j in range(0, len(ctx.message.guild.roles)):
+            if ctx.message.guild.roles[j].name == course:
                 dupe = True
         if dupe == True:
-            await self.bot.say("Class already exists")
+            await ctx.send("Class already exists")
         else:
             # temp value
             flag = True
@@ -32,11 +32,13 @@ class Classes():
             #     if ctx.message.author.roles[i].name == "Regular":
             #         flag = True
             if flag == True:
-                newRole = await self.bot.create_role(ctx.message.server, name = course, mentionable = True)# , hoist = True)
-                await self.bot.add_roles(ctx.message.author, newRole)
-                await self.bot.say(course+" class has been created. You have been placed in it.")
+                newRole = await ctx.message.guild.create_role(name=course, mentionable=True)
+                #newRole = await self.bot.create_role(ctx.message.guild, name = course, mentionable = True)# , hoist = True)
+                await ctx.message.author.add_roles(newRole, reason='using courses')
+                #await self.bot.add_roles(ctx.message.author, newRole)
+                await ctx.send(course+" class has been created. You have been placed in it.")
             else:
-                await self.bot.say("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
+                await ctx.send("You need to be level 10 and above to create classes! My master said this is to reduce spam.")
 
     @commands.command(pass_context = True)
     async def whois(self, ctx, course):
@@ -44,17 +46,17 @@ class Classes():
         Usage: whois <someclass>
         """
         get = 0
-        for i in ctx.message.server.roles:
+        for i in ctx.message.guild.roles:
             if i.name == course:
                 get = i
         if get == 0:
             # not role specified not found
-            await self.bot.say("That course doesn't exist!")
+            await ctx.send("That course doesn't exist!")
         else:
             # role specified is found
             # await self.bot.say("Found {}".format(get.name))
             people = []
-            for i in ctx.message.server.members:
+            for i in ctx.message.guild.members:
                 if get in i.roles:
                     if i.nick == None:
                         people.append(i.name)
@@ -62,13 +64,13 @@ class Classes():
                         people.append(i.nick)
             if len(people) == 0:
                 # no users found in that group
-                await self.bot.say("No one in this group!")
+                await ctx.send("No one in this group!")
             else:
                 result = "```I found these people: \n \n"
                 for i in people:
                     result += str(i) + "\n"
                 result += "```"
-                await self.bot.say(result)
+                await ctx.send(result)
 
     # Remove user from role
     @commands.command(pass_context = True)
@@ -82,10 +84,11 @@ class Classes():
             if course == ctx.message.author.roles[i].name:
                 found = i
         if found == 0:
-            await self.bot.say("You are not currently in this class.")
+            await ctx.send("You are not currently in this class.")
         else:
-            await self.bot.remove_roles(ctx.message.author, ctx.message.author.roles[found])
-            await self.bot.say("You've been removed from " + course)
+            await ctx.message.author.remove_roles(ctx.message.author.roles[found], reason='used the iamn command')
+            #await self.bot.remove_roles(ctx.message.author, ctx.message.author.roles[found])
+            await ctx.send("You've been removed from " + course)
 
     @commands.command(pass_context = True)
     async def iam(self, ctx, course : str):
@@ -93,18 +96,19 @@ class Classes():
         Usage: iam <someclass>
         """
         course = course.lower()
-        for role in ctx.message.server.roles:
+        for role in ctx.message.guild.roles:
             if course == role.name:
                 # found a match
                 if int(role.id) in FROZEN_ROLES:
-                    await self.bot.say("This role is locked.")
+                    await ctx.send("This role is locked.")
                     return
                 else:
                     print(role.id)
-                    await self.bot.add_roles(ctx.message.author, role)
-                    await self.bot.say("You've been placed in "+ course)
+                    await ctx.message.author.add_roles(role, reason='used the iam command')
+                    #await self.bot.add_roles(ctx.message.author, role)
+                    await ctx.send("You've been placed in "+ course)
                     return
-        await self.bot.say("This class doesn't exist. Try creating it with .newclass name")
+        await ctx.send("This class doesn't exist. Try creating it with .newclass name")
 
 def setup(bot):
     bot.add_cog(Classes(bot))

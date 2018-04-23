@@ -8,8 +8,8 @@ class Outlines:
         self.bot = bot
 
 
-    @commands.command()
-    async def outline(self, *args):
+    @commands.command(pass_context=True)
+    async def outline(self, ctx, *args):
         """Display an SFU course's outline
         Usage: outline <department> <number> (section) (year) (semester)
         """
@@ -37,7 +37,7 @@ class Outlines:
                 embed.add_field(name = key.title(), value = entry, inline = False)
         if len(keys) != 1:
             embed.add_field(name = "URL", value = "[here](https://www.sfu.ca/outlines.html?" + data[0].lower()+ ")")
-        await self.bot.say( embed=embed)
+        await ctx.send( embed=embed)
 
 
 def setup(bot):

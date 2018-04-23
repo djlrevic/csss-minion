@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from discord.ext import commands
 
 AVOID = ['342891382584770560', '300564141096304650', '360722519860445184', '312038519294001152', '321832332279676928']
@@ -6,12 +7,34 @@ AVOID = ['342891382584770560', '300564141096304650', '360722519860445184', '3120
 class Modtools:
   def __init__(self, bot):
     self.bot = bot
+    self.muted_role = 349848771007348738  # for testing server
+    # self.muted_role =  # for csss server
 
+
+
+  def purge_predicate(self, message):
+      """A check on each message to be purged."""
+      return self.minion(message.author)
+
+  # will delete the mentioned person's messages
+  @commands.command(pass_context=True)
+  async def purge(self, ctx, *msg):
+      return False  # disable command for now
+      await ctx.send('test')
+      #ch = ctx.message.mentions[0]
+      await ctx.channel.purge(check=self.purge_predicate)
+      await ctx.send('done')
+
+
+
+
+  
+  # Adds the "muted" permissions to all channels
   @commands.command(pass_context=True)
   async def propagateMute(self, ctx):
     if self.bot.Henry(ctx):
       for role in ctx.message.server.roles:
-        if role.id == '338575090847580160':
+        if role.id == self.muted_role:
           MUTED_ROLE = role
 
       overwrite = discord.PermissionOverwrite()
@@ -49,20 +72,20 @@ class Modtools:
   @commands.command(pass_context=True)
   async def unlock(self, ctx):
     """Unlocks the current channel."""
-    if self.minion(ctx):
-      for role in ctx.message.server.roles:
-        if role.id == '338575090847580160':
-          MUTED_ROLE = role
-      everyone = []
-      for user in ctx.message.server.members:
-        if ctx.message.channel.permissions_for(user).send_messages:
-          everyone.append(user)
-      for user in everyone:
-        if MUTED_ROLE in user.roles:
-          await self.bot.remove_roles(user, MUTED_ROLE)
-      await self.bot.say("Unlocking Channel")
+    if self.minion(ctx.message.author):
+        for role in ctx.message.guild.roles:
+            if role.id == self.muted_role:
+                MUTED_ROLE = role
+        everyone = []
+        for user in ctx.message.guild.members:
+            if ctx.message.channel.permissions_for(user).send_messages:
+                everyone.append(user)
+        for user in everyone:
+            if MUTED_ROLE in user.roles:
+                await self.bot.remove_roles(user, MUTED_ROLE)
+        await ctx.send("Unlocking Channel")
     else:
-      await self.bot.say("You ain't no mod, shoo!")
+      await ctx.send("You ain't no mod, shoo!")
 
   async def ch_perms(self, channel, user, value):
     """Helper function"""
@@ -74,30 +97,37 @@ class Modtools:
   async def unrestrict(self, ctx, *msg):
     """Undo any restrictions on a user for all channels.
     Usage: !unrestrict [users..]
+    Removes the MUTED role from a user
     """
-    if self.minion(ctx):
-      channels = ctx.message.server.channels
+    if self.minion(ctx.message.author):
+      for role in ctx.message.guild.roles:
+        if role.id == self.muted_role:
+          MUTED_ROLE = role
+      channels = ctx.message.guild.channels
       for user in ctx.message.mentions:
-        await self.bot.say("Unrestricting user "+user.name)
+        await ctx.send("Unrestricting user "+user.name)
         for ch in channels:
-          await self.ch_perms(ch, user, None) #None sets to default(inherited) value.
+          await ctx.message.mentions[0].remove_roles(MUTED_ROLE, reason='no longer being a dingus')
+          #await self.ch_perms(ch, user, None) #None sets to default(inherited) value.
     else:
-      await self.bot.say("You ain't no mod, shoo!")
+      await ctx.send("You ain't no mod, shoo!")
 
   @commands.command(pass_context=True)
   async def restrict(self, ctx):
-    if self.minion(ctx):
-      for role in ctx.message.server.roles:
-        if role.id == '338575090847580160':
+    """Basically just gives the MUTED role to a user"""
+    if self.minion(ctx.message.author):  # only runs if the command issuer is a minion
+      for role in ctx.message.guild.roles:
+        if role.id == self.muted_role:
           MUTED_ROLE = role
-      await self.bot.add_roles(ctx.message.mentions[0], MUTED_ROLE)
-      await self.bot.say("{} has been muted.".format(ctx.message.mentions[0].mention))
+      await ctx.message.mentions[0].add_roles(MUTED_ROLE, reason='for being dumb')
+      await ctx.send("{} has been muted.".format(ctx.message.mentions[0].mention))
     else:
-      await self.bot.say("You ain't no mod, shoo!")
+      await ctx.send("You ain't no mod, shoo!")
 
-  def minion(self, ctx):
-    for role in ctx.message.author.roles:
-      if "314296819272122368" == role.id:
+  def minion(self, author):
+    for role in author.roles:
+      if 349833623463002113 == role.id: # testing server
+      #if "314296819272122368" == role.id:  # csss server
         return True
     return False
 
@@ -117,7 +147,7 @@ class Modtools:
       embed = discord.Embed(description = string, color = color, title="An Echo From the Heavens Says...", footer="Moderator Warning")
       embed.set_author(name=author.display_name, icon_url = author.avatar_url)
       embed.set_footer(text="Moderator Warning")
-      await self.bot.say(embed=embed)
+      await ctx.send(embed=embed)
     try:
       await self.bot.delete_message(ctx.message)
     except Exception:
@@ -128,14 +158,15 @@ class Modtools:
     """Clear set amount of messages
     """
     if len(ctx.message.mentions) > 0:
-      send_msg = await self.bot.say("Feature coming. Bug Henry.")
+      send_msg = await ctx.send("Feature coming. Bug Henry.")
       # await self.bot.purge_from(ctx.message.channel, limit = 50, check=is_me)
     else:
-      await self.bot.purge_from(ctx.message.channel, limit = amount, check=True)
-      send_msg = await self.bot.say("{} message(s) has been deleted.".format(amount))
+      if(str.isdigit(amount)):
+        await ctx.channel.purge(limit=int(amount))
+        send_msg = await ctx.send("{} message(s) has been deleted.".format(amount))
 
     await asyncio.sleep(3)
-    await self.bot.delete_message(send_msg)
+    await send_msg.delete()
 
 def setup(bot):
   bot.add_cog(Modtools(bot))

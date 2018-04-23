@@ -6,6 +6,8 @@ wordart_dir/*
 __pycache__
 logs.txt
 remindmedb
+.idea/*
+.idea
 
 # exception to rules
 !wordart_dir/.gitkeep

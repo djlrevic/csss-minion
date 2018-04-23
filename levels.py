@@ -32,7 +32,7 @@ class Levels:
       await asyncio.sleep(1)
 
   # Check if author is currently on cooldown
-  def validate(self, message):
+  def validate(self, message, ctx):
     for item in self.expQueue:
       if message.author.id == item[0]:
         # author on cooldown
@@ -42,12 +42,12 @@ class Levels:
     self.expQueue.append([message.author.id, time.time()])
     return True
 
-  async def on_message(self, message):
-    if self.validate(message):
-      await self.add(message)
+  async def on_message(self, message, ctx):
+    if self.validate(message, ctx):
+      await self.add(message, ctx)
 
   # handles adding new users and updating existing user exp to database
-  async def add(self, message):
+  async def add(self, message, ctx):
     database = 'experience'
     entry = self.db_select(database, message.author.id)
     exp_amount = random.randint(15, 25)
@@ -55,13 +55,13 @@ class Levels:
       # user not in database
       # print("entry added to db")
       print('{} added to db, gaining {} exp.'.format(message.author.name, exp_amount))
-      self.db_insert(database, ['name', 'user_id', 'exp', 'level', 'true_experience'], [message.author.name, message.author.id, exp_amount, self.currentLevel(exp_amount), exp_amount])
+      self.db_insert(database, ['name', 'user_id', 'exp', 'level', 'true_experience'], [message.author.name, message.author.id, exp_amount, self.currentLevel(exp_amount, ctx), exp_amount])
     else:
       list(entry)
       if self.changeInLevel(exp_amount, entry[3], entry[4]) == 'levelup':
         # user's levelled up
-        self.db_update(database, 'level', self.currentLevel(entry[3]), 'user_id', message.author.id)
-        await self.bot.send_message(message.channel, "{} has leveled up to {}".format(message.author.name, self.currentLevel(entry[3])))
+        self.db_update(database, 'level', self.currentLevel(entry[3], ctx), 'user_id', message.author.id)
+        await self.bot.send_message(message.channel, "{} has leveled up to {}".format(message.author.name, self.currentLevel(entry[3], ctx)))
 
       # if changeInLevel(exp_amount, entry[3], entry[4]) == 'leveldown':
       #   # user's levelled down
@@ -73,15 +73,15 @@ class Levels:
       self.db_update(database, 'exp', entry[3]+exp_amount, 'user_id', message.author.id)
       self.db_update(database, 'true_experience', entry[3]+exp_amount, 'user_id', message.author.id)
 
-  def changeInLevel(self, change, experience, currLevel):
+  def changeInLevel(self, change, experience, currLevel, ctx):
     curr_experience = experience + change
-    new_level = self.currentLevel(experience)
+    new_level = self.currentLevel(experience, ctx)
     if new_level > currLevel:
       # user has leveled up
       return 'levelup'
 
   # outputs closest level based on total experience
-  def currentLevel(self, experience):
+  def currentLevel(self, experience, ctx):
     if experience is 0:
       return 0
     # grab the template experience list from database
@@ -91,7 +91,7 @@ class Levels:
       if experience <= level[1]:
         return level[0]-1
     # should never reach here, error out with -1
-    self.bot.say("Something went wrong.")
+    ctx.send("Something went wrong.")
     return -1
 
   # outputs current exp for level (not total exp)
@@ -124,7 +124,7 @@ class Levels:
     embed.add_field(name="Rank", value="{}/{}".format(rank, totalUsers), inline=True)
     embed.add_field(name="Level", value=level, inline=True)
     embed.add_field(name="Experience", value="{} / {} XP [{} total]".format(int(currentExperience), int(nextLevel), int(totalExperience)), inline=True)
-    await self.bot.say(embed=embed)
+    await ctx.send(embed=embed)
 
   @commands.command(pass_context = True)
   async def levels(self, ctx):

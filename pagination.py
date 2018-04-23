@@ -5,7 +5,7 @@ class CannotPaginate(Exception):
     pass
 
 class Pages:
-    def __init__(self, bot, *, message, entries, per_page=12):
+    def __init__(self, bot, *, message, ctx, entries, per_page=12):
         self.bot = bot
         self.entries = entries
         self.message = message
@@ -27,9 +27,9 @@ class Pages:
             ('\N{INFORMATION SOURCE}', self.show_help),
         ]
 
-        server = self.message.server
-        if server is not None:
-            self.permissions = self.message.channel.permissions_for(server.me)
+        guild = self.message.guild
+        if guild is not None:
+            self.permissions = self.message.channel.permissions_for(guild.me)
         else:
             self.permissions = self.message.channel.permissions_for(self.bot.user)
 
@@ -40,27 +40,25 @@ class Pages:
         base = (page - 1) * self.per_page
         return self.entries[base:base + self.per_page]
 
-    async def show_page(self, page, *, first=False):
+    async def show_page(self, page, *, first=False, ctx):
         self.current_page = page
         entries = self.get_page(page)
         p = []
         for t in entries:
             p.append(t)
-        if len(p) < 3:
-            p.append(True)
 
         self.embed.set_footer(text='Page %s/%s (%s entries)' % (page, self.maximum_pages, len(self.entries)))
 
         if not self.paginating:
             self.embed.clear_fields()
             for i in p:
-                self.embed.add_field(name = i[0], value = i[1], inline = i[2])
-            return await self.bot.send_message(self.message.channel, embed=self.embed)
+                self.embed.add_field(name = i[0], value = i[1])
+            return await ctx.send( embed=self.embed)
 
         if not first:
             self.embed.clear_fields()
             for i in p:
-                self.embed.add_field(name = i[0], value = i[1], inline = i[2])
+                self.embed.add_field(name = i[0], value = i[1])
             await self.bot.edit_message(self.message, embed=self.embed)
             return
 
@@ -75,7 +73,7 @@ class Pages:
 
         self.embed.clear_fields()
         for i in p:
-            self.embed.add_field(name = i[0], value = i[1], inline = i[2])
+            self.embed.add_field(name = i[0], value = i[1])
         self.message = await self.bot.send_message(self.message.channel, embed=self.embed)
         for (reaction, _) in self.reaction_emojis:
             if self.maximum_pages == 2 and reaction in ('\u23ed', '\u23ee'):
@@ -86,31 +84,31 @@ class Pages:
 
             await self.bot.add_reaction(self.message, reaction)
 
-    async def checked_show_page(self, page):
+    async def checked_show_page(self, page, ctx):
         if page != 0 and page <= self.maximum_pages:
             await self.show_page(page)
 
-    async def first_page(self):
+    async def first_page(self, ctx):
         """goes to the first page"""
-        await self.show_page(1)
+        await self.show_page(1, ctx)
 
-    async def last_page(self):
+    async def last_page(self, ctx):
         """goes to the last page"""
-        await self.show_page(self.maximum_pages)
+        await self.show_page(self.maximum_pages, ctx)
 
-    async def next_page(self):
+    async def next_page(self, ctx):
         """goes to the next page"""
-        await self.checked_show_page(self.current_page + 1)
+        await self.checked_show_page(self.current_page + 1, ctx)
 
-    async def previous_page(self):
+    async def previous_page(self, ctx):
         """goes to the previous page"""
-        await self.checked_show_page(self.current_page - 1)
+        await self.checked_show_page(self.current_page - 1, ctx)
 
-    async def show_current_page(self):
+    async def show_current_page(self, ctx):
         if self.paginating:
-            await self.show_page(self.current_page)
+            await self.show_page(self.current_page, ctx)
 
-    async def numbered_page(self):
+    async def numbered_page(self, ctx):
         """lets you type a page number to go to"""
         to_delete = []
         to_delete.append(await self.bot.send_message(self.message.channel, 'What page do you want to go to?'))
@@ -120,7 +118,7 @@ class Pages:
             page = int(msg.content)
             to_delete.append(msg)
             if page != 0 and page <= self.maximum_pages:
-                await self.show_page(page)
+                await self.show_page(page, ctx)
             else:
                 to_delete.append(await self.bot.say('Invalid page given. (%s/%s)' % (page, self.maximum_pages)))
                 await asyncio.sleep(5)
