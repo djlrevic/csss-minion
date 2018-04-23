@@ -194,7 +194,7 @@ async def update():
       f.flush()
       line = f.readline()
       while line:
-        await bot.send_message(bot.get_channel('321832332279676928'), line)
+        #await ctx.send(bot.get_channel('321832332279676928'), line)  # use something else other than bot.say
         line = f.readline()
       await asyncio.sleep(1)
 

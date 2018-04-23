@@ -8,6 +8,7 @@ logs.txt
 remindmedb
 .idea/*
 .idea
+bot.py
 
 # exception to rules
 !wordart_dir/.gitkeep
