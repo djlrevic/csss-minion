@@ -18,6 +18,9 @@ from io import StringIO
 import logging
 from pagination import Pages
 
+
+"""This is a quick and easy bot main file you can use to test the bot"""
+
 configFile = "botMain.settings"
 
 #check if config file exists, if not, input manually
