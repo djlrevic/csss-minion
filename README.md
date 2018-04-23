@@ -35,23 +35,41 @@ pagination, probably horribly broken
 
 
 modtools  # working as long as Henry defines wanted behavior
+
 dictionary  # working
+
 web # working
+
 memes # working
+
 poem # could use a rewrite, but working
+
 sfusearch #working
+
 translate # works
+
 remindme  # works
+
 wordart  # works
+
 tunes  # not working, replace with music cog REWRITE
+
 outlines  # working
+
 misc  # working
+
 announce  # works perfectly
+
 roads  # working
+
 classes  # working
+
 rtbf # errors out but appears to work
 
 music  # works well enough, doesn't delete music file
+
 levels  # probably going to break horribly due to ctx in onmessage
+
 info  # working, needs testing in actual MC channel
+
 devtools # not sure how it should work, will work once pagination does.

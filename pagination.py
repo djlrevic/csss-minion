@@ -36,6 +36,7 @@ class Pages:
         if not self.permissions.embed_links:
             raise CannotPaginate('Bot does not have embed links permission.')
 
+
     def get_page(self, page):
         base = (page - 1) * self.per_page
         return self.entries[base:base + self.per_page]
