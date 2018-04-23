@@ -20,7 +20,7 @@ class Levels:
     # creating a 2D empty array for exp queues
     self.expQueue = []
     self.EXP_COOLDOWN_TIMER = 60 #seconds
-    self.bot.loop.create_task(self.update_exp())
+    await self.bot.loop.create_task(self.update_exp())
 
   # used to update the queue
   async def update_exp(self):

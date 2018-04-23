@@ -16,7 +16,7 @@ import sys
 
 
 class Remindme:
-    
+
     def __init__(self, bot):
         self.bot = bot
         self.remindmelist = list()
@@ -27,17 +27,17 @@ class Remindme:
         c.close()
         self.mass_populate()
         main_loop = asyncio.get_event_loop()
-        main_loop.create_task(self.loop_remindme())
+        await main_loop.create_task(self.loop_remindme())
         if __main__.__file__ == "bot.py":
             self.remindmechannel = "304837708650643459" #testing channel
         else:
             self.remindmechannel = "228761314644852736"  #production channel
 
-    async def loop_remindme(self):    
+    async def loop_remindme(self):
         """This loop is subscribed to check the time.
         note, the while loop might be redundant.
-        
-        """   
+
+        """
         dt = datetime.datetime
         await asyncio.sleep(5)
         while True:
@@ -48,10 +48,10 @@ class Remindme:
                 #print(item)
                 if now > item[2]:
                     await self.notify_user(item[0],item[1], item[3])
-                    self.remindmelist.remove(item)  
+                    self.remindmelist.remove(item)
                     self.remove_from_db(item)
-            await asyncio.sleep(5)        
-        
+            await asyncio.sleep(5)
+
         # must pass in year, month, day for datetime.
     @commands.command(pass_context=True)
     async def remindme(self, ctx, *word:str):
@@ -70,10 +70,10 @@ class Remindme:
         self.add_to_queue(ctx.message.author.id, msg, time, ctx.message.channel.id)
         #print(self.bot.get_user_info(173177975045488640))
         await self.bot.send_message(ctx.message.channel, "Remembering: "+msg+" until "+str(time) + " for "+ ctx.message.author.name)
-   
+
     @commands.command(pass_context=True)
     async def remindmein(self, ctx, *word:str):
-        """usage: remindmein 2 days 'do that thing' 
+        """usage: remindmein 2 days 'do that thing'
         """
         unit = int(word[0])
         unittype = word[1]
@@ -88,14 +88,14 @@ class Remindme:
         self.add_to_storage(ctx.message.author.id, msg, time, ctx.message.channel.id)
         self.add_to_queue(ctx.message.author.id, msg, time, ctx.message.channel.id)
         await self.bot.send_message(ctx.message.channel, "Remembering: "+msg+" until "+str(time)[:19] + " for "+ ctx.message.author.name)
-        
-    
+
+
     @commands.command(pass_context=True)
     async def allreminders(self, ctx):
         """list all the active reminders."""
         await self.bot.say(self.remindmelist)
-        
-        
+
+
     @commands.command(pass_context=True)
     async def myreminders(self, ctx):
         """list only user's reminders"""
@@ -106,18 +106,18 @@ class Remindme:
                 userlist.append(item)
         await self.bot.say(userlist)
 
- 
-    
+
+
     async def notify_user(self, userid, msg, channel):
         """send the message to remind the user"""
-        user = await self.bot.get_user_info(userid) 
+        user = await self.bot.get_user_info(userid)
         #mgiht break here
-        try:    
+        try:
             await self.bot.send_message(self.bot.get_channel(channel),user.mention+"\nReminder: "+msg)
         except:
             await self.bot.send_message(self.bot.get_channel(self.remindmechannel),user.mention+"\nReminder: "+msg)
-        
-        
+
+
     def mass_populate(self):
         """retrieve all reminders from SQLite database and populate queue."""
         c = self.remindmedb.cursor()
@@ -126,8 +126,8 @@ class Remindme:
         for item in alist:
             self.add_to_queue(item[0],item[1],item[2], item[3])
         c.close()
-        
-        
+
+
     def add_to_storage(self, userid, msg, time, channel):
         """store in database so you can populate later."""
         c = self.remindmedb.cursor()
@@ -135,13 +135,13 @@ class Remindme:
         c.execute("INSERT INTO remindme VALUES (?,?,?,?)", data)
         self.remindmedb.commit()
         c.close()
-        
-        
-    def add_to_queue(self, userid, msg, time, channel):    
+
+
+    def add_to_queue(self, userid, msg, time, channel):
         """add to list so you can remember now."""
         self.remindmelist.append((userid, msg, time, channel))
-    
-    
+
+
     def remove_from_db(self, item):
         """delete entry from database once a user is reminded"""
         c = self.remindmedb.cursor()
@@ -149,9 +149,9 @@ class Remindme:
         c.execute("DELETE FROM remindme WHERE user_id = ? AND msg = ? AND datetime = ?", data)
         self.remindmedb.commit()
         c.close()
-        
-        
-        
+
+
+
     def parse_time(self, times): # make this more impressive in the future
         """Take the non-standard input and decode into standard datetime format.
         Return the time, False if no translation."""
@@ -165,16 +165,16 @@ class Remindme:
             year, month, day, hour = times
             return datetime.datetime(int(year),int(month),int(day),int(hour)).isoformat(' ')
         elif length < 6:
-            year, month, day, hour, minute = times 
+            year, month, day, hour, minute = times
             return datetime.datetime(int(year),int(month),int(day),int(hour),int(minute)).isoformat(' ')
         elif length < 7:
-            year, month, day, hour, minute, second = times   
+            year, month, day, hour, minute, second = times
             return datetime.datetime(int(year),int(month),int(day),int(hour),int(minute),int(second)).isoformat(' ')
         else:
             year, month, day, hour, minute, second, microsecond = times
-            return datetime.datetime(int(year),int(month),int(day),int(hour),int(minute),int(second),int(microsecond)).isoformat(' ')   
-            
-            
+            return datetime.datetime(int(year),int(month),int(day),int(hour),int(minute),int(second),int(microsecond)).isoformat(' ')
+
+
     async def parse_time_relative(self, unit, unittype):
         now = datetime.datetime.now()
         unit = int(round(unit))
@@ -197,8 +197,8 @@ class Remindme:
             await self.bot.say("There is no proper unit type, warning!\nyear(s), month(s), week(s), day(s), hour(s), minute(s), and second(s) are accepted time units.")
             return False
             #future = now
-        return future.isoformat(' ')                  
-        
-        
+        return future.isoformat(' ')
+
+
 def setup(bot):
-    bot.add_cog(Remindme(bot))        
+    bot.add_cog(Remindme(bot))
