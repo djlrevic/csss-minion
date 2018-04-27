@@ -9,6 +9,26 @@ class Misc():
         global wClient
         wClient = wolframalpha.Client(wolframid)
 
+    async def on_member_join(self, member):
+        message = """Hi, welcome to the SFU CSSS Discord Server.
+        We are a group of students who live to talk about classes and nerdy stuff.
+        If you need help, please ping any of our Execs, Execs at large, or First Year Reps.
+        
+        Our general channels include some of the following:
+        #off-topic, where we discuss damn near anything.
+        #first-years, for students who are starting, or about to start their first year.
+        #discussion, for serious non-academic discussion. (Politics et al.)
+        #sfu-discussions, for all SFU related discussion.
+        #projects_and_dev, for non-academic tech/dev/project discussion.
+        #bot_commands_and_misc, for command testing to reduce spam on other channels.
+        
+        
+        We also have a smattering of course specific Academic channels.
+        You can give yourself a class role by running <.iam cmpt320> or create a new class by <.newclass cmpt316>
+        Please keep Academic Honesty in mind when discussing course material here.
+        """
+        await member.send(message)
+
     @commands.command(pass_context=True)
     async def poll(self, ctx, *args):
         """Create an instant poll
