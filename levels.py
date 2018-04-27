@@ -31,9 +31,9 @@ class Levels():
 
     def validate(self, message, ctx):  # print("entry expired")
         for item in self.expQueue:
-            if message.author.id == item[0]:
+            if str(message.author.id) == str(item[0]):
                 return False
-        self.expQueue.append([message.author.id, time.time()])  # Check if author is currently on cooldown
+        self.expQueue.append([str(message.author.id), time.time()])  # Check if author is currently on cooldown
         return True
 
     async def on_message(self, message, ctx):
@@ -43,24 +43,24 @@ class Levels():
 
     async def add(self, message, ctx):  # print("entry added to queue")
         database = 'experience'
-        entry = self.db_select(database, message.author.id)
+        entry = self.db_select(database, str(message.author.id))
         exp_amount = random.randint(15, 25)
         if entry == None:
             print('{} added to db, gaining {} exp.'.format(message.author.name, exp_amount))
             self.db_insert(
                 database, ['name', 'user_id', 'exp', 'level', 'true_experience'],
-                [message.author.name, message.author.id, exp_amount,
+                [message.author.name, str(message.author.id), exp_amount,
                  self.currentLevel(exp_amount, ctx), exp_amount])
         else:
             list(entry)  # handles adding new users and updating existing user exp to database
             if self.changeInLevel(exp_amount, entry[3], entry[4]) == 'levelup':
-                self.db_update(database, 'level', self.currentLevel(entry[3], ctx), 'user_id', message.author.id)
+                self.db_update(database, 'level', self.currentLevel(entry[3], ctx), 'user_id', str(message.author.id))
                 await message.channel.send('{} has leveled up to {}'.format(message.author.name,
                                                                             self.currentLevel(entry[3], ctx)))
             print('{} gained {} exp.'.format(message.author.name, exp_amount))
-            self.db_update(database, 'exp', entry[3] + exp_amount, 'user_id', message.author.id)
+            self.db_update(database, 'exp', entry[3] + exp_amount, 'user_id', str(message.author.id))
             self.db_update(database, 'true_experience', entry[3] + exp_amount, 'user_id',
-                           message.author.id)  # user not in database
+                           str(message.author.id))  # user not in database
 # print("entry added to db")
 
     def changeInLevel(self, change, experience, currLevel, ctx):
@@ -97,7 +97,7 @@ class Levels():
             ctx.author = ctx.message.mentions[0]
         self.cur.execute(
             'SELECT * FROM (SELECT *, row_number() OVER(ORDER BY exp DESC) FROM experience) AS filter WHERE filter.user_id={}'.
-            format(ctx.author.id))
+            format(str(ctx.author.id)))
         res = list(self.cur.fetchone())
         self.cur.execute('SELECT count(*) from experience')  # grab the template experience list from database
         totalUsers = self.cur.fetchone()[0]
