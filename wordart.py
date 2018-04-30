@@ -118,12 +118,13 @@ class WordArt:
         
         r = list(filter(lambda x: x not in self.STOPWORDS, small))
         r = Counter(r).most_common()
-        msg = ""
+        msg = "```"
         for rank in r[:10]:
             msg += str(rank[1])            
             msg += "\t\t"
             msg += rank[0]
             msg += "\n"
+        msg += "```"
         await self.bot.embed_this_for_me(msg, ctx)
     
     @commands.command(pass_context=True)
@@ -136,12 +137,13 @@ class WordArt:
                 small.append(i)
         r = list(filter(lambda x: x not in self.STOPWORDS, small))
         r = Counter(r).most_common()
-        msg = ""
+        msg = "```"
         for rank in r[:10]:
             msg += str(rank[1])            
             msg += "\t\t"
             msg += rank[0]
             msg += "\n"
+        msg += "```"
         await self.bot.embed_this_for_me(msg, ctx)    
     
        
