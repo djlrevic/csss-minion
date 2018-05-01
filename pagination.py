@@ -60,7 +60,8 @@ class Pages:
             self.embed.clear_fields()
             for i in p:
                 self.embed.add_field(name = i[0], value = i[1])
-            await self.bot.edit_message(self.message, embed=self.embed)
+            await self.message.edit(embed=self.embed)
+            #await self.bot.edit_message(self.message, embed=self.embed)
             return
 
         # verify we can actually use the pagination session
@@ -75,7 +76,8 @@ class Pages:
         self.embed.clear_fields()
         for i in p:
             self.embed.add_field(name = i[0], value = i[1])
-        self.message = await self.bot.send_message(self.message.channel, embed=self.embed)
+        self.message = await ctx.send(self.message.channel, embed=self.embed)
+        #self.message = await self.bot.send_message(self.message.channel, embed=self.embed)
         for (reaction, _) in self.reaction_emojis:
             if self.maximum_pages == 2 and reaction in ('\u23ed', '\u23ee'):
                 # no |<< or >>| buttons if we only have two pages
@@ -83,7 +85,8 @@ class Pages:
                 # it from the default set
                 continue
 
-            await self.bot.add_reaction(self.message, reaction)
+            await self.message.add_reaction(reaction)
+          #  await self.bot.add_reaction(self.message, reaction)
 
     async def checked_show_page(self, page, ctx):
         if page != 0 and page <= self.maximum_pages:
@@ -112,9 +115,12 @@ class Pages:
     async def numbered_page(self, ctx):
         """lets you type a page number to go to"""
         to_delete = []
-        to_delete.append(await self.bot.send_message(self.message.channel, 'What page do you want to go to?'))
-        msg = await self.bot.wait_for_message(author=self.author, channel=self.message.channel,
-                                              check=lambda m: m.content.isdigit(), timeout=30.0)
+        to_delete.append(await ctx.send(self.message.channel, 'What page do you want to go to?'))
+        #to_delete.append(await self.bot.send_message(self.message.channel, 'What page do you want to go to?'))
+        msg = await self.bot.wait_for('message', author=self.author, channel=self.message.channel, check=lambda m: m.content.isdigit(), timeout=30.0)
+
+        #msg = await self.bot.wait_for_message(author=self.author, channel=self.message.channel,
+                                              #check=lambda m: m.content.isdigit(), timeout=30.0)
         if msg is not None:
             page = int(msg.content)
             to_delete.append(msg)
@@ -145,7 +151,8 @@ class Pages:
         e.description = '\n'.join(messages)
         e.colour =  0x738bd7 # blurple
         e.set_footer(text='We were on page %s before this message.' % self.current_page)
-        await self.bot.edit_message(self.message, embed=e)
+        await self.message.edit(embed=e)
+        #await self.bot.edit_message(self.message, embed=e)
 
         async def go_back_to_current_page():
             await asyncio.sleep(60.0)
@@ -155,7 +162,8 @@ class Pages:
 
     async def stop_pages(self):
         """stops the interactive pagination session"""
-        await self.bot.delete_message(self.message)
+        await self.message.delete()
+        #await self.bot.delete_message(self.message)
         self.paginating = False
 
     def react_check(self, reaction, user):
@@ -177,14 +185,16 @@ class Pages:
             if react is None:
                 self.paginating = False
                 try:
-                    await self.bot.clear_reactions(self.message)
+                    await self.message.clear_reactions()
+                    #await self.bot.clear_reactions(self.message)
                 except:
                     pass
                 finally:
                     break
 
             try:
-                await self.bot.remove_reaction(self.message, react.reaction.emoji, react.user)
+                await self.message.remove_reaction(react.reaction.emoji, react.user)
+                #await self.bot.remove_reaction(self.message, react.reaction.emoji, react.user)
             except:
                 pass # can't remove it so don't bother doing so
 
